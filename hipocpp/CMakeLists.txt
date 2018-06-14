@@ -1,0 +1,24 @@
+cmake_minimum_required(VERSION 3.9)
+
+add_library(hipocpp SHARED
+  src/data.cpp
+  src/dictionary.cpp
+  src/event.cpp
+  src/node.cpp
+  src/reader.cpp
+  src/record.cpp
+  src/text.cpp
+  src/utils.cpp
+  src/wrapper.cpp
+  src/writer.cpp
+  )
+set_target_properties(hipocpp PROPERTIES VERSION ${PROJECT_VERSION})
+
+target_include_directories(hipocpp PUBLIC include)
+
+install(TARGETS hipocpp
+    LIBRARY DESTINATION lib
+    PUBLIC_HEADER DESTINATION include/hipocpp
+    )
+
+
