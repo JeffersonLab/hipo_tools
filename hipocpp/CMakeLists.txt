@@ -14,6 +14,8 @@ add_library(hipocpp SHARED
   )
 set_target_properties(hipocpp PROPERTIES VERSION ${PROJECT_VERSION})
 
+target_link_libraries(hipocpp PUBLIC ${LZ4_LIBRARY})
+
 target_include_directories(hipocpp PUBLIC include)
 
 install(TARGETS hipocpp
