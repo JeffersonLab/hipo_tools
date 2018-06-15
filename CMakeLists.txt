@@ -13,6 +13,8 @@ add_subdirectory(hipocpp)
 
 add_executable(hipo examples/hipo.cpp)
 target_link_libraries(hipo hipocpp ${LZ4_LIBRARY})
+install(TARGETS hipo
+  RUNTIME DESTINATION bin)
 
 configure_file(hipocpp/hipocpp.pc.in hipocpp.pc @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/hipocpp.pc DESTINATION share/pkgconfig)
