@@ -1,9 +1,12 @@
 hipo-io
 =======
 
-This repo exists because `hipo-io` was not version controlled or publicly 
-available. Also, it now has a proper cmake build.
+[Documentation](https://userweb.jlab.org/~gavalian/docs/sphinx/hipo/html/index.html)
 
+This code was adopted from source code on the jlab CUE 
+`/group/clas12/packages/hipo-io`. This repo exists because `hipo-io` was not 
+version controlled or publicly available. Also, it now has a proper cmake 
+build.
 
 Installing
 ----------
