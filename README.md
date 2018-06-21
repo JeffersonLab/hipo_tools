@@ -19,6 +19,14 @@ cmake ../. -DCMAKE_INSTALL_PREFIX=$HOME
 make && make install
 ```
 
+### Some tips
+
+* Use the latest version of root with the latest compiler (e.g. gcc8)
+* Use **C++17** because you have no reason not to!
+* Compile root with "-Droot7:bool=ON -Dcxx17:BOOL=ON"
+* Don't write loops! Use [RDataFrame](https://root.cern.ch/doc/master/group__tutorial__dataframe.html)
+
+
 ### Install structure:
 
 ```
@@ -48,7 +56,9 @@ make && make install
         └── hipocpp.pc
 ```
 
-Converting files
+Converting hipo files
+---------------------
+
 
 
 
