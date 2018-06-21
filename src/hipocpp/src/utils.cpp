@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-#include "utils.h"
+#include "hipo/utils.h"
 
 
 namespace hipo {

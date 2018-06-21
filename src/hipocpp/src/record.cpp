@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-#include "record.h"
+#include "hipo/record.h"
 //#include "hipoexceptions.h"
 
 #ifdef __LZ4__

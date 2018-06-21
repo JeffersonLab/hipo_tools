@@ -4,8 +4,8 @@
  * and open the template in the editor.
  */
 
-#include "writer.h"
-#include "utils.h"
+#include "hipo/writer.h"
+#include "hipo/utils.h"
 
 namespace hipo {
 

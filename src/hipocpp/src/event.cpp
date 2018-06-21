@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-#include "event.h"
+#include "hipo/event.h"
 
 namespace hipo {
 

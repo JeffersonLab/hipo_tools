@@ -22,6 +22,14 @@ install(TARGETS hipocpp
     LIBRARY DESTINATION lib
     PUBLIC_HEADER DESTINATION include/hipocpp
     )
+install(
+    DIRECTORY
+    include/hipo
+    DESTINATION
+    include
+    FILES_MATCHING
+    PATTERN "*.h"
+)
 
 configure_file(hipocpp.pc.in hipocpp.pc @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/src/hipocpp/hipocpp.pc DESTINATION share/pkgconfig)

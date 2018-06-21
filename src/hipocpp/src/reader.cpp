@@ -3,9 +3,9 @@
  * (c) 2017.
  */
 
-#include "reader.h"
-#include "hipoexceptions.h"
-#include "record.h"
+#include "hipo/reader.h"
+#include "hipo/hipoexceptions.h"
+#include "hipo/record.h"
 
 #include <cstdlib>
 /**

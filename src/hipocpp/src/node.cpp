@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-#include "node.h"
+#include "hipo/node.h"
 
 namespace hipo {
 

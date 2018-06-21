@@ -4,8 +4,8 @@
  * and open the template in the editor.
  */
 
-#include "dictionary.h"
-#include "utils.h"
+#include "hipo/dictionary.h"
+#include "hipo/utils.h"
 #include <stdlib.h>
 
 namespace hipo {

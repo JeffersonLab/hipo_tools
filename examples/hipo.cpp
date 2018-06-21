@@ -14,13 +14,13 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "reader.h"
-#include "writer.h"
-#include "event.h"
-#include "node.h"
-#include "text.h"
-#include "data.h"
-#include "dictionary.h"
+#include "hipo/reader.h"
+#include "hipo/writer.h"
+#include "hipo/event.h"
+#include "hipo/node.h"
+#include "hipo/text.h"
+#include "hipo/data.h"
+#include "hipo/dictionary.h"
 
 using namespace std;
 
