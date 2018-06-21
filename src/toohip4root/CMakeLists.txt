@@ -51,22 +51,22 @@ install(
 #  PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/foo"
 #    COMPONENT dev)
 
-add_executable(toohipforroot src/toohipforroot.cxx)
+add_executable(toohip4root src/toohip4root.cxx)
 #target_compile_features(toohipforroot 
 #  PRIVATE cxx_std_17)
-target_include_directories(toohipforroot 
+target_include_directories(toohip4root 
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
   )
-target_link_libraries(toohipforroot
+target_link_libraries(toohip4root
   PRIVATE ${libname} stdc++fs
   PUBLIC hiporoot
   PUBLIC ${ROOT_LIBRARIES} 
   )
-add_dependencies(toohipforroot hipocpp)
-install(TARGETS toohipforroot
+add_dependencies(toohip4root hipocpp)
+install(TARGETS toohip4root
   EXPORT ${PROJECT_NAME}Targets
   RUNTIME DESTINATION bin)
 
