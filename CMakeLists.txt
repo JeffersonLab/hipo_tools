@@ -11,10 +11,7 @@ add_definitions(-D__LZ4__)
 
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS}/etc/cmake)
-find_package(ROOT REQUIRED COMPONENTS MathCore RIO Hist MathMore Graf Graf3d
-  Gpad GeomPainter RGL Gviz3d RGL Html GuiHtml
-   Eve EG Foam GenVector Geom Gui HistPainter MathCore Matrix MLP Net
-   Physics Spectrum Thread Tree TreeViewer)
+find_package(ROOT REQUIRED COMPONENTS Tree)
 include(${ROOT_USE_FILE})
 #add_definitions(${ROOT_CXX_FLAGS})
 ## extra root settings
@@ -26,6 +23,8 @@ include(cmake/root.cmake)
 add_subdirectory(src/hipocpp)
 include_directories(src/hipocpp/include)
 add_subdirectory(src/toohip4root)
+include_directories(src/hipocpp/include/hipo)
+add_subdirectory(src/hipo2root)
 
 add_executable(hipo examples/hipo.cpp)
 target_link_libraries(hipo hipocpp ${LZ4_LIBRARY})

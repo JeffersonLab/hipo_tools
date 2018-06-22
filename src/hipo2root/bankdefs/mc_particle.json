@@ -1,0 +1,233 @@
+[{
+    "bank": "REC::Event",
+    "group": 330,
+    "info": "Event Header Bank",
+    "items": [
+      { "name": "NRUN", "id": 1, "type": "int32", "info": "Run Number" },
+      { "name": "NEVENT", "id": 2, "type": "int32", "info": "Event Number" },
+      { "name": "EVNTime", "id": 3, "type": "float", "info": "Event Time" },
+      { "name": "TYPE", "id": 4, "type": "int8", "info": "Event Type (Data or MC)" },
+      { "name": "EvCAT", "id": 5, "type": "int16", "info": "Event Category, if >0:  e-, e-p, e-pi+....." },
+      { "name": "NPGP", "id": 6, "type": "int16", "info": "Number of Final (Timed-based) Reconstructed Particles*100 + Number of Geometrically Reconstructed Particles" },
+      { "name": "TRG", "id": 7, "type": "int64", "info": "Trigger Type (CLAS12_e-, FT_CLAS12_h, CLAS12_H,...) + Prescale Factor for that Trigger" },
+      { "name": "BCG", "id": 8, "type": "float", "info": "Faraday Cup Gated (Coulomb)" },
+      { "name": "LT", "id": 9, "type": "double", "info": "Clock" },
+      { "name": "STTime", "id": 10, "type": "float", "info": "Event Start Time (ns)" },
+      { "name": "RFTime", "id": 11, "type": "float", "info": "RF Time (ns)" },
+      { "name": "Helic", "id": 12, "type": "int8", "info": "Helicity of Event" },
+      { "name": "PTIME", "id": 13, "type": "float", "info": "Event Processing Time (UNIX Time = seconds)" }
+    ]
+  },
+  {
+    "bank": "REC::Particle",
+    "group": 331,
+    "info": "Reconstructed Particle Information",
+    "items": [
+      { "name": "pid", "id": 1, "type": "int32", "info": "particle id in LUND conventions" },
+      { "name": "px", "id": 2, "type": "float", "info": "x component of the momentum" },
+      { "name": "py", "id": 3, "type": "float", "info": "y component of the momentum" },
+      { "name": "pz", "id": 4, "type": "float", "info": "z component of the momentum" },
+      { "name": "vx", "id": 5, "type": "float", "info": "x component of the vertex" },
+      { "name": "vy", "id": 6, "type": "float", "info": "y component of the vertex" },
+      { "name": "vz", "id": 7, "type": "float", "info": "z component of the vertex" },
+      { "name": "charge", "id": 8, "type": "int8", "info": "particle charge" },
+      { "name": "beta", "id": 9, "type": "float", "info": "particle beta measured by TOF" },
+      { "name": "chi2pid", "id": 10, "type": "float", "info": "Chi2 of assigned PID" },
+      { "name": "status", "id": 11, "type": "int16", "info": "particle status (represents detector collection it passed)" }
+    ]
+  },
+  {
+    "bank": "REC::Calorimeter",
+    "group": 332,
+    "info": "Calorimeter Responses for Particles bank",
+    "items": [
+      { "name": "index", "id": 1, "type": "int16", "info": "index of the hit in the specific detector bank" },
+      { "name": "pindex", "id": 2, "type": "int16", "info": "row number in the particle bank hit is associated with" },
+      { "name": "detector", "id": 3, "type": "int8", "info": "Detector ID, defined in COATJAVA DetectorType" },
+      { "name": "sector", "id": 4, "type": "int8", "info": "Sector of the Detector hit" },
+      { "name": "layer", "id": 5, "type": "int8", "info": "Layer of the Detector hit" },
+      { "name": "energy", "id": 6, "type": "float", "info": "Energy associated with the hit" },
+      { "name": "time", "id": 7, "type": "float", "info": "Time associated with the hit" },
+      { "name": "path", "id": 8, "type": "float", "info": "Path from vertex to the hit position" },
+      { "name": "chi2", "id": 9, "type": "float", "info": "Chi2 (or quality) of hit-track matching" },
+      { "name": "x", "id": 10, "type": "float", "info": "X coordinate of the hit" },
+      { "name": "y", "id": 11, "type": "float", "info": "Y coordinate of the hit" },
+      { "name": "z", "id": 12, "type": "float", "info": "Z coordinate of the hit" },
+      { "name": "hx", "id": 13, "type": "float", "info": "X coordinate of the matched hit" },
+      { "name": "hy", "id": 14, "type": "float", "info": "Y coordinate of the mathced hit" },
+      { "name": "hz", "id": 15, "type": "float", "info": "Z coordinate of the matched hit" },
+      { "name": "lu", "id": 16, "type": "float", "info": "distance on U-side" },
+      { "name": "lv", "id": 17, "type": "float", "info": "distance on V-side" },
+      { "name": "lw", "id": 18, "type": "float", "info": "distance on W-side" },
+      { "name": "du", "id": 19, "type": "float", "info": "shower width on U-side" },
+      { "name": "dv", "id": 20, "type": "float", "info": "shower width on V-side" },
+      { "name": "dw", "id": 21, "type": "float", "info": "shower width on w-side" },
+      { "name": "m2u", "id": 22, "type": "float", "info": "2nd moment of the shower on U-side" },
+      { "name": "m2v", "id": 23, "type": "float", "info": "2nd moment of the shower on V-side" },
+      { "name": "m2w", "id": 24, "type": "float", "info": "2nd moment of the shower on W-side" },
+      { "name": "status", "id": 25, "type": "int16", "info": "hit status" }
+    ]
+  },
+  {
+    "bank": "REC::Cherenkov",
+    "group": 333,
+    "info": "Cherenkov Responses for Particles bank",
+    "items": [
+      { "name": "index", "id": 1, "type": "int16", "info": "index of the hit in the specific detector bank" },
+      { "name": "pindex", "id": 2, "type": "int16", "info": "row number in the particle bank hit is associated with" },
+      { "name": "detector", "id": 3, "type": "int8", "info": "Detector ID, defined in COATJAVA DetectorType" },
+      { "name": "sector", "id": 4, "type": "int8", "info": "Sector of the Detector hit" },
+      { "name": "nphe", "id": 5, "type": "float", "info": "Number of photoelectrons from Cherenkov radiation" },
+      { "name": "time", "id": 6, "type": "float", "info": "Time associated with the hit" },
+      { "name": "path", "id": 7, "type": "float", "info": "Path from vertex to the hit position" },
+      { "name": "chi2", "id": 8, "type": "float", "info": "Chi2 (or quality) of hit-track matching" },
+      { "name": "x", "id": 9, "type": "float", "info": "X coordinate of the hit" },
+      { "name": "y", "id": 10, "type": "float", "info": "Y coordinate of the hit" },
+      { "name": "z", "id": 11, "type": "float", "info": "Z coordinate of the hit" },
+      { "name": "theta", "id": 12, "type": "float", "info": "Theta of the matched hit" },
+      { "name": "phi", "id": 13, "type": "float", "info": "Phi of the mathced hit" },
+      { "name": "dtheta", "id": 14, "type": "float", "info": "Expected Theta Resolution" },
+      { "name": "dphi", "id": 15, "type": "float", "info": "Expected Phi Resolution" },
+      { "name": "status", "id": 16, "type": "int16", "info": "hit status" }
+    ]
+  },
+  {
+    "bank": "REC::ForwardTagger",
+    "group": 334,
+    "info": "Forward Tagger information for Particles bank",
+    "items": [
+      { "name": "index", "id": 1, "type": "int16", "info": "index of the cluster in the specific detector bank" },
+      { "name": "pindex", "id": 2, "type": "int16", "info": "row number in the particle bank hit is associated with" },
+      { "name": "detector", "id": 3, "type": "int8", "info": "Detector ID, defined in COATJAVA DetectorType" },
+      { "name": "energy", "id": 4, "type": "float", "info": "Energy associated with the cluster" },
+      { "name": "time", "id": 5, "type": "float", "info": "Time associated with the cluster" },
+      { "name": "path", "id": 6, "type": "float", "info": "Path from vertex to the cluster position" },
+      { "name": "chi2", "id": 7, "type": "float", "info": "Chi2 (or quality) of cluster-particle matching" },
+      { "name": "x", "id": 8, "type": "float", "info": "X coordinate of the cluster" },
+      { "name": "y", "id": 9, "type": "float", "info": "Y coordinate of the cluster" },
+      { "name": "z", "id": 10, "type": "float", "info": "Z coordinate of the cluster" },
+      { "name": "dx", "id": 11, "type": "float", "info": "Cluster width in x" },
+      { "name": "dy", "id": 12, "type": "float", "info": "Cluster width in y" },
+      { "name": "radius", "id": 13, "type": "float", "info": "Cluster radius" },
+      { "name": "size", "id": 14, "type": "int16", "info": "size of the cluster" },
+      { "name": "status", "id": 15, "type": "int16", "info": "hit status" }
+    ]
+  },
+  {
+    "bank": "REC::Scintillator",
+    "group": 335,
+    "info": "Scintillator Responses for Particles bank",
+    "items": [
+      { "name": "index", "id": 1, "type": "int16", "info": "index of the hit in the specific detector bank" },
+      { "name": "pindex", "id": 2, "type": "int16", "info": "row number in the particle bank hit is associated with" },
+      { "name": "detector", "id": 3, "type": "int8", "info": "Detector ID, defined in COATJAVA DetectorType" },
+      { "name": "sector", "id": 4, "type": "int8", "info": "Sector of the Detector hit" },
+      { "name": "layer", "id": 5, "type": "int8", "info": "Layer of the Detector hit" },
+      { "name": "component", "id": 6, "type": "int16", "info": "Component of the Detector hit" },
+      { "name": "energy", "id": 7, "type": "float", "info": "Energy associated with the hit" },
+      { "name": "time", "id": 8, "type": "float", "info": "Time associated with the hit" },
+      { "name": "path", "id": 9, "type": "float", "info": "Path from vertex to the hit position" },
+      { "name": "chi2", "id": 10, "type": "float", "info": "Chi2 (or quality) of hit-track matching" },
+      { "name": "x", "id": 11, "type": "float", "info": "X coordinate of the hit" },
+      { "name": "y", "id": 12, "type": "float", "info": "Y coordinate of the hit" },
+      { "name": "z", "id": 13, "type": "float", "info": "Z coordinate of the hit" },
+      { "name": "hx", "id": 14, "type": "float", "info": "X coordinate of the matched hit" },
+      { "name": "hy", "id": 15, "type": "float", "info": "Y coordinate of the mathced hit" },
+      { "name": "hz", "id": 16, "type": "float", "info": "Z coordinate of the matched hit" },
+      { "name": "status", "id": 17, "type": "int16", "info": "hit status" }
+    ]
+  }, {
+    "bank": "MC::Header",
+    "group": 40,
+    "info": "Head bank for the generated event",
+    "items": [
+      { "name": "run", "id": 1, "type": "int32", "info": "Run number" },
+      { "name": "event", "id": 2, "type": "int32", "info": "Event number" },
+      { "name": "type", "id": 3, "type": "int8", "info": "Event type" },
+      { "name": "helicity", "id": 4, "type": "float", "info": "Beam helicity" }
+    ]
+  },
+  {
+    "bank": "MC::Event",
+    "group": 41,
+    "info": "Lund header bank for the generated event",
+    "items": [
+      { "name": "npart", "id": 1, "type": "int16", "info": "number of particles in the event" },
+      { "name": "atarget", "id": 2, "type": "int16", "info": "Mass number of the target" },
+      { "name": "ztarget", "id": 3, "type": "int16", "info": "Atomic number oif the target" },
+      { "name": "ptarget", "id": 4, "type": "float", "info": "Target polarization" },
+      { "name": "pbeam", "id": 5, "type": "float", "info": "Beam polarization" },
+      { "name": "btype", "id": 6, "type": "int16", "info": "Beam type, electron=11, photon=22" },
+      { "name": "ebeam", "id": 7, "type": "float", "info": "Beam energy (GeV)" },
+      { "name": "targetid", "id": 8, "type": "int16", "info": "Interacted nucleaon ID (proton=2212, neutron=2112" },
+      { "name": "processid", "id": 9, "type": "int16", "info": "Process ID" },
+      { "name": "weight", "id": 10, "type": "float", "info": "Event weight" }
+    ]
+  },
+  {
+    "bank": "MC::Particle",
+    "group": 42,
+    "info": "Generated Particle information",
+    "items": [
+      { "name": "pid", "id": 1, "type": "int32", "info": "particle id" },
+      { "name": "px", "id": 2, "type": "float", "info": "x component of the momentum" },
+      { "name": "py", "id": 3, "type": "float", "info": "y component of the momentum" },
+      { "name": "pz", "id": 4, "type": "float", "info": "z component of the momentum" },
+      { "name": "vx", "id": 5, "type": "float", "info": "x component of the vertex" },
+      { "name": "vy", "id": 6, "type": "float", "info": "y component of the vertex" },
+      { "name": "vz", "id": 7, "type": "float", "info": "z component of the vertex" },
+      { "name": "vt", "id": 8, "type": "float", "info": "vertex time" }
+    ]
+  },
+  {
+    "bank": "MC::Lund",
+    "group": 43,
+    "info": "Generated Particle information from Lund",
+    "items": [
+      { "name": "index", "id": 1, "type": "int8", "info": "index of the first daughter" },
+      { "name": "type", "id": 2, "type": "int8", "info": "particle type (1 is active)" },
+      { "name": "pid", "id": 3, "type": "int32", "info": "particle id" },
+      { "name": "parent", "id": 4, "type": "int8", "info": "index of the parent" },
+      { "name": "daughter", "id": 5, "type": "int8", "info": "index of the first daughter" },
+      { "name": "px", "id": 6, "type": "float", "info": "x component of the momentum" },
+      { "name": "py", "id": 7, "type": "float", "info": "y component of the momentum" },
+      { "name": "pz", "id": 8, "type": "float", "info": "z component of the momentum" },
+      { "name": "E", "id": 9, "type": "float", "info": "Energy of the particle" },
+      { "name": "mass", "id": 10, "type": "float", "info": "mass of the particle" },
+      { "name": "vx", "id": 11, "type": "float", "info": "x component of the vertex" },
+      { "name": "vy", "id": 12, "type": "float", "info": "y component of the vertex" },
+      { "name": "vz", "id": 13, "type": "float", "info": "z component of the vertex" },
+      { "name": "ltime", "id": 14, "type": "float", "info": "particle lifetime" }
+    ]
+  },
+  {
+    "bank": "MC::True",
+    "group": 44,
+    "info": "True detector information from GEANT4",
+    "items": [
+      { "name": "detector", "id": 1, "type": "int8", "info": "detector ID" },
+      { "name": "pid", "id": 2, "type": "int32", "info": "ID of the first particle entering the sensitive volume" },
+      { "name": "mpid", "id": 3, "type": "int32", "info": "ID of the mother of the first particle entering the sensitive volume" },
+      { "name": "tid", "id": 4, "type": "int32", "info": "Track ID of the first particle entering the sensitive volume" },
+      { "name": "mtid", "id": 5, "type": "int32", "info": "Track ID of the mother of the first particle entering the sensitive volume" },
+      { "name": "otid", "id": 6, "type": "int32", "info": "Track ID of the original track that generated the first particle entering the sensitive volume" },
+      { "name": "trackE", "id": 7, "type": "float", "info": "Energy of the track" },
+      { "name": "avgX", "id": 8, "type": "float", "info": "Average X position in global reference system" },
+      { "name": "avgY", "id": 9, "type": "float", "info": "Average Y position in global reference system" },
+      { "name": "avgZ", "id": 10, "type": "float", "info": "Average Z position in global reference system" },
+      { "name": "avgLx", "id": 11, "type": "float", "info": "Average X position in local reference system" },
+      { "name": "avgLy", "id": 12, "type": "float", "info": "Average Y position in local reference system" },
+      { "name": "avgLz", "id": 13, "type": "float", "info": "Average Z position in local reference system" },
+      { "name": "px", "id": 14, "type": "float", "info": "x component of momentum of the particle entering the sensitive volume" },
+      { "name": "py", "id": 15, "type": "float", "info": "y component of momentum of the particle entering the sensitive volume" },
+      { "name": "pz", "id": 16, "type": "float", "info": "z component of momentum of the particle entering the sensitive volume" },
+      { "name": "vx", "id": 17, "type": "float", "info": "x component of primary vertex of the particle entering the sensitive volume" },
+      { "name": "vy", "id": 18, "type": "float", "info": "y component of primary vertex of the particle entering the sensitive volume" },
+      { "name": "vz", "id": 19, "type": "float", "info": "z component of primary vertex of the particle entering the sensitive volume" },
+      { "name": "mvx", "id": 20, "type": "float", "info": "x component of primary vertex of the mother of the particle entering the sensitive volume" },
+      { "name": "mvy", "id": 21, "type": "float", "info": "y component of primary vertex of the mother of the particle entering the sensitive volume" },
+      { "name": "mvz", "id": 22, "type": "float", "info": "z component of primary vertex of the mother of the particle entering the sensitive volume" },
+      { "name": "avgT", "id": 23, "type": "float", "info": "Average time" }
+    ]
+  }
+]
