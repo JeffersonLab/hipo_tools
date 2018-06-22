@@ -19,16 +19,22 @@ include_directories(${ROOT_INCLUDE_DIRS})
 link_directories(${ROOT_LIBRARY_DIR})
 include(cmake/root.cmake)
 
+include_directories(src/hipocpp/include)
 
 add_subdirectory(src/hipocpp)
-include_directories(src/hipocpp/include)
 add_subdirectory(src/toohip4root)
-include_directories(src/hipocpp/include/hipo)
 add_subdirectory(src/hipo2root)
+add_subdirectory(src/hipo-io)
+
 
 add_executable(hipo examples/hipo.cpp)
 target_link_libraries(hipo hipocpp ${LZ4_LIBRARY})
 install(TARGETS hipo RUNTIME DESTINATION bin)
+
+add_executable(hipo_write examples/write_file.cpp)
+target_link_libraries(hipo_write hipocpp ${LZ4_LIBRARY})
+install(TARGETS hipo_write RUNTIME DESTINATION bin)
+
 
 # -------------------------
 # install library config

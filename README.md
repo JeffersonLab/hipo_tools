@@ -95,10 +95,9 @@ Todo
 ----
 
 * Isolate json parser from converter
-* Create clas12 specific helpers (maybe different geometry)
+* Create clas12 specific helpers (maybe different repo for clas12 specific json?)
 * Setup CI with test data.
 * Debug build on mac
 * Test library in external cmake and pkgconfig projects
-
 
 
