@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.5)
-project(hipoio LANGUAGES C;CXX VERSION 0.0.1 DESCRIPTION "hipo-io")
+cmake_minimum_required(VERSION 3.6)
+project(hipoio VERSION 0.0.1 DESCRIPTION "hipo-io")
 
 set(CMAKE_MODULE_PATH
    ${CMAKE_MODULE_PATH}
@@ -11,7 +11,7 @@ add_definitions(-D__LZ4__)
 
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS}/etc/cmake)
-find_package(ROOT REQUIRED COMPONENTS RIO Tree)
+find_package(ROOT REQUIRED COMPONENTS Tree)
 include(${ROOT_USE_FILE})
 #add_definitions(${ROOT_CXX_FLAGS})
 ## extra root settings
