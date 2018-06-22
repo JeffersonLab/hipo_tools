@@ -1,9 +1,14 @@
 #include <iostream>
 #include "clipp.h"
-#include <filesystem>
 #include "THipo.h"
-
+#ifdef __cpp_lib_filesystem
+#include <filesystem>
 namespace fs = std::filesystem;
+#else
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#endif
+
 using namespace clipp; using std::cout; using std::string;
 
 int main(int argc, char* argv[]) {
