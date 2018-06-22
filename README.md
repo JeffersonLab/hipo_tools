@@ -26,8 +26,6 @@ make && make install
 * Compile root with "-Droot7:bool=ON -Dcxx17:BOOL=ON"
 * Don't write loops! Use [RDataFrame](https://root.cern.ch/doc/master/group__tutorial__dataframe.html)
 
-
-
 ### Install structure:
 
 ```
@@ -60,6 +58,31 @@ make && make install
 Converting hipo files
 ---------------------
 
+### toohip4root
 
+```
+$ toohip4root -h
+SYNOPSIS
+        toohip4root (<input file> | [-i <input file>]) [-o <output file>] [-f] [-v] [-N <N events>] [-h]
+
+OPTIONS
+        -f, --force force the output to overwrite existing files
+
+        -v, --verbose
+                    turn on verbose output
+
+        -h, --help  print help
+SYNOPSIS
+        toohip4root (<input file> | [-i <input file>]) [-o <output file>] [-f] [-v] [-N <N events>] [-h]
+
+OPTIONS
+        -f, --force force the output to overwrite existing files
+
+        -v, --verbose
+                    turn on verbose output
+
+        -h, --help  print help
+
+```
 
 
