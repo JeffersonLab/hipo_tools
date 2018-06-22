@@ -85,7 +85,7 @@ begining = r"""/*
 #include "TFile.h"
 #include "TTree.h"
 // Hipo libs
-#include "reader.h"
+#include "hipo/reader.h"
 
 int main(int argc, char **argv) {
 
