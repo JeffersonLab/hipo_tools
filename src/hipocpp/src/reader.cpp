@@ -8,6 +8,7 @@
 #include "hipo/record.h"
 
 #include <cstdlib>
+
 /**
  * HIPO namespace is used for the classes that read write
  * files and records.
