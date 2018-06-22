@@ -26,6 +26,8 @@ include(cmake/root.cmake)
 add_subdirectory(src/hipocpp)
 include_directories(src/hipocpp/include)
 add_subdirectory(src/toohip4root)
+include_directories(src/hipocpp/include/hipo)
+add_subdirectory(src/hipo2root)
 
 add_executable(hipo examples/hipo.cpp)
 target_link_libraries(hipo hipocpp ${LZ4_LIBRARY})
