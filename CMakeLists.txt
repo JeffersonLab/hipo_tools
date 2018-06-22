@@ -30,3 +30,34 @@ add_executable(hipo examples/hipo.cpp)
 target_link_libraries(hipo hipocpp ${LZ4_LIBRARY})
 install(TARGETS hipo RUNTIME DESTINATION bin)
 
+# -------------------------
+# install library config
+include(CMakePackageConfigHelpers)
+
+# Install and export targets
+install(EXPORT HipoToolsTargets
+    FILE HipoToolsTargets.cmake
+    NAMESPACE HipoTools::
+    DESTINATION lib/hipo
+    )
+
+
+set(TARGETS_INSTALL_PATH lib/hipo/HipoToolsTargets.cmake)
+CONFIGURE_PACKAGE_CONFIG_FILE(
+  cmake/HipoToolsConfig.cmake.in  
+  ${CMAKE_CURRENT_BINARY_DIR}/HipoToolsConfig.cmake
+    INSTALL_DESTINATION lib/hipo
+    PATH_VARS TARGETS_INSTALL_PATH
+    )
+
+  write_basic_package_version_file("HipoToolsConfigVersion.cmake"
+    VERSION ${VERSION}
+    COMPATIBILITY SameMajorVersion
+    )
+
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/HipoToolsConfig.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/HipoToolsConfigVersion.cmake
+  DESTINATION lib/hipo
+  )
+
