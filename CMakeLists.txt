@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(hipoio VERSION 0.0.1 DESCRIPTION "hipo-io")
+project(hipoio LANGUAGES C;CXX VERSION 0.0.1 DESCRIPTION "hipo-io")
 
 set(CMAKE_MODULE_PATH
    ${CMAKE_MODULE_PATH}
