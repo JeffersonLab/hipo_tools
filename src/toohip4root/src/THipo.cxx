@@ -119,7 +119,7 @@ namespace hipo {
   //  ToRoot(filename);
   //}
   
-  void THipo::ToRoot(TString filename, TString output_filename) {
+  void THipo::ToRoot(TString filename, TString output_filename, int N_events) {
     cout << "THipo::ToRoot " << filename << endl;
     // Convert file called filename
     InitFile(filename);
@@ -136,7 +136,14 @@ namespace hipo {
     //}
     InitOutput(output_filename);
     // loop over events
-    while (NextEvent()) { }
+    //
+    int i_event = 0;
+    while (NextEvent()) {
+      if( (N_events > 0) && (i_event >= N_events) ){
+        break;
+      }
+      i_event++;
+    }
     CloseOutput();
   }
 

@@ -7,17 +7,29 @@ namespace fs = std::filesystem;
 using namespace clipp; using std::cout; using std::string;
 
 int main(int argc, char* argv[]) {
-  bool   rec = false, utf16 = false;
-  string infile = "", outfile = "";
-  bool force_out = false;
+  bool   rec       = false;
+  string infile    = "";
+  string outfile   = "";
+  bool   force_out = false;
+  int    N_events  = 0;
+  bool   help      = false;
+  bool   verbose   = false;
 
-  auto cli = ((value("input file", infile)) | (option("-i") & value("input file", infile)) ,
-              option("-o") & value("output file", outfile),
-              option("-f").set(force_out) % "force the output to overwrite existing files",
-              option("-utf16").set(utf16).doc("use UTF-16 encoding"));
+  auto cli = ((value("input file", infile)) | (option("-i","--input") & value("input file", infile)) ,
+              option("-o","--output") & value("output file", outfile),
+              option("-f","--force").set(force_out) % "force the output to overwrite existing files",
+              option("-v","--verbose").set(verbose) % "turn on verbose output",
+              option("-N","--Nevents") & value("N events", N_events),
+              option("-h","--help").set(help) % "print help"
+              );
 
   if (!parse(argc, argv, cli)) {
     cout << make_man_page(cli, argv[0]);
+  }
+
+  if(help){
+    cout << make_man_page(cli, argv[0]);
+    return 0;
   }
 
   fs::path in_path = infile;
@@ -51,8 +63,6 @@ int main(int argc, char* argv[]) {
       return -127;
     }
   }
-
-
 
   cout << "converting " << in_path  << "\n";
   cout << "to         " << out_path << "\n";

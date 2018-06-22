@@ -557,7 +557,7 @@ namespace hipo {
     void       ToRoot();
     void       ToRoot(TString filename);
     void       ToRoot(std::vector<std::string> files);
-    void       ToRoot(TString filename, TString output_filename);
+    void       ToRoot(TString filename, TString output_filename, int N_events = 0);
 
     void       InitFile(TString filename);
     Bool_t     ConfigBanks();
