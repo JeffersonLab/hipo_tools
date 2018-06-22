@@ -74,6 +74,6 @@ int main(int argc, char* argv[]) {
 
   hipo::THipo h;
   h.ToRoot(in_path.string() ,
-           out_path.string() );
+           out_path.string(), N_events );
   return 0;
 }
