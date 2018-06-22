@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.5)
 project(hipoio VERSION 0.0.1 DESCRIPTION "hipo-io")
 
 set(CMAKE_MODULE_PATH
@@ -11,10 +11,7 @@ add_definitions(-D__LZ4__)
 
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS}/etc/cmake)
-find_package(ROOT REQUIRED COMPONENTS MathCore RIO Hist MathMore Graf Graf3d
-  Gpad GeomPainter RGL Gviz3d RGL Html GuiHtml
-   Eve EG Foam GenVector Geom Gui HistPainter MathCore Matrix MLP Net
-   Physics Spectrum Thread Tree TreeViewer)
+find_package(ROOT REQUIRED COMPONENTS RIO Tree)
 include(${ROOT_USE_FILE})
 #add_definitions(${ROOT_CXX_FLAGS})
 ## extra root settings
