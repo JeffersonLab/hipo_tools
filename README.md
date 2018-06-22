@@ -32,7 +32,8 @@ make && make install
 .
 ├── bin
 │   ├── hipo
-│   └── toohipforroot
+│   ├── hipo2root
+│   └── toohip4root
 ├── include
 │   └── hipo
 │       ├── data.h
@@ -47,6 +48,11 @@ make && make install
 │       ├── utils.h
 │       └── writer.h
 ├── lib
+│   ├── hipo
+│   │   ├── HipoToolsConfig.cmake
+│   │   ├── HipoToolsConfigVersion.cmake
+│   │   ├── HipoToolsTargets.cmake
+│   │   └── HipoToolsTargets-noconfig.cmake
 │   ├── libhipocpp.so -> libhipocpp.so.0.0.1
 │   ├── libhipocpp.so.0.0.1
 │   └── libhiporoot.so
@@ -84,5 +90,16 @@ OPTIONS
         -h, --help  print help
 
 ```
+
+Todo
+----
+
+* Isolate json parser from converter
+* Create clas12 specific helpers (maybe different geometry)
+* Setup CI with test data.
+* Debug build on mac
+* Test library in external cmake and pkgconfig projects
+
+
 
 
