@@ -1,0 +1,11 @@
+image: tylern4/hipo_tools:base
+
+before_script:
+  - git clone https://github.com/JeffersonLab/hipo_tools.git
+  - mkdir -p hipo_tools/build && cd hipo_tools/build
+
+build:
+  script:
+  - cmake ..
+  - make
+  - make install
