@@ -46,16 +46,6 @@ OPTIONS
                     turn on verbose output
 
         -h, --help  print help
-SYNOPSIS
-        toohip4root (<input file> | [-i <input file>]) [-o <output file>] [-f] [-v] [-N <N events>] [-h]
-
-OPTIONS
-        -f, --force force the output to overwrite existing files
-
-        -v, --verbose
-                    turn on verbose output
-
-        -h, --help  print help
 
 ```
 
