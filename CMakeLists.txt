@@ -22,9 +22,9 @@ include(cmake/root.cmake)
 include_directories(src/hipocpp/include)
 
 add_subdirectory(src/hipocpp)
-add_subdirectory(src/toohip4root)
-add_subdirectory(src/hipo2root)
-add_subdirectory(src/hipo-io)
+#add_subdirectory(src/toohip4root)
+add_subdirectory(src/reconstructed2root)
+#add_subdirectory(src/hipo-io)
 
 
 add_executable(hipo examples/hipo.cpp)

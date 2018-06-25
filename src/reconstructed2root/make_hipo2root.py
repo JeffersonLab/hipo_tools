@@ -49,7 +49,7 @@ middle = r"""
     entry++;
     if ((entry % 1000) == 0) std::cerr << "\t" << entry << "\r\r" << std::flush;
 """
-#loop = """
+# loop = """
 #    %s = event.get%s(%s, %s);"""
 
 loop = r"""
@@ -145,8 +145,8 @@ def make_hipo2root(files):
 
                     clear_vec.append("\t\t" + name + "_vec.clear();  \n")
 
-    with open("hipo2root.cpp", 'w') as outfile:
-        write = lambda x: outfile.write(x)
+    with open("recon2root.cpp", 'w') as outfile:
+        def write(x): return outfile.write(x)
         write(begining)
         write("\n\n")
         map(write, hipo_nodes)
@@ -158,7 +158,6 @@ def make_hipo2root(files):
         map(write, loops)
         write("\n\t\tclas12->Fill();\n")
         map(write, clear_vec)
-        #write("\n\t\t}\n")
         write(ending)
 
 
@@ -169,13 +168,11 @@ if __name__ == '__main__':
         '-a',
         '--ALL',
         action='store_true',
-        help=
-        'Add all banks from bankdefs/hipo/*.json, overrides all other options')
+        help='Add all banks from bankdefs/hipo/*.json, overrides all other options')
     parser.add_argument(
         '--json',
         nargs='+',
-        help=
-        'Specify json file/files for bank information, overrides all other options'
+        help='Specify json file/files for bank information, overrides all other options'
     )
     parser.add_argument(
         '--clas6', action='store_true', help="Add banks from clas6")
