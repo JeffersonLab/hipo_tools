@@ -4,7 +4,7 @@ before_script:
   - git clone https://github.com/JeffersonLab/hipo_tools.git
   - mkdir -p hipo_tools/build && cd hipo_tools/build
 
-test:
+build:
   script:
   - cmake ..
   - make
