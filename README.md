@@ -13,6 +13,7 @@ This code was adopted from source code on the jlab CUE
 Installing
 ----------
 
+**Note**: These instructions are for Linux. For MacOS, refer to the next subsection.
 ```
 git clone https://github.com/JeffersonLab/hipo_tools.git
 cd hipo_tools && mkdir build
