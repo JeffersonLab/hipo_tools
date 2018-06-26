@@ -21,6 +21,25 @@ cmake ../. -DCMAKE_INSTALL_PREFIX=$HOME
 make && make install
 ```
 
+### Installing on MacOS
+
+For some reason XCode does not currently ship with the necessary C++17
+filesystem libraries (even though they have been available in LLVM for several
+versions). As temporary workaround, we suggest to install llvm through Homebrew:
+```
+brew install llvm
+```
+Homebrew will skip the linking step when you install llvm (as to not screw up
+your system), so you will have to tell cmake to use the newer version of
+llvm/clang. The installation instructions for MacOS are:
+```
+git clone https://github.com/JeffersonLab/hipo_tools.git
+cd hipo_tools && mkdir build
+cd build
+CXX=/usr/local/opt/llvm/bin/clang++ cmake ../. -DCMAKE_INSTALL_PREFIX=$HOME
+make && make install
+```
+
 ### Some tips
 
 * Use the latest version of root with the latest compiler (e.g. gcc8)
