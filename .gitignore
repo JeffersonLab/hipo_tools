@@ -1,1 +1,3 @@
 build
+src/hipopy/pylibhipo.cpp
+src/hipopy/pylibhipo.cpython-36m-darwin.so
