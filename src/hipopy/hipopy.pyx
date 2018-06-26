@@ -15,6 +15,11 @@ cdef extern from "record.cpp":
 cdef extern from "dictionary.cpp":
   pass
 
+cdef extern from "hipo/node.h" namespace "hipo":
+    cdef cppclass node[T]:
+      node() except +
+      int getLength()
+
 cdef extern from "hipo/reader.h" namespace "hipo":
     cdef cppclass reader:
       reader() except +
@@ -24,8 +29,8 @@ cdef extern from "hipo/reader.h" namespace "hipo":
       bool next()
       bool  isOpen()
       void  showInfo()
-      template<class T> hipo::node<T> *getBranch(int group, int item);
-      template<class T> hipo::node<T> *getBranch(const char* group, const char* item);
+      node *getBranch(int, int)
+      node *getBranch(char*,char*)
 
 cdef class hipo_reader:
   cdef reader*c_reader
@@ -54,3 +59,8 @@ cdef class hipo_reader:
 
   def next(self):
     return self.c_reader.next()
+
+  def getIntBranch(self, group, item):
+    print(group, item)
+    #cdef node[int]*c_int_node(group,item)
+    #print(c_int_node.getLength())
