@@ -60,8 +60,9 @@ target_include_directories(toohip4root
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
   )
+  #  PRIVATE ${libname} stdc++fs
 target_link_libraries(toohip4root
-  PRIVATE ${libname} stdc++fs
+  PRIVATE ${libname} ${CXX_FILESYSTEM_LIB}
   PUBLIC hiporoot
   PUBLIC ${ROOT_LIBRARIES} 
   )

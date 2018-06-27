@@ -417,7 +417,7 @@ namespace hipo {
         break;
       case 8:
         dynamic_cast<THipoItemL*>(bank->GetItem(CodeToItem(vcode)))
-            ->ResetNode(fReader->getBranch<long>(bank->GetName(), CodeToItem(vcode).Data()));
+            ->ResetNode(fReader->getBranch<int64_t>(bank->GetName(), CodeToItem(vcode).Data()));
         break;
       default:
         break;

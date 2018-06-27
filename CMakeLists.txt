@@ -6,6 +6,13 @@ set(CMAKE_MODULE_PATH
    ${PROJECT_SOURCE_DIR}/cmake
    ${PROJECT_SOURCE_DIR}/cmake/modules)
 
+## Use C++17 features 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+## OS Specific settings
+include(cmake/os.cmake)
+
 find_package(LZ4 REQUIRED)
 add_definitions(-D__LZ4__)
 
@@ -13,7 +20,6 @@ list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS}/etc/cmake)
 find_package(ROOT REQUIRED COMPONENTS Tree)
 include(${ROOT_USE_FILE})
-#add_definitions(${ROOT_CXX_FLAGS})
 ## extra root settings
 include_directories(${ROOT_INCLUDE_DIRS})
 link_directories(${ROOT_LIBRARY_DIR})
