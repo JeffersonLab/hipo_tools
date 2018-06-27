@@ -83,11 +83,11 @@ $ recon2root <input file> [<output file>]
 Todo
 ----
 
-[ ] Isolate json parser from converter
-[ ] Create clas12 specific helpers (maybe different repo for clas12 specific json?)
-[ ] Setup CI with test data.
-[x] Debug build on mac (#7)
-[ ] Test library in external cmake and pkgconfig projects
+- [ ] Isolate json parser from converter
+- [ ] Create clas12 specific helpers (maybe different repo for clas12 specific json?)
+- [ ] Setup CI with test data.
+- [x] Debug build on mac (#7)
+- [ ] Test library in external cmake and pkgconfig projects
 
 
 ### Install structure:
