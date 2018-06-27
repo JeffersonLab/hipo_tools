@@ -1,8 +1,15 @@
-sudo: false
-dist: trusty
-language: cpp
-services:
-- docker
-script:
-- docker build -t hipo_tools docker/.
-- docker images -a
+matrix:
+  include:
+    - os: linux
+      sudo: false
+      dist: trusty
+      language: cpp
+      services:
+        - docker
+      script:
+        - docker build -t hipo_tools docker/.
+        - docker images -a
+    - os: osx
+      language: generic
+      script:
+        - .travis_build.sh
