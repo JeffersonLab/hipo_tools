@@ -3,19 +3,41 @@ hipo-tools
 
 "Official" C++ based analysis tools for hipo files.
 
-[Hipo Documentation](https://userweb.jlab.org/~gavalian/docs/sphinx/hipo/html/index.html)
+[Hipo-file
+Documentation](https://userweb.jlab.org/~gavalian/docs/sphinx/hipo/html/index.html)
+(external project)
 
-This code was adopted from source code on the jlab CUE 
+This code was adopted from source code on the jlab CUE
 `/group/clas12/packages/hipo-io`.
 
 Installing
 ----------
 
+**Note**: These instructions are for Linux. For MacOS, refer to the next subsection.
 ```
-git clone ...
-cd hipo-tools && mkdir build
+git clone https://github.com/JeffersonLab/hipo_tools.git
+cd hipo_tools && mkdir build
 cd build
 cmake ../. -DCMAKE_INSTALL_PREFIX=$HOME
+make && make install
+```
+
+### Installing on MacOS
+
+For some reason XCode does not currently ship with the necessary C++17
+filesystem libraries (even though they have been available in LLVM for several
+versions). As temporary workaround, we suggest to install llvm through Homebrew:
+```
+brew install llvm
+```
+Homebrew will skip the linking step when you install llvm (as to not screw up
+your system), so you will have to tell cmake to use the newer version of
+llvm/clang. The installation instructions for MacOS are:
+```
+git clone https://github.com/JeffersonLab/hipo_tools.git
+cd hipo_tools && mkdir build
+cd build
+CXX=/usr/local/opt/llvm/bin/clang++ cmake ../. -DCMAKE_INSTALL_PREFIX=$HOME
 make && make install
 ```
 
@@ -26,13 +48,54 @@ make && make install
 * Compile root with "-Droot7:bool=ON -Dcxx17:BOOL=ON"
 * Don't write loops! Use [RDataFrame](https://root.cern.ch/doc/master/group__tutorial__dataframe.html)
 
+
+Converting hipo files
+---------------------
+
+### toohip4root
+
+```
+$ toohip4root -h
+SYNOPSIS
+        toohip4root (<input file> | [-i <input file>]) [-o <output file>] [-f] [-v] [-N <N events>] [-h]
+
+OPTIONS
+        -f, --force force the output to overwrite existing files
+
+        -v, --verbose
+                    turn on verbose output
+
+        -h, --help  print help
+
+```
+
+### recon2root
+
+A clas12 specific converter to extract the `REC::*` banks from a hipo file and
+put them into a root file. Useful for analysis especially if downloading the
+files to an offsite location or a personal computer.
+
+```
+$ recon2root <input file> [<output file>]
+```
+
+
+Todo
+----
+
+[ ] Isolate json parser from converter
+[ ] Create clas12 specific helpers (maybe different repo for clas12 specific json?)
+[ ] Setup CI with test data.
+[x] Debug build on mac (#7)
+[ ] Test library in external cmake and pkgconfig projects
+
 ### Install structure:
 
 ```
 .
 ├── bin
 │   ├── hipo
-│   ├── hipo2root
+│   ├── recon2root
 │   └── toohip4root
 ├── include
 │   └── hipo
@@ -60,44 +123,3 @@ make && make install
     └── pkgconfig
         └── hipocpp.pc
 ```
-
-Converting hipo files
----------------------
-
-### toohip4root
-
-```
-$ toohip4root -h
-SYNOPSIS
-        toohip4root (<input file> | [-i <input file>]) [-o <output file>] [-f] [-v] [-N <N events>] [-h]
-
-OPTIONS
-        -f, --force force the output to overwrite existing files
-
-        -v, --verbose
-                    turn on verbose output
-
-        -h, --help  print help
-SYNOPSIS
-        toohip4root (<input file> | [-i <input file>]) [-o <output file>] [-f] [-v] [-N <N events>] [-h]
-
-OPTIONS
-        -f, --force force the output to overwrite existing files
-
-        -v, --verbose
-                    turn on verbose output
-
-        -h, --help  print help
-
-```
-
-Todo
-----
-
-* Isolate json parser from converter
-* Create clas12 specific helpers (maybe different repo for clas12 specific json?)
-* Setup CI with test data.
-* Debug build on mac
-* Test library in external cmake and pkgconfig projects
-
-
