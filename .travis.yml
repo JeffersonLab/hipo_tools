@@ -17,10 +17,10 @@ matrix:
           - /usr/local/Cellar
           - /usr/local/Homebrew
       script:
-        - brew install llvm && echo "Done"
-        - brew install lz4 && echo "Done"
-        - brew install gcc && echo "Done"
-        - brew install root && echo "Done"
+        - brew install llvm; echo "Done"
+        - brew install lz4; echo "Done"
+        - brew install gcc; echo "Done"
+        - brew install root; echo "Done"
         - mkdir build && cd build
         - CXX=/usr/local/opt/llvm/bin/clang++ CC=/usr/local/opt/llvm/bin/clang cmake .. -DCMAKE_INSTALL_PREFIX=install
         - make
