@@ -1,5 +1,5 @@
 # distutils: language = c++
-
+from libcpp.vector cimport vector
 from libcpp cimport bool
 
 cdef extern from "utils.cpp":
@@ -18,7 +18,15 @@ cdef extern from "dictionary.cpp":
 cdef extern from "hipo/node.h" namespace "hipo":
     cdef cppclass node[T]:
       node() except +
-      int getLength()
+      node(int, int) except +
+      T getValue(int)
+      void   reset()
+      void   show()
+      int    getLength()
+      char  *getAddress()
+      int    getBytesLength()
+      void   setLength(int)
+      void   setAddress(char *)
 
 cdef extern from "hipo/reader.h" namespace "hipo":
     cdef cppclass reader:
@@ -29,8 +37,24 @@ cdef extern from "hipo/reader.h" namespace "hipo":
       bool next()
       bool  isOpen()
       void  showInfo()
-      node *getBranch(int, int)
-      node *getBranch(char*,char*)
+      node *getBranch[T](int, int)
+      #node *getBranch(char*,char*)
+
+cdef class int_node:
+  cdef node[int]*c_node
+  def __cinit__(self):
+    self.c_node = new node[int]()
+
+  cdef setup(self, node[int]* node):
+    self.c_node = node
+
+  def getValue(self, x):
+    return self.c_node.getValue(x)
+
+  def getLength(self):
+    return self.c_node.getLength()
+
+
 
 cdef class hipo_reader:
   cdef reader*c_reader
@@ -60,7 +84,9 @@ cdef class hipo_reader:
   def next(self):
     return self.c_reader.next()
 
-  def getIntBranch(self, group, item):
-    print(group, item)
-    #cdef node[int]*c_int_node(group,item)
-    #print(c_int_node.getLength())
+  def getNode(self, group, item):
+    cdef node[int]*c_node
+    c_node = self.c_reader.getBranch[int](group, item)
+    py_node = int_node()
+    py_node.setup(c_node)
+    return py_node
