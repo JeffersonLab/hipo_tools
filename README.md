@@ -1,10 +1,12 @@
 hipo-tools
 ==========
 
+[![Build Status](https://travis-ci.com/JeffersonLab/hipo_tools.svg?branch=master)](https://travis-ci.com/JeffersonLab/hipo_tools)
+
 "Official" C++ based analysis tools for hipo files.
 
-[Hipo-file 
-Documentation](https://userweb.jlab.org/~gavalian/docs/sphinx/hipo/html/index.html) 
+[Hipo-file
+Documentation](https://userweb.jlab.org/~gavalian/docs/sphinx/hipo/html/index.html)
 (external project)
 
 This code was adopted from source code on the jlab CUE
@@ -124,4 +126,3 @@ Todo
     └── pkgconfig
         └── hipocpp.pc
 ```
-
