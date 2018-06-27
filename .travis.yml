@@ -11,5 +11,17 @@ matrix:
         - docker images -a
     - os: osx
       language: cpp
+      cache:
+        directories:
+          - $HOME/Library/Caches/Homebrew
+      env:
+        - CXX=/usr/local/opt/llvm/bin/clang++
+        - CC=/usr/local/opt/llvm/bin/clang
+      before_script:
+        - brew install root llvm
       script:
-        - bash .travis_build.sh
+        - cd hipo_tools
+        - mkdir build && cd build
+        - cmake .. -DCMAKE_INSTALL_PREFIX=install
+        - make
+        - make install
