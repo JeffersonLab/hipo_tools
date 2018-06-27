@@ -18,7 +18,6 @@ matrix:
         - CXX=/usr/local/opt/llvm/bin/clang++
         - CC=/usr/local/opt/llvm/bin/clang
       before_script:
-        - brew install root
         - brew install llvm
       script:
         - cd hipo_tools
