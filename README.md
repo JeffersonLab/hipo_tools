@@ -3,8 +3,8 @@ hipo-tools
 
 "Official" C++ based analysis tools for hipo files.
 
-[Hipo-file
-Documentation](https://userweb.jlab.org/~gavalian/docs/sphinx/hipo/html/index.html)
+[Hipo-file 
+Documentation](https://userweb.jlab.org/~gavalian/docs/sphinx/hipo/html/index.html) 
 (external project)
 
 This code was adopted from source code on the jlab CUE
@@ -89,6 +89,7 @@ Todo
 [x] Debug build on mac (#7)
 [ ] Test library in external cmake and pkgconfig projects
 
+
 ### Install structure:
 
 ```
@@ -123,3 +124,4 @@ Todo
     └── pkgconfig
         └── hipocpp.pc
 ```
+
