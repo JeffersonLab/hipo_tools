@@ -41,15 +41,6 @@ int main(int argc, char **argv) {
 
 
 
-hipo::node<int32_t> *RUN_config_run_node = reader.getBranch<int32_t>(11, 1);
-hipo::node<int32_t> *RUN_config_event_node = reader.getBranch<int32_t>(11, 2);
-hipo::node<int32_t> *RUN_config_unixtime_node = reader.getBranch<int32_t>(11, 3);
-hipo::node<int64_t> *RUN_config_trigger_node = reader.getBranch<int64_t>(11, 4);
-hipo::node<int64_t> *RUN_config_timestamp_node = reader.getBranch<int64_t>(11, 5);
-hipo::node<int8_t> *RUN_config_type_node = reader.getBranch<int8_t>(11, 6);
-hipo::node<int8_t> *RUN_config_mode_node = reader.getBranch<int8_t>(11, 7);
-hipo::node<float> *RUN_config_torus_node = reader.getBranch<float>(11, 8);
-hipo::node<float> *RUN_config_solenoid_node = reader.getBranch<float>(11, 9);
 hipo::node<int32_t> *REC_Event_NRUN_node = reader.getBranch<int32_t>(330, 1);
 hipo::node<int32_t> *REC_Event_NEVENT_node = reader.getBranch<int32_t>(330, 2);
 hipo::node<float> *REC_Event_EVNTime_node = reader.getBranch<float>(330, 3);
@@ -150,16 +141,81 @@ hipo::node<float> *REC_Scintillator_hx_node = reader.getBranch<float>(335, 14);
 hipo::node<float> *REC_Scintillator_hy_node = reader.getBranch<float>(335, 15);
 hipo::node<float> *REC_Scintillator_hz_node = reader.getBranch<float>(335, 16);
 hipo::node<int16_t> *REC_Scintillator_status_node = reader.getBranch<int16_t>(335, 17);
+hipo::node<int16_t> *REC_Track_index_node = reader.getBranch<int16_t>(336, 1);
+hipo::node<int16_t> *REC_Track_pindex_node = reader.getBranch<int16_t>(336, 2);
+hipo::node<int8_t> *REC_Track_detector_node = reader.getBranch<int8_t>(336, 3);
+hipo::node<int8_t> *REC_Track_sector_node = reader.getBranch<int8_t>(336, 4);
+hipo::node<int16_t> *REC_Track_status_node = reader.getBranch<int16_t>(336, 5);
+hipo::node<int8_t> *REC_Track_q_node = reader.getBranch<int8_t>(336, 6);
+hipo::node<float> *REC_Track_chi2_node = reader.getBranch<float>(336, 7);
+hipo::node<int16_t> *REC_Track_NDF_node = reader.getBranch<int16_t>(336, 8);
+hipo::node<float> *REC_Track_px_nomm_node = reader.getBranch<float>(336, 9);
+hipo::node<float> *REC_Track_py_nomm_node = reader.getBranch<float>(336, 10);
+hipo::node<float> *REC_Track_pz_nomm_node = reader.getBranch<float>(336, 11);
+hipo::node<float> *REC_Track_vx_nomm_node = reader.getBranch<float>(336, 12);
+hipo::node<float> *REC_Track_vy_nomm_node = reader.getBranch<float>(336, 13);
+hipo::node<float> *REC_Track_vz_nomm_node = reader.getBranch<float>(336, 14);
+hipo::node<float> *REC_Track_chi2_nomm_node = reader.getBranch<float>(336, 15);
+hipo::node<int16_t> *REC_Track_NDF_nomm_node = reader.getBranch<int16_t>(336, 16);
+hipo::node<int16_t> *REC_TrackCross_index_node = reader.getBranch<int16_t>(337, 1);
+hipo::node<int16_t> *REC_TrackCross_pindex_node = reader.getBranch<int16_t>(337, 2);
+hipo::node<int8_t> *REC_TrackCross_detector_node = reader.getBranch<int8_t>(337, 3);
+hipo::node<int8_t> *REC_TrackCross_sector_node = reader.getBranch<int8_t>(337, 4);
+hipo::node<int8_t> *REC_TrackCross_layer_node = reader.getBranch<int8_t>(337, 5);
+hipo::node<float> *REC_TrackCross_c_x_node = reader.getBranch<float>(337, 6);
+hipo::node<float> *REC_TrackCross_c_y_node = reader.getBranch<float>(337, 7);
+hipo::node<float> *REC_TrackCross_c_z_node = reader.getBranch<float>(337, 8);
+hipo::node<float> *REC_TrackCross_c_ux_node = reader.getBranch<float>(337, 9);
+hipo::node<float> *REC_TrackCross_c_uy_node = reader.getBranch<float>(337, 10);
+hipo::node<float> *REC_TrackCross_c_uz_node = reader.getBranch<float>(337, 11);
+hipo::node<int16_t> *REC_TrackCross_status_node = reader.getBranch<int16_t>(337, 12);
+hipo::node<int16_t> *REC_CovMat_index_node = reader.getBranch<int16_t>(338, 1);
+hipo::node<int16_t> *REC_CovMat_pindex_node = reader.getBranch<int16_t>(338, 2);
+hipo::node<float> *REC_CovMat_C11_node = reader.getBranch<float>(338, 3);
+hipo::node<float> *REC_CovMat_C12_node = reader.getBranch<float>(338, 4);
+hipo::node<float> *REC_CovMat_C13_node = reader.getBranch<float>(338, 5);
+hipo::node<float> *REC_CovMat_C14_node = reader.getBranch<float>(338, 6);
+hipo::node<float> *REC_CovMat_C15_node = reader.getBranch<float>(338, 7);
+hipo::node<float> *REC_CovMat_C22_node = reader.getBranch<float>(338, 8);
+hipo::node<float> *REC_CovMat_C23_node = reader.getBranch<float>(338, 9);
+hipo::node<float> *REC_CovMat_C24_node = reader.getBranch<float>(338, 10);
+hipo::node<float> *REC_CovMat_C25_node = reader.getBranch<float>(338, 11);
+hipo::node<float> *REC_CovMat_C33_node = reader.getBranch<float>(338, 12);
+hipo::node<float> *REC_CovMat_C34_node = reader.getBranch<float>(338, 13);
+hipo::node<float> *REC_CovMat_C35_node = reader.getBranch<float>(338, 14);
+hipo::node<float> *REC_CovMat_C44_node = reader.getBranch<float>(338, 15);
+hipo::node<float> *REC_CovMat_C45_node = reader.getBranch<float>(338, 16);
+hipo::node<float> *REC_CovMat_C55_node = reader.getBranch<float>(338, 17);
+hipo::node<int16_t> *REC_VertDoca_index1_node = reader.getBranch<int16_t>(339, 1);
+hipo::node<int16_t> *REC_VertDoca_index2_node = reader.getBranch<int16_t>(339, 2);
+hipo::node<float> *REC_VertDoca_x_node = reader.getBranch<float>(339, 3);
+hipo::node<float> *REC_VertDoca_y_node = reader.getBranch<float>(339, 4);
+hipo::node<float> *REC_VertDoca_z_node = reader.getBranch<float>(339, 5);
+hipo::node<float> *REC_VertDoca_x1_node = reader.getBranch<float>(339, 6);
+hipo::node<float> *REC_VertDoca_y1_node = reader.getBranch<float>(339, 7);
+hipo::node<float> *REC_VertDoca_z1_node = reader.getBranch<float>(339, 8);
+hipo::node<float> *REC_VertDoca_cx1_node = reader.getBranch<float>(339, 9);
+hipo::node<float> *REC_VertDoca_cy1_node = reader.getBranch<float>(339, 10);
+hipo::node<float> *REC_VertDoca_cz1_node = reader.getBranch<float>(339, 11);
+hipo::node<float> *REC_VertDoca_x2_node = reader.getBranch<float>(339, 12);
+hipo::node<float> *REC_VertDoca_y2_node = reader.getBranch<float>(339, 13);
+hipo::node<float> *REC_VertDoca_z2_node = reader.getBranch<float>(339, 14);
+hipo::node<float> *REC_VertDoca_cx2_node = reader.getBranch<float>(339, 15);
+hipo::node<float> *REC_VertDoca_cy2_node = reader.getBranch<float>(339, 16);
+hipo::node<float> *REC_VertDoca_cz2_node = reader.getBranch<float>(339, 17);
+hipo::node<float> *REC_VertDoca_r_node = reader.getBranch<float>(339, 18);
+hipo::node<int16_t> *REC_Traj_pindex_node = reader.getBranch<int16_t>(340, 1);
+hipo::node<int16_t> *REC_Traj_index_node = reader.getBranch<int16_t>(340, 2);
+hipo::node<int16_t> *REC_Traj_detId_node = reader.getBranch<int16_t>(340, 3);
+hipo::node<int8_t> *REC_Traj_q_node = reader.getBranch<int8_t>(340, 4);
+hipo::node<float> *REC_Traj_x_node = reader.getBranch<float>(340, 5);
+hipo::node<float> *REC_Traj_y_node = reader.getBranch<float>(340, 6);
+hipo::node<float> *REC_Traj_z_node = reader.getBranch<float>(340, 7);
+hipo::node<float> *REC_Traj_cx_node = reader.getBranch<float>(340, 8);
+hipo::node<float> *REC_Traj_cy_node = reader.getBranch<float>(340, 9);
+hipo::node<float> *REC_Traj_cz_node = reader.getBranch<float>(340, 10);
+hipo::node<float> *REC_Traj_pathlength_node = reader.getBranch<float>(340, 11);
 
-	std::vector<int> RUN_config_run_vec; 
-	std::vector<int> RUN_config_event_vec; 
-	std::vector<int> RUN_config_unixtime_vec; 
-	std::vector<int> RUN_config_trigger_vec; 
-	std::vector<int> RUN_config_timestamp_vec; 
-	std::vector<int> RUN_config_type_vec; 
-	std::vector<int> RUN_config_mode_vec; 
-	std::vector<float> RUN_config_torus_vec; 
-	std::vector<float> RUN_config_solenoid_vec; 
 	std::vector<int> REC_Event_NRUN_vec; 
 	std::vector<int> REC_Event_NEVENT_vec; 
 	std::vector<float> REC_Event_EVNTime_vec; 
@@ -260,17 +316,82 @@ hipo::node<int16_t> *REC_Scintillator_status_node = reader.getBranch<int16_t>(33
 	std::vector<float> REC_Scintillator_hy_vec; 
 	std::vector<float> REC_Scintillator_hz_vec; 
 	std::vector<int> REC_Scintillator_status_vec; 
+	std::vector<int> REC_Track_index_vec; 
+	std::vector<int> REC_Track_pindex_vec; 
+	std::vector<int> REC_Track_detector_vec; 
+	std::vector<int> REC_Track_sector_vec; 
+	std::vector<int> REC_Track_status_vec; 
+	std::vector<int> REC_Track_q_vec; 
+	std::vector<float> REC_Track_chi2_vec; 
+	std::vector<int> REC_Track_NDF_vec; 
+	std::vector<float> REC_Track_px_nomm_vec; 
+	std::vector<float> REC_Track_py_nomm_vec; 
+	std::vector<float> REC_Track_pz_nomm_vec; 
+	std::vector<float> REC_Track_vx_nomm_vec; 
+	std::vector<float> REC_Track_vy_nomm_vec; 
+	std::vector<float> REC_Track_vz_nomm_vec; 
+	std::vector<float> REC_Track_chi2_nomm_vec; 
+	std::vector<int> REC_Track_NDF_nomm_vec; 
+	std::vector<int> REC_TrackCross_index_vec; 
+	std::vector<int> REC_TrackCross_pindex_vec; 
+	std::vector<int> REC_TrackCross_detector_vec; 
+	std::vector<int> REC_TrackCross_sector_vec; 
+	std::vector<int> REC_TrackCross_layer_vec; 
+	std::vector<float> REC_TrackCross_c_x_vec; 
+	std::vector<float> REC_TrackCross_c_y_vec; 
+	std::vector<float> REC_TrackCross_c_z_vec; 
+	std::vector<float> REC_TrackCross_c_ux_vec; 
+	std::vector<float> REC_TrackCross_c_uy_vec; 
+	std::vector<float> REC_TrackCross_c_uz_vec; 
+	std::vector<int> REC_TrackCross_status_vec; 
+	std::vector<int> REC_CovMat_index_vec; 
+	std::vector<int> REC_CovMat_pindex_vec; 
+	std::vector<float> REC_CovMat_C11_vec; 
+	std::vector<float> REC_CovMat_C12_vec; 
+	std::vector<float> REC_CovMat_C13_vec; 
+	std::vector<float> REC_CovMat_C14_vec; 
+	std::vector<float> REC_CovMat_C15_vec; 
+	std::vector<float> REC_CovMat_C22_vec; 
+	std::vector<float> REC_CovMat_C23_vec; 
+	std::vector<float> REC_CovMat_C24_vec; 
+	std::vector<float> REC_CovMat_C25_vec; 
+	std::vector<float> REC_CovMat_C33_vec; 
+	std::vector<float> REC_CovMat_C34_vec; 
+	std::vector<float> REC_CovMat_C35_vec; 
+	std::vector<float> REC_CovMat_C44_vec; 
+	std::vector<float> REC_CovMat_C45_vec; 
+	std::vector<float> REC_CovMat_C55_vec; 
+	std::vector<int> REC_VertDoca_index1_vec; 
+	std::vector<int> REC_VertDoca_index2_vec; 
+	std::vector<float> REC_VertDoca_x_vec; 
+	std::vector<float> REC_VertDoca_y_vec; 
+	std::vector<float> REC_VertDoca_z_vec; 
+	std::vector<float> REC_VertDoca_x1_vec; 
+	std::vector<float> REC_VertDoca_y1_vec; 
+	std::vector<float> REC_VertDoca_z1_vec; 
+	std::vector<float> REC_VertDoca_cx1_vec; 
+	std::vector<float> REC_VertDoca_cy1_vec; 
+	std::vector<float> REC_VertDoca_cz1_vec; 
+	std::vector<float> REC_VertDoca_x2_vec; 
+	std::vector<float> REC_VertDoca_y2_vec; 
+	std::vector<float> REC_VertDoca_z2_vec; 
+	std::vector<float> REC_VertDoca_cx2_vec; 
+	std::vector<float> REC_VertDoca_cy2_vec; 
+	std::vector<float> REC_VertDoca_cz2_vec; 
+	std::vector<float> REC_VertDoca_r_vec; 
+	std::vector<int> REC_Traj_pindex_vec; 
+	std::vector<int> REC_Traj_index_vec; 
+	std::vector<int> REC_Traj_detId_vec; 
+	std::vector<int> REC_Traj_q_vec; 
+	std::vector<float> REC_Traj_x_vec; 
+	std::vector<float> REC_Traj_y_vec; 
+	std::vector<float> REC_Traj_z_vec; 
+	std::vector<float> REC_Traj_cx_vec; 
+	std::vector<float> REC_Traj_cy_vec; 
+	std::vector<float> REC_Traj_cz_vec; 
+	std::vector<float> REC_Traj_pathlength_vec; 
 
 
-	clas12->Branch("RUN_config_run",&RUN_config_run_vec); 
-	clas12->Branch("RUN_config_event",&RUN_config_event_vec); 
-	clas12->Branch("RUN_config_unixtime",&RUN_config_unixtime_vec); 
-	clas12->Branch("RUN_config_trigger",&RUN_config_trigger_vec); 
-	clas12->Branch("RUN_config_timestamp",&RUN_config_timestamp_vec); 
-	clas12->Branch("RUN_config_type",&RUN_config_type_vec); 
-	clas12->Branch("RUN_config_mode",&RUN_config_mode_vec); 
-	clas12->Branch("RUN_config_torus",&RUN_config_torus_vec); 
-	clas12->Branch("RUN_config_solenoid",&RUN_config_solenoid_vec); 
 	clas12->Branch("REC_Event_NRUN",&REC_Event_NRUN_vec); 
 	clas12->Branch("REC_Event_NEVENT",&REC_Event_NEVENT_vec); 
 	clas12->Branch("REC_Event_EVNTime",&REC_Event_EVNTime_vec); 
@@ -371,6 +492,80 @@ hipo::node<int16_t> *REC_Scintillator_status_node = reader.getBranch<int16_t>(33
 	clas12->Branch("REC_Scintillator_hy",&REC_Scintillator_hy_vec); 
 	clas12->Branch("REC_Scintillator_hz",&REC_Scintillator_hz_vec); 
 	clas12->Branch("REC_Scintillator_status",&REC_Scintillator_status_vec); 
+	clas12->Branch("REC_Track_index",&REC_Track_index_vec); 
+	clas12->Branch("REC_Track_pindex",&REC_Track_pindex_vec); 
+	clas12->Branch("REC_Track_detector",&REC_Track_detector_vec); 
+	clas12->Branch("REC_Track_sector",&REC_Track_sector_vec); 
+	clas12->Branch("REC_Track_status",&REC_Track_status_vec); 
+	clas12->Branch("REC_Track_q",&REC_Track_q_vec); 
+	clas12->Branch("REC_Track_chi2",&REC_Track_chi2_vec); 
+	clas12->Branch("REC_Track_NDF",&REC_Track_NDF_vec); 
+	clas12->Branch("REC_Track_px_nomm",&REC_Track_px_nomm_vec); 
+	clas12->Branch("REC_Track_py_nomm",&REC_Track_py_nomm_vec); 
+	clas12->Branch("REC_Track_pz_nomm",&REC_Track_pz_nomm_vec); 
+	clas12->Branch("REC_Track_vx_nomm",&REC_Track_vx_nomm_vec); 
+	clas12->Branch("REC_Track_vy_nomm",&REC_Track_vy_nomm_vec); 
+	clas12->Branch("REC_Track_vz_nomm",&REC_Track_vz_nomm_vec); 
+	clas12->Branch("REC_Track_chi2_nomm",&REC_Track_chi2_nomm_vec); 
+	clas12->Branch("REC_Track_NDF_nomm",&REC_Track_NDF_nomm_vec); 
+	clas12->Branch("REC_TrackCross_index",&REC_TrackCross_index_vec); 
+	clas12->Branch("REC_TrackCross_pindex",&REC_TrackCross_pindex_vec); 
+	clas12->Branch("REC_TrackCross_detector",&REC_TrackCross_detector_vec); 
+	clas12->Branch("REC_TrackCross_sector",&REC_TrackCross_sector_vec); 
+	clas12->Branch("REC_TrackCross_layer",&REC_TrackCross_layer_vec); 
+	clas12->Branch("REC_TrackCross_c_x",&REC_TrackCross_c_x_vec); 
+	clas12->Branch("REC_TrackCross_c_y",&REC_TrackCross_c_y_vec); 
+	clas12->Branch("REC_TrackCross_c_z",&REC_TrackCross_c_z_vec); 
+	clas12->Branch("REC_TrackCross_c_ux",&REC_TrackCross_c_ux_vec); 
+	clas12->Branch("REC_TrackCross_c_uy",&REC_TrackCross_c_uy_vec); 
+	clas12->Branch("REC_TrackCross_c_uz",&REC_TrackCross_c_uz_vec); 
+	clas12->Branch("REC_TrackCross_status",&REC_TrackCross_status_vec); 
+	clas12->Branch("REC_CovMat_index",&REC_CovMat_index_vec); 
+	clas12->Branch("REC_CovMat_pindex",&REC_CovMat_pindex_vec); 
+	clas12->Branch("REC_CovMat_C11",&REC_CovMat_C11_vec); 
+	clas12->Branch("REC_CovMat_C12",&REC_CovMat_C12_vec); 
+	clas12->Branch("REC_CovMat_C13",&REC_CovMat_C13_vec); 
+	clas12->Branch("REC_CovMat_C14",&REC_CovMat_C14_vec); 
+	clas12->Branch("REC_CovMat_C15",&REC_CovMat_C15_vec); 
+	clas12->Branch("REC_CovMat_C22",&REC_CovMat_C22_vec); 
+	clas12->Branch("REC_CovMat_C23",&REC_CovMat_C23_vec); 
+	clas12->Branch("REC_CovMat_C24",&REC_CovMat_C24_vec); 
+	clas12->Branch("REC_CovMat_C25",&REC_CovMat_C25_vec); 
+	clas12->Branch("REC_CovMat_C33",&REC_CovMat_C33_vec); 
+	clas12->Branch("REC_CovMat_C34",&REC_CovMat_C34_vec); 
+	clas12->Branch("REC_CovMat_C35",&REC_CovMat_C35_vec); 
+	clas12->Branch("REC_CovMat_C44",&REC_CovMat_C44_vec); 
+	clas12->Branch("REC_CovMat_C45",&REC_CovMat_C45_vec); 
+	clas12->Branch("REC_CovMat_C55",&REC_CovMat_C55_vec); 
+	clas12->Branch("REC_VertDoca_index1",&REC_VertDoca_index1_vec); 
+	clas12->Branch("REC_VertDoca_index2",&REC_VertDoca_index2_vec); 
+	clas12->Branch("REC_VertDoca_x",&REC_VertDoca_x_vec); 
+	clas12->Branch("REC_VertDoca_y",&REC_VertDoca_y_vec); 
+	clas12->Branch("REC_VertDoca_z",&REC_VertDoca_z_vec); 
+	clas12->Branch("REC_VertDoca_x1",&REC_VertDoca_x1_vec); 
+	clas12->Branch("REC_VertDoca_y1",&REC_VertDoca_y1_vec); 
+	clas12->Branch("REC_VertDoca_z1",&REC_VertDoca_z1_vec); 
+	clas12->Branch("REC_VertDoca_cx1",&REC_VertDoca_cx1_vec); 
+	clas12->Branch("REC_VertDoca_cy1",&REC_VertDoca_cy1_vec); 
+	clas12->Branch("REC_VertDoca_cz1",&REC_VertDoca_cz1_vec); 
+	clas12->Branch("REC_VertDoca_x2",&REC_VertDoca_x2_vec); 
+	clas12->Branch("REC_VertDoca_y2",&REC_VertDoca_y2_vec); 
+	clas12->Branch("REC_VertDoca_z2",&REC_VertDoca_z2_vec); 
+	clas12->Branch("REC_VertDoca_cx2",&REC_VertDoca_cx2_vec); 
+	clas12->Branch("REC_VertDoca_cy2",&REC_VertDoca_cy2_vec); 
+	clas12->Branch("REC_VertDoca_cz2",&REC_VertDoca_cz2_vec); 
+	clas12->Branch("REC_VertDoca_r",&REC_VertDoca_r_vec); 
+	clas12->Branch("REC_Traj_pindex",&REC_Traj_pindex_vec); 
+	clas12->Branch("REC_Traj_index",&REC_Traj_index_vec); 
+	clas12->Branch("REC_Traj_detId",&REC_Traj_detId_vec); 
+	clas12->Branch("REC_Traj_q",&REC_Traj_q_vec); 
+	clas12->Branch("REC_Traj_x",&REC_Traj_x_vec); 
+	clas12->Branch("REC_Traj_y",&REC_Traj_y_vec); 
+	clas12->Branch("REC_Traj_z",&REC_Traj_z_vec); 
+	clas12->Branch("REC_Traj_cx",&REC_Traj_cx_vec); 
+	clas12->Branch("REC_Traj_cy",&REC_Traj_cy_vec); 
+	clas12->Branch("REC_Traj_cz",&REC_Traj_cz_vec); 
+	clas12->Branch("REC_Traj_pathlength",&REC_Traj_pathlength_vec); 
 
   int entry = 0;
   int l = 0;
@@ -378,51 +573,6 @@ hipo::node<int16_t> *REC_Scintillator_status_node = reader.getBranch<int16_t>(33
     entry++;
     if ((entry % 1000) == 0) std::cerr << "\t" << entry << "\r\r" << std::flush;
 
-    l = RUN_config_run_node->getLength();
-    RUN_config_run_vec.resize(l);
-    for (int i = 0; i < l; i++) RUN_config_run_vec.at(i) = RUN_config_run_node->getValue(i);
-
-    
-    l = RUN_config_event_node->getLength();
-    RUN_config_event_vec.resize(l);
-    for (int i = 0; i < l; i++) RUN_config_event_vec.at(i) = RUN_config_event_node->getValue(i);
-
-    
-    l = RUN_config_unixtime_node->getLength();
-    RUN_config_unixtime_vec.resize(l);
-    for (int i = 0; i < l; i++) RUN_config_unixtime_vec.at(i) = RUN_config_unixtime_node->getValue(i);
-
-    
-    l = RUN_config_trigger_node->getLength();
-    RUN_config_trigger_vec.resize(l);
-    for (int i = 0; i < l; i++) RUN_config_trigger_vec.at(i) = RUN_config_trigger_node->getValue(i);
-
-    
-    l = RUN_config_timestamp_node->getLength();
-    RUN_config_timestamp_vec.resize(l);
-    for (int i = 0; i < l; i++) RUN_config_timestamp_vec.at(i) = RUN_config_timestamp_node->getValue(i);
-
-    
-    l = RUN_config_type_node->getLength();
-    RUN_config_type_vec.resize(l);
-    for (int i = 0; i < l; i++) RUN_config_type_vec.at(i) = RUN_config_type_node->getValue(i);
-
-    
-    l = RUN_config_mode_node->getLength();
-    RUN_config_mode_vec.resize(l);
-    for (int i = 0; i < l; i++) RUN_config_mode_vec.at(i) = RUN_config_mode_node->getValue(i);
-
-    
-    l = RUN_config_torus_node->getLength();
-    RUN_config_torus_vec.resize(l);
-    for (int i = 0; i < l; i++) RUN_config_torus_vec.at(i) = RUN_config_torus_node->getValue(i);
-
-    
-    l = RUN_config_solenoid_node->getLength();
-    RUN_config_solenoid_vec.resize(l);
-    for (int i = 0; i < l; i++) RUN_config_solenoid_vec.at(i) = RUN_config_solenoid_node->getValue(i);
-
-    
     l = REC_Event_NRUN_node->getLength();
     REC_Event_NRUN_vec.resize(l);
     for (int i = 0; i < l; i++) REC_Event_NRUN_vec.at(i) = REC_Event_NRUN_node->getValue(i);
@@ -923,16 +1073,377 @@ hipo::node<int16_t> *REC_Scintillator_status_node = reader.getBranch<int16_t>(33
     for (int i = 0; i < l; i++) REC_Scintillator_status_vec.at(i) = REC_Scintillator_status_node->getValue(i);
 
     
+    l = REC_Track_index_node->getLength();
+    REC_Track_index_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_index_vec.at(i) = REC_Track_index_node->getValue(i);
+
+    
+    l = REC_Track_pindex_node->getLength();
+    REC_Track_pindex_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_pindex_vec.at(i) = REC_Track_pindex_node->getValue(i);
+
+    
+    l = REC_Track_detector_node->getLength();
+    REC_Track_detector_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_detector_vec.at(i) = REC_Track_detector_node->getValue(i);
+
+    
+    l = REC_Track_sector_node->getLength();
+    REC_Track_sector_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_sector_vec.at(i) = REC_Track_sector_node->getValue(i);
+
+    
+    l = REC_Track_status_node->getLength();
+    REC_Track_status_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_status_vec.at(i) = REC_Track_status_node->getValue(i);
+
+    
+    l = REC_Track_q_node->getLength();
+    REC_Track_q_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_q_vec.at(i) = REC_Track_q_node->getValue(i);
+
+    
+    l = REC_Track_chi2_node->getLength();
+    REC_Track_chi2_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_chi2_vec.at(i) = REC_Track_chi2_node->getValue(i);
+
+    
+    l = REC_Track_NDF_node->getLength();
+    REC_Track_NDF_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_NDF_vec.at(i) = REC_Track_NDF_node->getValue(i);
+
+    
+    l = REC_Track_px_nomm_node->getLength();
+    REC_Track_px_nomm_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_px_nomm_vec.at(i) = REC_Track_px_nomm_node->getValue(i);
+
+    
+    l = REC_Track_py_nomm_node->getLength();
+    REC_Track_py_nomm_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_py_nomm_vec.at(i) = REC_Track_py_nomm_node->getValue(i);
+
+    
+    l = REC_Track_pz_nomm_node->getLength();
+    REC_Track_pz_nomm_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_pz_nomm_vec.at(i) = REC_Track_pz_nomm_node->getValue(i);
+
+    
+    l = REC_Track_vx_nomm_node->getLength();
+    REC_Track_vx_nomm_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_vx_nomm_vec.at(i) = REC_Track_vx_nomm_node->getValue(i);
+
+    
+    l = REC_Track_vy_nomm_node->getLength();
+    REC_Track_vy_nomm_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_vy_nomm_vec.at(i) = REC_Track_vy_nomm_node->getValue(i);
+
+    
+    l = REC_Track_vz_nomm_node->getLength();
+    REC_Track_vz_nomm_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_vz_nomm_vec.at(i) = REC_Track_vz_nomm_node->getValue(i);
+
+    
+    l = REC_Track_chi2_nomm_node->getLength();
+    REC_Track_chi2_nomm_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_chi2_nomm_vec.at(i) = REC_Track_chi2_nomm_node->getValue(i);
+
+    
+    l = REC_Track_NDF_nomm_node->getLength();
+    REC_Track_NDF_nomm_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Track_NDF_nomm_vec.at(i) = REC_Track_NDF_nomm_node->getValue(i);
+
+    
+    l = REC_TrackCross_index_node->getLength();
+    REC_TrackCross_index_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_TrackCross_index_vec.at(i) = REC_TrackCross_index_node->getValue(i);
+
+    
+    l = REC_TrackCross_pindex_node->getLength();
+    REC_TrackCross_pindex_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_TrackCross_pindex_vec.at(i) = REC_TrackCross_pindex_node->getValue(i);
+
+    
+    l = REC_TrackCross_detector_node->getLength();
+    REC_TrackCross_detector_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_TrackCross_detector_vec.at(i) = REC_TrackCross_detector_node->getValue(i);
+
+    
+    l = REC_TrackCross_sector_node->getLength();
+    REC_TrackCross_sector_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_TrackCross_sector_vec.at(i) = REC_TrackCross_sector_node->getValue(i);
+
+    
+    l = REC_TrackCross_layer_node->getLength();
+    REC_TrackCross_layer_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_TrackCross_layer_vec.at(i) = REC_TrackCross_layer_node->getValue(i);
+
+    
+    l = REC_TrackCross_c_x_node->getLength();
+    REC_TrackCross_c_x_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_TrackCross_c_x_vec.at(i) = REC_TrackCross_c_x_node->getValue(i);
+
+    
+    l = REC_TrackCross_c_y_node->getLength();
+    REC_TrackCross_c_y_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_TrackCross_c_y_vec.at(i) = REC_TrackCross_c_y_node->getValue(i);
+
+    
+    l = REC_TrackCross_c_z_node->getLength();
+    REC_TrackCross_c_z_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_TrackCross_c_z_vec.at(i) = REC_TrackCross_c_z_node->getValue(i);
+
+    
+    l = REC_TrackCross_c_ux_node->getLength();
+    REC_TrackCross_c_ux_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_TrackCross_c_ux_vec.at(i) = REC_TrackCross_c_ux_node->getValue(i);
+
+    
+    l = REC_TrackCross_c_uy_node->getLength();
+    REC_TrackCross_c_uy_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_TrackCross_c_uy_vec.at(i) = REC_TrackCross_c_uy_node->getValue(i);
+
+    
+    l = REC_TrackCross_c_uz_node->getLength();
+    REC_TrackCross_c_uz_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_TrackCross_c_uz_vec.at(i) = REC_TrackCross_c_uz_node->getValue(i);
+
+    
+    l = REC_TrackCross_status_node->getLength();
+    REC_TrackCross_status_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_TrackCross_status_vec.at(i) = REC_TrackCross_status_node->getValue(i);
+
+    
+    l = REC_CovMat_index_node->getLength();
+    REC_CovMat_index_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_index_vec.at(i) = REC_CovMat_index_node->getValue(i);
+
+    
+    l = REC_CovMat_pindex_node->getLength();
+    REC_CovMat_pindex_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_pindex_vec.at(i) = REC_CovMat_pindex_node->getValue(i);
+
+    
+    l = REC_CovMat_C11_node->getLength();
+    REC_CovMat_C11_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_C11_vec.at(i) = REC_CovMat_C11_node->getValue(i);
+
+    
+    l = REC_CovMat_C12_node->getLength();
+    REC_CovMat_C12_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_C12_vec.at(i) = REC_CovMat_C12_node->getValue(i);
+
+    
+    l = REC_CovMat_C13_node->getLength();
+    REC_CovMat_C13_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_C13_vec.at(i) = REC_CovMat_C13_node->getValue(i);
+
+    
+    l = REC_CovMat_C14_node->getLength();
+    REC_CovMat_C14_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_C14_vec.at(i) = REC_CovMat_C14_node->getValue(i);
+
+    
+    l = REC_CovMat_C15_node->getLength();
+    REC_CovMat_C15_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_C15_vec.at(i) = REC_CovMat_C15_node->getValue(i);
+
+    
+    l = REC_CovMat_C22_node->getLength();
+    REC_CovMat_C22_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_C22_vec.at(i) = REC_CovMat_C22_node->getValue(i);
+
+    
+    l = REC_CovMat_C23_node->getLength();
+    REC_CovMat_C23_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_C23_vec.at(i) = REC_CovMat_C23_node->getValue(i);
+
+    
+    l = REC_CovMat_C24_node->getLength();
+    REC_CovMat_C24_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_C24_vec.at(i) = REC_CovMat_C24_node->getValue(i);
+
+    
+    l = REC_CovMat_C25_node->getLength();
+    REC_CovMat_C25_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_C25_vec.at(i) = REC_CovMat_C25_node->getValue(i);
+
+    
+    l = REC_CovMat_C33_node->getLength();
+    REC_CovMat_C33_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_C33_vec.at(i) = REC_CovMat_C33_node->getValue(i);
+
+    
+    l = REC_CovMat_C34_node->getLength();
+    REC_CovMat_C34_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_C34_vec.at(i) = REC_CovMat_C34_node->getValue(i);
+
+    
+    l = REC_CovMat_C35_node->getLength();
+    REC_CovMat_C35_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_C35_vec.at(i) = REC_CovMat_C35_node->getValue(i);
+
+    
+    l = REC_CovMat_C44_node->getLength();
+    REC_CovMat_C44_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_C44_vec.at(i) = REC_CovMat_C44_node->getValue(i);
+
+    
+    l = REC_CovMat_C45_node->getLength();
+    REC_CovMat_C45_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_C45_vec.at(i) = REC_CovMat_C45_node->getValue(i);
+
+    
+    l = REC_CovMat_C55_node->getLength();
+    REC_CovMat_C55_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_CovMat_C55_vec.at(i) = REC_CovMat_C55_node->getValue(i);
+
+    
+    l = REC_VertDoca_index1_node->getLength();
+    REC_VertDoca_index1_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_index1_vec.at(i) = REC_VertDoca_index1_node->getValue(i);
+
+    
+    l = REC_VertDoca_index2_node->getLength();
+    REC_VertDoca_index2_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_index2_vec.at(i) = REC_VertDoca_index2_node->getValue(i);
+
+    
+    l = REC_VertDoca_x_node->getLength();
+    REC_VertDoca_x_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_x_vec.at(i) = REC_VertDoca_x_node->getValue(i);
+
+    
+    l = REC_VertDoca_y_node->getLength();
+    REC_VertDoca_y_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_y_vec.at(i) = REC_VertDoca_y_node->getValue(i);
+
+    
+    l = REC_VertDoca_z_node->getLength();
+    REC_VertDoca_z_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_z_vec.at(i) = REC_VertDoca_z_node->getValue(i);
+
+    
+    l = REC_VertDoca_x1_node->getLength();
+    REC_VertDoca_x1_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_x1_vec.at(i) = REC_VertDoca_x1_node->getValue(i);
+
+    
+    l = REC_VertDoca_y1_node->getLength();
+    REC_VertDoca_y1_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_y1_vec.at(i) = REC_VertDoca_y1_node->getValue(i);
+
+    
+    l = REC_VertDoca_z1_node->getLength();
+    REC_VertDoca_z1_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_z1_vec.at(i) = REC_VertDoca_z1_node->getValue(i);
+
+    
+    l = REC_VertDoca_cx1_node->getLength();
+    REC_VertDoca_cx1_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_cx1_vec.at(i) = REC_VertDoca_cx1_node->getValue(i);
+
+    
+    l = REC_VertDoca_cy1_node->getLength();
+    REC_VertDoca_cy1_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_cy1_vec.at(i) = REC_VertDoca_cy1_node->getValue(i);
+
+    
+    l = REC_VertDoca_cz1_node->getLength();
+    REC_VertDoca_cz1_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_cz1_vec.at(i) = REC_VertDoca_cz1_node->getValue(i);
+
+    
+    l = REC_VertDoca_x2_node->getLength();
+    REC_VertDoca_x2_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_x2_vec.at(i) = REC_VertDoca_x2_node->getValue(i);
+
+    
+    l = REC_VertDoca_y2_node->getLength();
+    REC_VertDoca_y2_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_y2_vec.at(i) = REC_VertDoca_y2_node->getValue(i);
+
+    
+    l = REC_VertDoca_z2_node->getLength();
+    REC_VertDoca_z2_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_z2_vec.at(i) = REC_VertDoca_z2_node->getValue(i);
+
+    
+    l = REC_VertDoca_cx2_node->getLength();
+    REC_VertDoca_cx2_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_cx2_vec.at(i) = REC_VertDoca_cx2_node->getValue(i);
+
+    
+    l = REC_VertDoca_cy2_node->getLength();
+    REC_VertDoca_cy2_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_cy2_vec.at(i) = REC_VertDoca_cy2_node->getValue(i);
+
+    
+    l = REC_VertDoca_cz2_node->getLength();
+    REC_VertDoca_cz2_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_cz2_vec.at(i) = REC_VertDoca_cz2_node->getValue(i);
+
+    
+    l = REC_VertDoca_r_node->getLength();
+    REC_VertDoca_r_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_VertDoca_r_vec.at(i) = REC_VertDoca_r_node->getValue(i);
+
+    
+    l = REC_Traj_pindex_node->getLength();
+    REC_Traj_pindex_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Traj_pindex_vec.at(i) = REC_Traj_pindex_node->getValue(i);
+
+    
+    l = REC_Traj_index_node->getLength();
+    REC_Traj_index_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Traj_index_vec.at(i) = REC_Traj_index_node->getValue(i);
+
+    
+    l = REC_Traj_detId_node->getLength();
+    REC_Traj_detId_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Traj_detId_vec.at(i) = REC_Traj_detId_node->getValue(i);
+
+    
+    l = REC_Traj_q_node->getLength();
+    REC_Traj_q_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Traj_q_vec.at(i) = REC_Traj_q_node->getValue(i);
+
+    
+    l = REC_Traj_x_node->getLength();
+    REC_Traj_x_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Traj_x_vec.at(i) = REC_Traj_x_node->getValue(i);
+
+    
+    l = REC_Traj_y_node->getLength();
+    REC_Traj_y_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Traj_y_vec.at(i) = REC_Traj_y_node->getValue(i);
+
+    
+    l = REC_Traj_z_node->getLength();
+    REC_Traj_z_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Traj_z_vec.at(i) = REC_Traj_z_node->getValue(i);
+
+    
+    l = REC_Traj_cx_node->getLength();
+    REC_Traj_cx_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Traj_cx_vec.at(i) = REC_Traj_cx_node->getValue(i);
+
+    
+    l = REC_Traj_cy_node->getLength();
+    REC_Traj_cy_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Traj_cy_vec.at(i) = REC_Traj_cy_node->getValue(i);
+
+    
+    l = REC_Traj_cz_node->getLength();
+    REC_Traj_cz_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Traj_cz_vec.at(i) = REC_Traj_cz_node->getValue(i);
+
+    
+    l = REC_Traj_pathlength_node->getLength();
+    REC_Traj_pathlength_vec.resize(l);
+    for (int i = 0; i < l; i++) REC_Traj_pathlength_vec.at(i) = REC_Traj_pathlength_node->getValue(i);
+
+    
 		clas12->Fill();
-		RUN_config_run_vec.clear();  
-		RUN_config_event_vec.clear();  
-		RUN_config_unixtime_vec.clear();  
-		RUN_config_trigger_vec.clear();  
-		RUN_config_timestamp_vec.clear();  
-		RUN_config_type_vec.clear();  
-		RUN_config_mode_vec.clear();  
-		RUN_config_torus_vec.clear();  
-		RUN_config_solenoid_vec.clear();  
 		REC_Event_NRUN_vec.clear();  
 		REC_Event_NEVENT_vec.clear();  
 		REC_Event_EVNTime_vec.clear();  
@@ -1033,6 +1544,80 @@ hipo::node<int16_t> *REC_Scintillator_status_node = reader.getBranch<int16_t>(33
 		REC_Scintillator_hy_vec.clear();  
 		REC_Scintillator_hz_vec.clear();  
 		REC_Scintillator_status_vec.clear();  
+		REC_Track_index_vec.clear();  
+		REC_Track_pindex_vec.clear();  
+		REC_Track_detector_vec.clear();  
+		REC_Track_sector_vec.clear();  
+		REC_Track_status_vec.clear();  
+		REC_Track_q_vec.clear();  
+		REC_Track_chi2_vec.clear();  
+		REC_Track_NDF_vec.clear();  
+		REC_Track_px_nomm_vec.clear();  
+		REC_Track_py_nomm_vec.clear();  
+		REC_Track_pz_nomm_vec.clear();  
+		REC_Track_vx_nomm_vec.clear();  
+		REC_Track_vy_nomm_vec.clear();  
+		REC_Track_vz_nomm_vec.clear();  
+		REC_Track_chi2_nomm_vec.clear();  
+		REC_Track_NDF_nomm_vec.clear();  
+		REC_TrackCross_index_vec.clear();  
+		REC_TrackCross_pindex_vec.clear();  
+		REC_TrackCross_detector_vec.clear();  
+		REC_TrackCross_sector_vec.clear();  
+		REC_TrackCross_layer_vec.clear();  
+		REC_TrackCross_c_x_vec.clear();  
+		REC_TrackCross_c_y_vec.clear();  
+		REC_TrackCross_c_z_vec.clear();  
+		REC_TrackCross_c_ux_vec.clear();  
+		REC_TrackCross_c_uy_vec.clear();  
+		REC_TrackCross_c_uz_vec.clear();  
+		REC_TrackCross_status_vec.clear();  
+		REC_CovMat_index_vec.clear();  
+		REC_CovMat_pindex_vec.clear();  
+		REC_CovMat_C11_vec.clear();  
+		REC_CovMat_C12_vec.clear();  
+		REC_CovMat_C13_vec.clear();  
+		REC_CovMat_C14_vec.clear();  
+		REC_CovMat_C15_vec.clear();  
+		REC_CovMat_C22_vec.clear();  
+		REC_CovMat_C23_vec.clear();  
+		REC_CovMat_C24_vec.clear();  
+		REC_CovMat_C25_vec.clear();  
+		REC_CovMat_C33_vec.clear();  
+		REC_CovMat_C34_vec.clear();  
+		REC_CovMat_C35_vec.clear();  
+		REC_CovMat_C44_vec.clear();  
+		REC_CovMat_C45_vec.clear();  
+		REC_CovMat_C55_vec.clear();  
+		REC_VertDoca_index1_vec.clear();  
+		REC_VertDoca_index2_vec.clear();  
+		REC_VertDoca_x_vec.clear();  
+		REC_VertDoca_y_vec.clear();  
+		REC_VertDoca_z_vec.clear();  
+		REC_VertDoca_x1_vec.clear();  
+		REC_VertDoca_y1_vec.clear();  
+		REC_VertDoca_z1_vec.clear();  
+		REC_VertDoca_cx1_vec.clear();  
+		REC_VertDoca_cy1_vec.clear();  
+		REC_VertDoca_cz1_vec.clear();  
+		REC_VertDoca_x2_vec.clear();  
+		REC_VertDoca_y2_vec.clear();  
+		REC_VertDoca_z2_vec.clear();  
+		REC_VertDoca_cx2_vec.clear();  
+		REC_VertDoca_cy2_vec.clear();  
+		REC_VertDoca_cz2_vec.clear();  
+		REC_VertDoca_r_vec.clear();  
+		REC_Traj_pindex_vec.clear();  
+		REC_Traj_index_vec.clear();  
+		REC_Traj_detId_vec.clear();  
+		REC_Traj_q_vec.clear();  
+		REC_Traj_x_vec.clear();  
+		REC_Traj_y_vec.clear();  
+		REC_Traj_z_vec.clear();  
+		REC_Traj_cx_vec.clear();  
+		REC_Traj_cy_vec.clear();  
+		REC_Traj_cz_vec.clear();  
+		REC_Traj_pathlength_vec.clear();  
 
   }
   OutputFile->cd();

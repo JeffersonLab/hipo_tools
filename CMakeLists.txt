@@ -29,7 +29,7 @@ include_directories(src/hipocpp/include)
 
 add_subdirectory(src/hipocpp)
 add_subdirectory(src/toohip4root)
-add_subdirectory(src/hipo2root)
+add_subdirectory(src/recon2root)
 add_subdirectory(src/hipo-io)
 
 

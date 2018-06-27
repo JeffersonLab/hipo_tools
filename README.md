@@ -7,7 +7,7 @@ hipo-tools
 Documentation](https://userweb.jlab.org/~gavalian/docs/sphinx/hipo/html/index.html) 
 (external project)
 
-This code was adopted from source code on the jlab CUE 
+This code was adopted from source code on the jlab CUE
 `/group/clas12/packages/hipo-io`.
 
 Installing
@@ -69,14 +69,25 @@ OPTIONS
 
 ```
 
+### recon2root
+
+A clas12 specific converter to extract the `REC::*` banks from a hipo file and
+put them into a root file. Useful for analysis especially if downloading the
+files to an offsite location or a personal computer.
+
+```
+$ recon2root <input file> [<output file>]
+```
+
+
 Todo
 ----
 
-* Isolate json parser from converter
-* Create clas12 specific helpers (maybe different repo for clas12 specific json?)
-* Setup CI with test data.
-* Debug build on mac
-* Test library in external cmake and pkgconfig projects
+- [ ] Isolate json parser from converter
+- [ ] Create clas12 specific helpers (maybe different repo for clas12 specific json?)
+- [ ] Setup CI with test data.
+- [x] Debug build on mac (#7)
+- [ ] Test library in external cmake and pkgconfig projects
 
 
 ### Install structure:
@@ -85,7 +96,7 @@ Todo
 .
 ├── bin
 │   ├── hipo
-│   ├── hipo2root
+│   ├── recon2root
 │   └── toohip4root
 ├── include
 │   └── hipo
