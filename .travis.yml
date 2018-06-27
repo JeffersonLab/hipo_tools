@@ -19,8 +19,9 @@ matrix:
         - CC=/usr/local/opt/llvm/bin/clang
       before_script:
         - brew install llvm
+        - brew install lz4
+        - brew install root
       script:
-        - cd hipo_tools
         - mkdir build && cd build
         - cmake .. -DCMAKE_INSTALL_PREFIX=install
         - make
