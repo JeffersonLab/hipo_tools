@@ -304,18 +304,18 @@ namespace hipo {
     std::vector<double_t> fVecD;
   };
   
-  /** Item for long.
+  /** Item for long (64 bit int).
    */
   class THipoItemL : public THipoItem {
 
   public:
-    THipoItemL(hipo::node<long>* node, Int_t* entry) : THipoItem(entry) {
+    THipoItemL(hipo::node<int64_t>* node, Int_t* entry) : THipoItem(entry) {
       fNodeL = node;
       fNode  = dynamic_cast<hipo::generic_node*>(fNodeL);
       fNode->type(8);
     };
     virtual ~THipoItemL(){};
-    virtual void ResetNode(hipo::node<long>* node) {
+    virtual void ResetNode(hipo::node<int64_t>* node) {
       fNodeL = nullptr;
       fNode  = nullptr;
       fNodeL = node;
@@ -342,11 +342,11 @@ namespace hipo {
       }
       return kFALSE;
     }
-    long Val() { return fNodeL->getValue(fBankEntry); }
+    int64_t Val() { return fNodeL->getValue(fBankEntry); }
 
   private:
-    hipo::node<long>* fNodeL = nullptr;
-    std::vector<long> fVecL;
+    hipo::node<int64_t>* fNodeL = nullptr;
+    std::vector<int64_t> fVecL;
   };
 
   /* inline Bool_t THipoItem::FindEntry(Float_t val){ */

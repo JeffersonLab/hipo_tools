@@ -10,8 +10,9 @@ target_include_directories(hipo_io
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
   )
+  #PRIVATE ${libname} stdc++fs
 target_link_libraries(hipo_io
-  PRIVATE ${libname} stdc++fs
+  PRIVATE ${libname} ${CXX_FILESYSTEM_LIB}
   PUBLIC hipocpp
   )
 
