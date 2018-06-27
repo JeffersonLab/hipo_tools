@@ -2,13 +2,11 @@ from hipopy import hipo_reader
 
 reader = hipo_reader("/Users/tylern/Data/hipo/out_clas_004203.evio.101.hipo")
 
-reader.showInfo()
-print(reader.getRecordCount())
+rec_part_pid = reader.getNode(331, 1)  # REC::Particle pid
 
-node = reader.getNode(331, 1)  # REC::Particle pid
-
-while(reader.next()):
-    val = node.getLength()
-    print(val)
-
-assert(reader.getRecordCount() == 579), "Wrong record count!"
+num = 0
+while(reader.next() and num < 50):
+    for i in range(0, rec_part_pid.getLength()):
+        print(rec_part_pid.getValue(i), end='  ')
+    num += 1
+    print()

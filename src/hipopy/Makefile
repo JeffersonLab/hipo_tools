@@ -1,8 +1,10 @@
 .PHONY: clean
-all: setup
+all: setup tests
 
 setup:
 	python setup.py build_ext --inplace
+
+tests:
 	python test.py
 
 clean:
