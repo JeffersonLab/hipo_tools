@@ -10,6 +10,6 @@ matrix:
         - docker build -t hipo_tools docker/.
         - docker images -a
     - os: osx
-      language: generic
+      language: cpp
       script:
-        - .travis_build.sh
+        - bash .travis_build.sh
