@@ -55,6 +55,21 @@ cdef class int_node:
     return self.c_node.getLength()
 
 
+cdef class float_node:
+  cdef node[float]*c_node
+  def __cinit__(self):
+    self.c_node = new node[float]()
+
+  cdef setup(self, node[float]* node):
+    self.c_node = node
+
+  def getValue(self, x):
+    return self.c_node.getValue(x)
+
+  def getLength(self):
+    return self.c_node.getLength()
+
+
 
 cdef class hipo_reader:
   cdef reader*c_reader
@@ -84,9 +99,16 @@ cdef class hipo_reader:
   def next(self):
     return self.c_reader.next()
 
-  def getNode(self, group, item):
+  def getIntNode(self, group, item):
     cdef node[int]*c_node
     c_node = self.c_reader.getBranch[int](group, item)
     py_node = int_node()
+    py_node.setup(c_node)
+    return py_node
+
+  def getFloatNode(self, group, item):
+    cdef node[float]*c_node
+    c_node = self.c_reader.getBranch[float](group, item)
+    py_node = float_node()
     py_node.setup(c_node)
     return py_node
