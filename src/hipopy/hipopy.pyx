@@ -3,19 +3,6 @@ from libcpp.vector cimport vector
 from libcpp.string cimport string
 from libcpp cimport bool
 
-cdef extern from "utils.cpp":
-  pass
-cdef extern from "node.cpp":
-  pass
-cdef extern from "reader.cpp":
-  pass
-cdef extern from "event.cpp":
-  pass
-cdef extern from "record.cpp":
-  pass
-cdef extern from "dictionary.cpp":
-  pass
-
 cdef extern from "hipo/node.h" namespace "hipo":
     cdef cppclass node[T]:
       node() except +
