@@ -44,7 +44,8 @@ int main(int argc, char** argv) {
   bool   help      = false;
   bool   verbose   = false;
   std::vector<string> out_banks;
-  string code_file_out   = "";
+  string code_file_out   = "myAnalysis.cxx";
+  bool   is_convert_cmd = false;
   bool   is_list_cmd = false;
   bool   is_dump_cmd = false;
   bool   is_code_cmd = false;
@@ -77,6 +78,7 @@ int main(int argc, char** argv) {
     // todo: add starting event number
     option("-N", "--Nevents") & value("Nevents",N_events) % "Number of events to output."
     );
+
   auto help_cli = (
     command("help").set(is_help_cmd) % "print help"
     );
@@ -110,25 +112,6 @@ int main(int argc, char** argv) {
     return -127;
   }
 
-  fs::path out_path = outfile;
-  if (outfile.empty()) {
-    out_path = in_path;
-    out_path.replace_extension(".root");
-    outfile = out_path.string();
-  }
-  if (out_path.extension() != fs::path(".root")) {
-    out_path.replace_extension(".root");
-    outfile = out_path.string();
-  }
-
-  if (fs::exists(out_path)) {
-    if(force_out){
-      std::cout << out_path << " will be overwritten\n";
-    } else {
-      std::cerr << "error: file " << out_path << " exists (use -f to force overwrite).\n";
-      return -127;
-    }
-  }
 
   //cout << "converting " << in_path  << "\n";
   //cout << "to         " << out_path << "\n";
@@ -210,32 +193,60 @@ int main(int argc, char** argv) {
     //if(out_banks.size()==0){
     //  printf("[--code] error : please provide bank names..\n\n");
     //} else {
-      printf("[code] ----> starting code generation....\n");
-      printf("[open] ----> writing file : runFileLoop.cc\n");
-      ofstream my_cc_file ("runFileLoop.cc");
-      my_cc_file << hipo::utils::getFileHeader().c_str() << std::endl;
+    std::cout << "[code] ----> starting code generation....\n";
+    std::cout << "[open] ----> writing file : " << code_file_out << "\n";
+    ofstream my_cc_file (code_file_out);
+    my_cc_file << hipo::utils::getFileHeader().c_str() << std::endl;
 
 
-      for(int i = 0; i < code_nodes.size(); i++){
-        if(dict->hasSchema(code_nodes[i].c_str())==true){
-          std::vector<std::string>  code = dict->getSchema(code_nodes[i].c_str()).branchesCode();
+    for(int i = 0; i < code_nodes.size(); i++){
+      if(dict->hasSchema(code_nodes[i].c_str())==true){
+        std::vector<std::string>  code = dict->getSchema(code_nodes[i].c_str()).branchesCode();
 
-          for(int v = 0; v < code.size(); v++){
-            //printf("%s\n",code[v].c_str());
-            my_cc_file << code[v].c_str() << std::endl;
-          }
-        } else {
-          printf("// ** error ** can not find bank with name [%s]\n",code_nodes[i].c_str());
+        for(int v = 0; v < code.size(); v++){
+          //printf("%s\n",code[v].c_str());
+          my_cc_file << code[v].c_str() << std::endl;
         }
+      } else {
+        std::cout << "// ** error ** can not find bank with name [" << code_nodes[i].c_str() <<"]\n";
       }
-      std::vector<std::string>  access_code = dict->getSchema(code_nodes[0].c_str()).branchesAccessCode();
-      //printf("%s\n",hipo::utils::getFileTrailer(access_code[0].c_str()).c_str());
-      my_cc_file << hipo::utils::getFileTrailer(access_code[0].c_str()).c_str() << std::endl;
-      my_cc_file.close();
+    }
+    std::vector<std::string>  access_code = dict->getSchema(code_nodes[0].c_str()).branchesAccessCode();
+    //printf("%s\n",hipo::utils::getFileTrailer(access_code[0].c_str()).c_str());
+    my_cc_file << hipo::utils::getFileTrailer(access_code[0].c_str()).c_str() << std::endl;
+    my_cc_file.close();
     //}
   }
 
   if(is_dump_cmd) {
+
+    fs::path out_path = outfile;
+
+    if (outfile.empty()) {
+      out_path = in_path;
+      out_path.replace_extension(".root");
+      outfile = out_path.string();
+    }
+    if (out_path.extension() != fs::path(".root")) {
+      out_path.replace_extension(".root");
+      outfile = out_path.string();
+    }
+
+    if (fs::exists(out_path)) {
+      if(force_out){
+        std::cout << out_path << " will be overwritten\n";
+      } else {
+        std::cerr << "error: file " << out_path << " exists (use -f to force overwrite).\n";
+        return -127;
+      }
+    }
+
+    std::cout << " UNABLE TO WRITE FROM HIPO FILES FROM C++\n";
+    std::cout << " Please make a request for support by emailing:\n";   
+    std::cout << " clas12_software@jlab.org\n";
+    std::cout << "   or create a new issue on github \n";
+    std::cout << " https://github.com/JeffersonLab/hipo_tools\n";   
+
     hipo::writer hip_writer;
     hip_writer.open(out_path.string().c_str());
 
