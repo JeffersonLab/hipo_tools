@@ -28,5 +28,3 @@ matrix:
         - CXX=/usr/local/opt/llvm/bin/clang++ CC=/usr/local/opt/llvm/bin/clang cmake .. -DCMAKE_INSTALL_PREFIX=$SOURCE/install
         - make
         - make install
-      script:
-        - LD_LIBRARY_PATH=$SOURCE/install/lib; python -c 'from hipopy import hipo_reader;'
