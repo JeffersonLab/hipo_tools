@@ -32,6 +32,10 @@ add_subdirectory(src/toohip4root)
 add_subdirectory(src/recon2root)
 add_subdirectory(src/hipo-io)
 
+find_package(Cython)
+if(Cython_FOUND)
+    add_subdirectory(src/hipopy)
+endif()
 
 add_executable(hipo examples/hipo.cpp)
 target_link_libraries(hipo hipocpp ${LZ4_LIBRARY})
