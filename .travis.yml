@@ -17,6 +17,7 @@ matrix:
           - /usr/local/Cellar
           - /usr/local/Homebrew
       before_install:
+        - export SOURCE=$PWD
         - brew install llvm; echo "Done"
         - brew install lz4; echo "Done"
         - brew install gcc; echo "Done"
@@ -24,8 +25,8 @@ matrix:
         - pip install cython scikit-build numpy
       install:
         - mkdir build && cd build
-        - CXX=/usr/local/opt/llvm/bin/clang++ CC=/usr/local/opt/llvm/bin/clang cmake .. -DCMAKE_INSTALL_PREFIX=install
+        - CXX=/usr/local/opt/llvm/bin/clang++ CC=/usr/local/opt/llvm/bin/clang cmake .. -DCMAKE_INSTALL_PREFIX=$SOURCE/install
         - make
         - make install
       script:
-        - python -c 'from hipopy import hipo_reader;'
+        - LD_LIBRARY_PATH=$SOURCE/install/lib; python -c 'from hipopy import hipo_reader;'
