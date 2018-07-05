@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
          printf("[code] ----> starting code generation....\n");
          printf("[open] ----> writing file : runFileLoop.cc\n");
          ofstream my_cc_file ("runFileLoop.cc");
-         my_cc_file << hipo::utils::getFileHeader().c_str() << std::endl;
+         my_cc_file << hipo::utils::getFileHeader("runFileLoop").c_str() << std::endl;
 
          if(doAll==true){
            banks.clear();
