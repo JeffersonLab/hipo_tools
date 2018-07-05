@@ -9,12 +9,25 @@ enable_testing()
 #    SOVERSION "${lib_MAJOR_VERSION}"
 #    SUFFIX ".so")
 
-set(HEADERS include/THipo.h)
+set(HEADERS 
+  include/THipo.h
+  include/THipoItem.h
+  include/THipoBank.h
+  include/THipoBankParser.h
+  #include/RHipoDS.h
+  )
 
 #ROOT_GENERATE_DICTIONARY(${dictname} -I${PROJECT_SOURCE_DIR}/src/Hipo -I${PROJECT_SOURCE_DIR}/src/Hipo/include ${lib_HEADERS} LINKDEF ${lib_LINKDEF} OPTIONS -p)
 #ADD_CUSTOM_TARGET(${aname}_ROOTDICTS DEPENDS ${lib_SRCS} ${lib_HEADERS} ${lib_DICTIONARY_SRC} ${lib_DICTIONARY_HEADER})
 
-add_library(hiporoot SHARED src/THipo.cxx)
+message("ROOT_LIBRARIES ${ROOT_LIBRARIES} ")
+add_library(hiporoot SHARED 
+  src/THipo.cxx
+  src/THipoItem.cxx
+  src/THipoBank.cxx
+  src/THipoBankParser.cxx
+  #src/RHipoDS.cxx
+  )
 target_link_libraries(hiporoot 
   PUBLIC ${ROOT_LIBRARIES} 
   PUBLIC ${LZ4_LIBRARY}
