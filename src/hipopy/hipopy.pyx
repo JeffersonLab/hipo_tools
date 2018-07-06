@@ -26,11 +26,11 @@ cdef extern from "hipo/reader.h" namespace "hipo":
       bool next()
       bool  isOpen()
       void  showInfo()
-      node *getBranch[T](int, int)
-      #node *getBranch[T](char*,char*)
+      #node *getBranch[T](int, int)
+      node *getBranch[T](char*,char*)
 
 
-def str_to_char(name):
+def str_to_char(str name):
   cdef bytes name_bytes = name.encode()
   cdef char* c_name = name_bytes
   return c_name
@@ -70,20 +70,11 @@ cdef class hipo_reader:
   def __cinit__(self):
     self.c_reader = new reader(True)
 
-  def __cinit__(self, bool randonAccess=True):
-    self.c_reader = new reader(randonAccess)
+  def __cinit__(self, str filename, bool randomAccess = True):
+    self.c_reader = new reader(randomAccess)
+    self.open(filename)
 
-  def __cinit__(self, string filename):
-    self.c_reader = new reader(True)
-    cdef bytes filename_bytes = filename.encode()
-    cdef char* c_filename = filename_bytes
-    self.c_reader.open(c_filename)
-
-  def __cinit__(self, bytes filename):
-    self.c_reader = new reader(True)
-    self.c_reader.open(filename)
-
-  def open(self, string filename):
+  def open(self, str filename):
     cdef bytes filename_bytes = filename.encode()
     cdef char* c_filename = filename_bytes
     self.c_reader.open(c_filename)
@@ -103,26 +94,20 @@ cdef class hipo_reader:
   def getDictionary(self):
     return self.c_reader.getDictionary()
 
-  #def getIntNode(self, group, item):
-  #  cdef node[int]*c_node
-  #  if(isinstance(group, basestring)):
-  #    group = str_to_char(group)
-  #    item = str_to_char(item)
-  #  c_node = self.c_reader.getBranch[int](group,item)
-  #  py_node = int_node()
-  #  py_node.setup(c_node)
-  #  return py_node
-
-  def getIntNode(self, int group, int item):
+  def getIntNode(self, str group, str item):
     cdef node[int]*c_node
-    c_node = self.c_reader.getBranch[int](group,item)
+    c_group = str_to_char(group)
+    c_item = str_to_char(item)
+    c_node = self.c_reader.getBranch[int](c_group,c_item)
     py_node = int_node()
     py_node.setup(c_node)
     return py_node
 
-  def getFloatNode(self, int group, int item):
+  def getFloatNode(self, str group, str item):
     cdef node[float]*c_node
-    c_node = self.c_reader.getBranch[float](group,item)
+    c_group = str_to_char(group)
+    c_item = str_to_char(item)
+    c_node = self.c_reader.getBranch[float](c_group,c_item)
     py_node = float_node()
     py_node.setup(c_node)
     return py_node
