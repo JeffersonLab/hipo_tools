@@ -193,10 +193,16 @@ int main(int argc, char** argv) {
     //if(out_banks.size()==0){
     //  printf("[--code] error : please provide bank names..\n\n");
     //} else {
+    
+    fs::path out_path = code_file_out;
+    if(out_path.extension().empty()) {
+      out_path.replace_extension(".cxx");
+    }
+
     std::cout << "[code] ----> starting code generation....\n";
     std::cout << "[open] ----> writing file : " << code_file_out << "\n";
-    ofstream my_cc_file (code_file_out);
-    my_cc_file << hipo::utils::getFileHeader().c_str() << std::endl;
+    ofstream my_cc_file (out_path);
+    my_cc_file << hipo::utils::getFileHeader(out_path.stem().string()).c_str() << std::endl;
 
 
     for(int i = 0; i < code_nodes.size(); i++){
