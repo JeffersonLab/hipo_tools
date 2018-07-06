@@ -30,4 +30,12 @@ namespace hipo {
 
   void generic_node::length(int length) { __length = length;}
   int  generic_node::length() const { return __length;}
+
+  template class node<int8_t>;
+  template class node<int16_t>;
+  template class node<int32_t>;
+  template class node<int64_t>;
+  template class node<float>;
+  template class node<double>;
+
 }
