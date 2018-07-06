@@ -27,7 +27,10 @@ add_library(hipocpp SHARED
 set_target_properties(hipocpp PROPERTIES VERSION ${PROJECT_VERSION})
 #add_dependencies(hipocpp hipocppDict_ROOTDICTS)
 
-target_link_libraries(hipocpp PUBLIC ${LZ4_LIBRARY} ${ROOT_LIBRARIES})
+target_link_libraries(hipocpp 
+  PUBLIC ${LZ4_LIBRARY} 
+#  ${ROOT_LIBRARIES}
+  )
 
 target_include_directories(hipocpp 
   PRIVATE include)
