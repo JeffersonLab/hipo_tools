@@ -2,20 +2,18 @@ cmake_minimum_required(VERSION 3.6)
 
 enable_testing()
 
-# add src file names here (without the extention or src/ prefix)
-#set(lib_files THipo)
-#ROOT_GENERATE_DICTIONARY(${dictname} -I${PROJECT_SOURCE_DIR}/src/Hipo -I${PROJECT_SOURCE_DIR}/src/Hipo/include ${lib_HEADERS} LINKDEF ${lib_LINKDEF} OPTIONS -p)
 #SET(lib_VERSION "${${PROJECT_NAME}_VERSION}")
 #SET(lib_MAJOR_VERSION "${${PROJECT_NAME}_MAJOR_VERSION}")
 #SET(lib_LIBRARY_PROPERTIES 
 #    VERSION "${lib_VERSION}"
 #    SOVERSION "${lib_MAJOR_VERSION}"
 #    SUFFIX ".so")
-#ADD_CUSTOM_TARGET(${aname}_ROOTDICTS DEPENDS ${lib_SRCS} ${lib_HEADERS} ${lib_DICTIONARY_SRC} ${lib_DICTIONARY_HEADER})
 
 set(HEADERS include/THipo.h)
 
-message("ROOT_LIBRARIES ${ROOT_LIBRARIES} ")
+#ROOT_GENERATE_DICTIONARY(${dictname} -I${PROJECT_SOURCE_DIR}/src/Hipo -I${PROJECT_SOURCE_DIR}/src/Hipo/include ${lib_HEADERS} LINKDEF ${lib_LINKDEF} OPTIONS -p)
+#ADD_CUSTOM_TARGET(${aname}_ROOTDICTS DEPENDS ${lib_SRCS} ${lib_HEADERS} ${lib_DICTIONARY_SRC} ${lib_DICTIONARY_HEADER})
+
 add_library(hiporoot SHARED src/THipo.cxx)
 target_link_libraries(hiporoot 
   PUBLIC ${ROOT_LIBRARIES} 

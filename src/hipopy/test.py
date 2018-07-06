@@ -19,5 +19,4 @@ while(reader.next() and num < 5):
 
     print()
 
-
 print(reader.getDictionary())
