@@ -1,6 +1,7 @@
 from hipopy import hipo_reader
 import sys
 import numpy as np
+import json
 
 file_name = sys.argv[1]
 reader = hipo_reader(file_name)
@@ -20,4 +21,4 @@ while(reader.next() and num < 5):
     print()
 
 
-print(reader.getDictionary())
+bankdef = reader.getjson()

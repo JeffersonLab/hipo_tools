@@ -1,7 +1,8 @@
-# distutils: language = c++
 from libcpp.vector cimport vector
 from libcpp.string cimport string
 from libcpp cimport bool
+
+import json as json
 
 cdef extern from "hipo/node.h" namespace "hipo":
     cdef cppclass node[T]:
@@ -93,6 +94,31 @@ cdef class hipo_reader:
 
   def getDictionary(self):
     return self.c_reader.getDictionary()
+
+  def getjson(self):
+    hipo_dict = self.c_reader.getDictionary()
+    out = []
+    out.append("[{\n")
+    for dic in hipo_dict:
+        dic = str(dic)
+        dic = dic.split("{")[1].split("}")
+        bank = dic[0].split(",")
+        out.append("\t\"bank\" : \""+bank[1]+"\",\n")
+        out.append("\t\"group\" : "+ bank[0]+",\n")
+        out.append("\t\t\"items\": [\n")
+        items = dic[1].split("[")
+        ids = []
+        for x in items[1:]:
+            ids = x.split("]")[0].split(",")
+            out.append("\t\t{")
+            out.append("\"name\": \"{0}\", \"id\": {1}, \"type\": \"{2}\"".format(ids[1],ids[0],str(ids[2]).lower()))
+            out.append("},\n")
+        out[-1] = "}\t]\n},\n{\n"
+
+    out[-1] = "}\n]\n}\n]"
+    out = ''.join(out)
+    return json.loads(out)
+
 
   def getIntNode(self, str group, str item):
     cdef node[int]*c_node
