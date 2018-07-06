@@ -13,7 +13,29 @@ function(ROOT_GENERATE_DICTIONARY dictionary)
   find_program(ROOTCLING rootcling)
   add_custom_command(
     OUTPUT ${dictionary}.cxx ${dictionary}_rdict.pcm 
-    COMMAND ${ROOTCLING} -f ${dictionary}.cxx -s ${dictionary}.pcm 
+    COMMAND ${ROOTCLING} -f ${dictionary}.cxx
+    -s ${dictionary}.pcm 
+    ${ARG_OPTIONS} ${ARG_UNPARSED_ARGUMENTS} ${extra_includes} ${ARG_LINKDEF}
+    DEPENDS ${includes} ${linkdefs})
+endfunction()
+
+function(ROOT_GENERATE_DICTIONARY_ROOTMAP dictionary libname)
+  CMAKE_PARSE_ARGUMENTS(ARG "" "" "LINKDEF;OPTIONS" "" ${ARGN})
+  ## Get all include directories
+  get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+  set(extra_includes "")
+  foreach(dir ${dirs})
+    set(extra_includes ${extra_includes} "-I${dir}")
+  endforeach()
+  ## find and call ROOTCLING
+  find_program(ROOTCLING rootcling)
+  add_custom_command(
+    OUTPUT ${dictionary}.cxx ${dictionary}_rdict.pcm ${libname}.rootmap 
+    COMMAND ${ROOTCLING} -f ${dictionary}.cxx
+    -rmf ${libname}.rootmap
+    -rml lib/${libname}.so
+    -rml ${libname}.so
+    -s ${dictionary}.pcm 
     ${ARG_OPTIONS} ${ARG_UNPARSED_ARGUMENTS} ${extra_includes} ${ARG_LINKDEF}
     DEPENDS ${includes} ${linkdefs})
 endfunction()
