@@ -1,11 +1,12 @@
 from hipopy import hipo_reader
+import sys
 import numpy as np
 
-reader = hipo_reader(b'/Users/tylern/Data/hipo/out_clas_004203.evio.101.hipo')
+file_name = sys.argv[1]
+reader = hipo_reader(file_name)
 
-rec_part_pid = reader.getIntNode(331, 1)  # REC::Particle pid
-rec_part_px = reader.getFloatNode(331, 3)  # REC::Particle px
-
+rec_part_pid = reader.getIntNode("REC::Particle", "pid")  # REC::Particle pid
+rec_part_px = reader.getFloatNode("REC::Particle", "px")
 
 px = []
 num = 0
@@ -14,5 +15,9 @@ while(reader.next() and num < 5):
     print("length (" + str(rec_part_pid.getLength()) + "):", end=' ')
     for i in range(0, rec_part_pid.getLength()):
         print(rec_part_pid.getValue(i), end=' ')
+        print(rec_part_px.getValue(i), end=' ')
 
     print()
+
+
+print(reader.getDictionary())
