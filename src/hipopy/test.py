@@ -15,8 +15,8 @@ while(reader.next() and num < 5):
     num += 1
     print("length (" + str(rec_part_pid.getLength()) + "):", end=' ')
     for i in range(0, rec_part_pid.getLength()):
-        print(rec_part_pid.getValue(i), end=' ')
-        print(rec_part_px.getValue(i), end=' ')
+        print(rec_part_pid[i], end=' ')
+        print(rec_part_px[i], end=' ')
 
     print()
 
