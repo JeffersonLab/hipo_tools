@@ -4,19 +4,28 @@ enable_testing()
 
 #SET(lib_VERSION "${${PROJECT_NAME}_VERSION}")
 #SET(lib_MAJOR_VERSION "${${PROJECT_NAME}_MAJOR_VERSION}")
-#SET(lib_LIBRARY_PROPERTIES 
+#SET(lib_LIBRARY_PROPERTIES
 #    VERSION "${lib_VERSION}"
 #    SOVERSION "${lib_MAJOR_VERSION}"
 #    SUFFIX ".so")
 
-set(HEADERS include/THipo.h)
+set(HEADERS
+  include/THipo.h
+  include/THipoItem.h
+  include/THipoBank.h
+  include/THipoBankParser.h
+  #include/RHipoDS.h
+  )
+
+#ROOT_GENERATE_DICTIONARY(${dictname} -I${PROJECT_SOURCE_DIR}/src/Hipo -I${PROJECT_SOURCE_DIR}/src/Hipo/include ${lib_HEADERS} LINKDEF ${lib_LINKDEF} OPTIONS -p)
+#ADD_CUSTOM_TARGET(${aname}_ROOTDICTS DEPENDS ${lib_SRCS} ${lib_HEADERS} ${lib_DICTIONARY_SRC} ${lib_DICTIONARY_HEADER})
 
 #ROOT_GENERATE_DICTIONARY(${dictname} -I${PROJECT_SOURCE_DIR}/src/Hipo -I${PROJECT_SOURCE_DIR}/src/Hipo/include ${lib_HEADERS} LINKDEF ${lib_LINKDEF} OPTIONS -p)
 #ADD_CUSTOM_TARGET(${aname}_ROOTDICTS DEPENDS ${lib_SRCS} ${lib_HEADERS} ${lib_DICTIONARY_SRC} ${lib_DICTIONARY_HEADER})
 
 add_library(hiporoot SHARED src/THipo.cxx)
-target_link_libraries(hiporoot 
-  PUBLIC ${ROOT_LIBRARIES} 
+target_link_libraries(hiporoot
+  PUBLIC ${ROOT_LIBRARIES}
   PUBLIC ${LZ4_LIBRARY}
   PRIVATE hipocpp
   )
@@ -24,7 +33,7 @@ target_link_libraries(hiporoot
 #set_target_properties(hiporoot PROPERTIES ${lib_LIBRARY_PROPERTIES})
 #target_compile_features(${libname} PUBLIC cxx_std_14)
 #add_dependencies(${libname} ${needs_libs} ${aname}_ROOTDICTS)
-target_include_directories(hiporoot 
+target_include_directories(hiporoot
   PUBLIC include
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
@@ -32,14 +41,14 @@ target_include_directories(hiporoot
   )
 
 install(
-  TARGETS hiporoot 
+  TARGETS hiporoot
   EXPORT ${PROJECT_NAME}Targets
   DESTINATION lib )
 
 #install( FILES ${lib_PCM_FILE} DESTINATION lib )
 SET(lib_HEADERS ${HEADERS} ${template_headers})
 install(
-  FILES ${HEADERS} 
+  FILES ${HEADERS}
   DESTINATION include/hipo )
 
 #install(TARGETS foo
@@ -50,9 +59,9 @@ install(
 #    COMPONENT dev)
 
 add_executable(toohip4root src/toohip4root.cxx)
-#target_compile_features(toohipforroot 
+#target_compile_features(toohipforroot
 #  PRIVATE cxx_std_17)
-target_include_directories(toohip4root 
+target_include_directories(toohip4root
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -62,7 +71,7 @@ target_include_directories(toohip4root
 target_link_libraries(toohip4root
   PRIVATE ${libname} ${CXX_FILESYSTEM_LIB}
   PUBLIC hiporoot
-  PUBLIC ${ROOT_LIBRARIES} 
+  PUBLIC ${ROOT_LIBRARIES}
   )
 add_dependencies(toohip4root hipocpp)
 install(TARGETS toohip4root
@@ -80,4 +89,3 @@ install(TARGETS toohip4root
 #  PUBLIC ${libname}
 #  )
 #add_test(NAME ${test_name} COMMAND ${test_name} -s)
-
