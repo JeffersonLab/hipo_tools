@@ -28,6 +28,7 @@ namespace hipo {
         recordHeaderBuffer.resize(80);
         stream.seekg(position,std::ios::beg);
 
+        // Nothing about this is reasonable c++
         stream.read( (char *) &recordHeaderBuffer[0],80);
         recordHeader.recordLength    = *(reinterpret_cast<int *>(&recordHeaderBuffer[0]));
         recordHeader.headerLength    = *(reinterpret_cast<int *>(&recordHeaderBuffer[8]));
@@ -121,9 +122,26 @@ namespace hipo {
         }
 	      //printf("final position = %d\n",eventPosition);
     }
+
     int   record::getRecordSizeCompressed(){
       return recordHeader.recordLength;
     }
+    
+    int record::getDataSize() const {
+      //return recordHeaderBuffer.getInt(HipoRecordHeader.OFFSET_DATA_LENGTH_WORD_UNCOMPRESSED);
+      return recordHeaderBuffer.size();
+    }
+
+    void record::reset(){
+      recordHeaderBuffer.clear();
+      //setDataSize(0);
+      //setDataSizeCompressed(0);
+      //setHeaderSize(0);
+      //setNumberOfEvents(0);
+      //setIndexArraySize(0);
+      //setRecordHeaderLength(0);
+    }
+
     void  record::readRecord__(std::ifstream &stream, long position, long recordLength){
 
       stream.seekg(position,std::ios::beg);
@@ -331,5 +349,126 @@ namespace hipo {
 
     }
 
+    /**
+     * add an byte array into the record.
+     * @param array
+     */
+    void record::addEvent(const std::vector<char>& ev) {
 
-}
+
+      auto eventLength = ev.size();
+
+      recordBuffer.insert( recordBuffer.end(), ev.begin(), ev.end() );
+
+      recordHeader.numberOfEvents = recordBuffer.size();
+      //recordBytesWritten += eventLength;
+
+      //recordEvents.add(array);
+      //recordHeader.setNumberOfEvents(recordEvents.size());
+      //recordBytesWritten += eventLength;
+    }
+
+    /**
+     * Builds the record into a ByteBuffer includes the Header, Index Array and Event Buffer.
+     * If compression type is specified the event buffer will be compressed, and header will
+     * contain different sizes for event size compressed and event size uncompressed.
+     * NOTE: the record Header is never compressed.
+     * @return 
+     */
+    std::vector<char> record::build(){
+
+      //int totalSize  = recordHeader.size();//getRecordHeaderLength();        
+      //int eventsSize = getDataBytesSize();
+
+      //recordHeader.setDataSize(eventsSize);
+
+      //auto eventBytes = this.buildDataBytes();
+      //auto indexBytes = this.buildIndexBytes();
+
+      ////totalSize += eventsSize;
+      //totalSize += indexBytes.length;
+      //totalSize += eventBytes.length;
+
+      //recordHeader.setRecordSize(totalSize);
+      //recordHeader.setDataSizeCompressed(eventBytes.length);
+      //recordHeader.setCompressionType(this.compressionType);
+      //recordHeader.setIndexArraySize(indexBytes.length);
+
+      //auto buffer = new byte[totalSize];
+
+      //System.arraycopy(recordHeader.getRecordHeaderData(), 0, buffer, 0, recordHeader.getRecordHeaderLength());
+      //System.arraycopy(indexBytes, 0, buffer, 
+      //                 recordHeader.getRecordHeaderLength() + recordHeader.getHeaderSize(), indexBytes.length);
+
+      //int position = recordHeader.getRecordHeaderLength() + recordHeader.getHeaderSize() + indexBytes.length;
+
+      //System.arraycopy(eventBytes, 0, buffer, position, eventBytes.length);
+
+      //ByteBuffer nioBuffer = ByteBuffer.wrap(buffer);        
+      //nioBuffer.order(ByteOrder.LITTLE_ENDIAN);
+      //return nioBuffer;
+      return recordBuffer;
+      //recordBuffer.insert( recordBuffer.end(), ev.begin(), ev.end() );
+    }
+    /**
+     * returns the total size of the all events combined
+     * @return 
+     */
+    int  record::getDataBytesSize(){
+      int size = 0;
+      //for(byte[] array : recordEvents) size += array.length;
+      return recordBuffer.size();
+    }
+    /**
+     * returns a byte[] array with index for each event.
+     * @return 
+     */
+    std::vector<char> record::buildIndexBytes(){
+      //int indexSize = 4*recordEvents.size();
+      //byte[] indexBytes = new byte[indexSize];
+      //ByteBuffer buffer = ByteBuffer.wrap(indexBytes);
+      //buffer.order(ByteOrder.LITTLE_ENDIAN);
+      //for(int i = 0; i < recordEvents.size(); i++){
+      //  buffer.putInt(i*4, recordEvents.get(i).length);
+      //}
+      //return buffer.array();
+      std::vector<char>  buf;
+      return buf;
+    }
+    /**
+     * returns one byte[] containing all the events chained together
+     * @return 
+     */
+    std::vector<char> record::buildDataBytes(){
+
+      //int size = this.getDataBytesSize();
+      //byte[]  dataBytes = new byte[size];
+      //int position = 0;
+      //for(int i = 0; i < recordEvents.size(); i++){
+      //  int len = recordEvents.get(i).length;
+      //  System.arraycopy(recordEvents.get(i), 0, dataBytes, position, len);
+      //  position += len;
+      //}
+
+      //if(this.compressionType>0){
+
+      //  if(this.compressionType==1){
+      //    byte[]  dataBytesCompressed = HipoByteUtils.gzip(dataBytes);
+      //    return dataBytesCompressed;
+      //  }
+
+      //  if(this.compressionType==2){
+      //    byte[]  dataBytesCompressed = HipoByteUtils.compressLZ4(dataBytes);
+      //    return dataBytesCompressed;
+      //  }
+
+      //  if(this.compressionType==3){
+      //    byte[]  dataBytesCompressed = HipoByteUtils.compressLZ4max(dataBytes);
+      //    return dataBytesCompressed;
+      //  }
+      //}       
+      //return dataBytes;
+      return recordBuffer;
+    }
+
+} // namespace hipo

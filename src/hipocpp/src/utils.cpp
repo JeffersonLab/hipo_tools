@@ -105,7 +105,7 @@ namespace hipo {
     file_header += "//    root -x " + func_name + ".cxx+" + "\n";
     file_header += "//    root -x \"" + func_name + ".cxx+" + "(\\\"data/your_hipofile.hipo\\\")\"\n";
 
-    file_header += "\nint " + func_name + "(const char* inputFile = \"phys_data_0.hipo\"){\n";
+    file_header += "\nint " + func_name + "(const char* inputFile = \"physics_data_0.hipo\"){\n";
     file_header.append("\n//int main(int argc, char** argv) {\n");
     file_header.append("//   std::cout << \" reading file example program (HIPO) \" << std::endl;\n");
     file_header.append("//   char inputFile[256];\n\n" );
@@ -130,6 +130,7 @@ namespace hipo {
     file_trailer.append(code);
     file_trailer.append("   }\n");
     file_trailer.append("   //----------------------------------------------------\n");
+    file_trailer.append("   return 0;\n");
     file_trailer.append("}\n");
     file_trailer.append("//###### ENF OF GENERATED FILE #######\n");
     return file_trailer;
