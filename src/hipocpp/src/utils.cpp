@@ -93,18 +93,25 @@ namespace hipo {
     return header;
   }
 
-  std::string utils::getFileHeader(){
+  std::string utils::getFileHeader(std::string func_name){
     std::string  file_header;
     std::string  comments = hipo::utils::getHeader();
     file_header.append(comments);
     file_header.append("#include <cstdlib>\n#include <iostream>\n\n");
-    file_header.append("#include \"reader.h\"\n#include \"node.h\"\n");
-    file_header.append("\nint main(int argc, char** argv) {\n");
-    file_header.append("   std::cout << \" reading file example program (HIPO) \" << std::endl;\n");
-    file_header.append("   char inputFile[256];\n\n" );
-    file_header.append("   if(argc>1) {\n      sprintf(inputFile,\"%s\",argv[1]);\n   } else {\n " );
-    file_header.append("     std::cout << \" *** please provide a file name...\" << std::endl;\n" );
-    file_header.append("     exit(0);\n   }\n\n");
+    file_header.append("#include \"hipo/reader.h\"\n#include \"hipo/node.h\"\n");
+    file_header += "//R__ADD_LIBRARY_PATH($FOODIR) // if needed\n";
+    file_header += "R__LOAD_LIBRARY(libhipocpp.so)\n\n";
+    file_header += "// Running this code:\n";
+    file_header += "//    root -x " + func_name + ".cxx+" + "\n";
+    file_header += "//    root -x \"" + func_name + ".cxx+" + "(\\\"data/your_hipofile.hipo\\\")\"\n";
+
+    file_header += "\nint " + func_name + "(const char* inputFile = \"physics_data_0.hipo\"){\n";
+    file_header.append("\n//int main(int argc, char** argv) {\n");
+    file_header.append("//   std::cout << \" reading file example program (HIPO) \" << std::endl;\n");
+    file_header.append("//   char inputFile[256];\n\n" );
+    file_header.append("//   if(argc>1) {\n//      sprintf(inputFile,\"%s\",argv[1]);\n//   } else {\n " );
+    file_header.append("//     std::cout << \" *** please provide a file name...\" << std::endl;\n" );
+    file_header.append("//     exit(0);\n//   }\n\n");
     file_header.append("   hipo::reader  reader;\n");
     file_header.append("   reader.open(inputFile);\n\n" );
     return file_header;
@@ -123,6 +130,7 @@ namespace hipo {
     file_trailer.append(code);
     file_trailer.append("   }\n");
     file_trailer.append("   //----------------------------------------------------\n");
+    file_trailer.append("   return 0;\n");
     file_trailer.append("}\n");
     file_trailer.append("//###### ENF OF GENERATED FILE #######\n");
     return file_trailer;
