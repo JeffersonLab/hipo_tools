@@ -65,6 +65,34 @@ cdef class int_node:
     return self.c_node.getLength()
 
 
+cdef class char_node:
+  cdef node[char]*c_node
+
+  def __cinit__(self):
+    self.c_node = new node[char]()
+
+  def __getitem__(self, arg):
+    return self.c_node.getValue(arg)
+
+  def __len__(self):
+    return self.c_node.getLength()
+
+  def __str__(self):
+    self.c_node.show()
+
+  def __repr__(self):
+    self.c_node.show()
+
+  cdef setup(self, node[char]* node):
+    self.c_node = node
+
+  cpdef char getValue(self, x):
+    return self.c_node.getValue(x)
+
+  cpdef char getLength(self):
+    return self.c_node.getLength()
+
+
 cdef class float_node:
   cdef node[float]*c_node
   def __cinit__(self):
@@ -104,10 +132,10 @@ cdef class hipo_reader:
     self.open(filename)
 
   def __str__(self):
-    self.getjson()
+    return self.getjson()
 
   def __repr__(self):
-    self.getjson()
+    return self.getjson()
 
   cpdef void open(self, str filename):
     """Open a new hipo file with the hipo::reader"""
@@ -139,7 +167,7 @@ cdef class hipo_reader:
     """Get dictionary string from hipo file [More useful to use getjson]"""
     return self.c_reader.getDictionary()
 
-  cpdef getjson(self):
+  cpdef string getjson(self):
     """Get dictionary as a json object"""
     hipo_dict = self.c_reader.getDictionary()
     out = []
@@ -162,7 +190,7 @@ cdef class hipo_reader:
 
     out[-1] = "}\n]\n}\n]"
     out = ''.join(out)
-    return json.loads(out)
+    return out
 
   def getIntNode(self, str group, str item):
     """Create a hipo::node<int> which is accesible to python"""
@@ -171,6 +199,16 @@ cdef class hipo_reader:
     c_item = str_to_char(item)
     c_node = self.c_reader.getBranch[int](c_group,c_item)
     py_node = int_node()
+    py_node.setup(c_node)
+    return py_node
+
+  def getByteNode(self, str group, str item):
+    """Create a hipo::node<char> which is accesible to python"""
+    cdef node[char]*c_node
+    c_group = str_to_char(group)
+    c_item = str_to_char(item)
+    c_node = self.c_reader.getBranch[char](c_group,c_item)
+    py_node = char_node()
     py_node.setup(c_node)
     return py_node
 
