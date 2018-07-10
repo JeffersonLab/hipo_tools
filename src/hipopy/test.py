@@ -4,7 +4,7 @@ import numpy as np
 import json
 
 file_name = sys.argv[1]
-reader = hipo_reader(file_name)
+reader = hipo_reader(file_name, True)
 
 rec_part_pid = reader.getIntNode("REC::Particle", "pid")  # REC::Particle pid
 rec_part_px = reader.getFloatNode("REC::Particle", "px")
