@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.6)
-
 enable_testing()
 
 #SET(lib_VERSION "${${PROJECT_NAME}_VERSION}")
@@ -17,8 +16,11 @@ set(HEADERS
   #include/RHipoDS.h
   )
 
-#ROOT_GENERATE_DICTIONARY(${dictname} -I${PROJECT_SOURCE_DIR}/src/Hipo -I${PROJECT_SOURCE_DIR}/src/Hipo/include ${lib_HEADERS} LINKDEF ${lib_LINKDEF} OPTIONS -p)
-#ADD_CUSTOM_TARGET(${aname}_ROOTDICTS DEPENDS ${lib_SRCS} ${lib_HEADERS} ${lib_DICTIONARY_SRC} ${lib_DICTIONARY_HEADER})
+ROOT_GENERATE_DICTIONARY(toohip4rootDict 
+  -I${CMAKE_CURRENT_SOURCE_DIR} ${HEADERS} 
+  LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/include/LinkDef.h
+  OPTIONS -p)
+ADD_CUSTOM_TARGET(toohip4rootDict_ROOTDICTS DEPENDS ${HEADERS} toohip4rootDict.cxx )
 
 message("ROOT_LIBRARIES ${ROOT_LIBRARIES} ")
 add_library(hiporoot SHARED 
@@ -26,6 +28,7 @@ add_library(hiporoot SHARED
   src/THipoItem.cxx
   src/THipoBank.cxx
   src/THipoBankParser.cxx
+  toohip4rootDict.cxx
   #src/RHipoDS.cxx
   )
 target_link_libraries(hiporoot 
@@ -49,7 +52,9 @@ install(
   EXPORT ${PROJECT_NAME}Targets
   DESTINATION lib )
 
-#install( FILES ${lib_PCM_FILE} DESTINATION lib )
+install( FILES ${CMAKE_CURRENT_BINARY_DIR}/toohip4rootDict_rdict.pcm 
+  DESTINATION lib )
+
 SET(lib_HEADERS ${HEADERS} ${template_headers})
 install(
   FILES ${HEADERS} 
