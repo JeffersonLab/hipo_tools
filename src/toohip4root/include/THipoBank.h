@@ -44,7 +44,7 @@ namespace hipo {
     void ReadEvent();
 
     void ClearEvent();
-    void Print();
+    void Print(int verbose = 0);
     void InitTree(TTree* tree);
     // Iterate over entries for each event in item name
     Bool_t     NextEntry();
