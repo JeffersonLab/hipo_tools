@@ -251,7 +251,7 @@ namespace hipo {
     // fReader.next();
     for (UInt_t ib = 0; ib < fBanks.size(); ib++)
       fBanks.at(ib)->InitTree(fOutTree);
-    fOutTree->Print("");
+    //fOutTree->Print("");
   }
 
   void THipo::CloseOutput() {
