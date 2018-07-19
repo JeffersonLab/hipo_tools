@@ -158,7 +158,7 @@ namespace hipo {
   }
 
   bool reader::next(){
-    std::cout << "========= random access = " << "\n";
+    //std::cout << "========= random access = " << "\n";
     if(isRandomAccess){
       if(inReaderCurrentRecord<0){
         inReaderCurrentRecord = 0;
