@@ -6,7 +6,7 @@ set(CMAKE_MODULE_PATH
    ${PROJECT_SOURCE_DIR}/cmake
    ${PROJECT_SOURCE_DIR}/cmake/modules)
 
-## Use C++17 features 
+## Use C++17 features
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -28,9 +28,12 @@ include(cmake/root.cmake)
 include_directories(src/hipocpp/include)
 
 add_subdirectory(src/hipocpp)
-add_subdirectory(src/toohip4root)
 add_subdirectory(src/recon2root)
-add_subdirectory(src/hipo-io)
+if(NOT APPLE)
+  add_subdirectory(src/toohip4root)
+  add_subdirectory(src/hipo-io)
+endif()
+
 
 find_package(Cython)
 if(Cython_FOUND)
@@ -60,7 +63,7 @@ install(EXPORT HipoToolsTargets
 
 set(TARGETS_INSTALL_PATH lib/hipo/HipoToolsTargets.cmake)
 CONFIGURE_PACKAGE_CONFIG_FILE(
-  cmake/HipoToolsConfig.cmake.in  
+  cmake/HipoToolsConfig.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/HipoToolsConfig.cmake
     INSTALL_DESTINATION lib/hipo
     PATH_VARS TARGETS_INSTALL_PATH
@@ -76,4 +79,3 @@ install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/HipoToolsConfigVersion.cmake
   DESTINATION lib/hipo
   )
-
