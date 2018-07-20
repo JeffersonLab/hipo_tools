@@ -1,4 +1,4 @@
-#ifdef __CINT__
+#ifdef __CLING__
 
 #pragma link off all globals;
 #pragma link off all classes;
@@ -10,7 +10,10 @@
 
 #pragma link C++ namespace hipo;
 
-#pragma link C++ class hipo::THipo+;
+//#pragma link C++ class hipo::THipo+;
+
+#pragma link C++ class std::vector<signed char>+;
+
 
 //#pragma link C++ class CLAS12EventDisplay+;
 
