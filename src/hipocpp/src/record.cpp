@@ -8,7 +8,7 @@
 //#include "hipoexceptions.h"
 
 #ifdef __LZ4__
-#include <lz4.h>
+#include "lz4.h"
 #endif
 
 namespace hipo {

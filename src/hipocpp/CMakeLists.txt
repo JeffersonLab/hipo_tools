@@ -33,7 +33,9 @@ target_link_libraries(hipocpp
   )
 
 target_include_directories(hipocpp 
-  PRIVATE include)
+  PRIVATE include
+  PUBLIC ${LZ4_INCLUDE_DIR}
+  )
 
 install(TARGETS hipocpp
   EXPORT HipoToolsTargets
