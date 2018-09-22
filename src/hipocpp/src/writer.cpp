@@ -47,43 +47,28 @@ namespace hipo {
     }
 
     void writer::writeRecord(hipo::record& record){
-        std::vector<char> recordVec = record.build();
-        outputStream.write(&recordVec[0],recordVec.size());
+      /*  std::vector<char> recordVec = record.build();
+        outputStream.write(&recordVec[0],recordVec.size());*/
     }
 
     void writer::writeEvent(hipo::event& event){
-        writerRecord.addEvent(event.getEventBuffer());
-        if(writerRecord.getDataSize()>__MAX_RECORD_SIZE__){
-            writeRecord(writerRecord);
-            writerRecord.reset();
-        }
+        /*writerRecord.addEvent(event);*/
     }
 
-    /** Write event buffer.
-     * adds an event to the records, not actually written to the disk at this
-     * point. if the record size or record length exceed the default maximum
-     * values the record will be written to the disk and the record container
-     * will be reset.
-     * @param event byte array to add to the events record.
-     */
     void writer::writeEvent(std::vector<char> &event){
-        writerRecord.addEvent(event);
+      /*  writerRecord.addEvent(event);
         if(writerRecord.getDataSize()>__MAX_RECORD_SIZE__){
             writeRecord(writerRecord);
             writerRecord.reset();
-        }
-
-      std::cout << "asdfasfd\n";
+        }*/
     }
 
     void writer::close(){
-      std::cout << " writer::close \n";
-      std::cout << " writerRecord.getEventCount()= " << writerRecord.getEventCount() << "\n";
-      if(writerRecord.getEventCount()>0){
-        writeRecord(writerRecord);
-        writerRecord.reset();
-      }
-      outputStream.close();
+      /*  if(writerRecord.getEventCount()>0){
+            writeRecord(writerRecord);
+            writerRecord.reset();
+        }
+        outputStream.close();*/
     }
 
 

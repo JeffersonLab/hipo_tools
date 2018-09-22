@@ -26,7 +26,7 @@
 
 namespace hipo {
 
-    struct recordHeader{
+    typedef struct {
         int signatureString; // 1) identifier string is HREC (int = 0x43455248
         int recordLength; // 2) TOTAL Length of the RECORD, includes INDEX array
         int recordDataLength; // 3) Length of the DATA uncompressed
@@ -40,9 +40,7 @@ namespace hipo {
         int compressionType;
         int compressedLengthPadding;
         int dataEndianness;
-    } ;
-
-    using recordHeader_t  = recordHeader;
+    } recordHeader_t;
 
     class data {
       private:
@@ -96,21 +94,6 @@ namespace hipo {
         void  readEvent( std::vector<char> &vec, int index);
         void  readHipoEvent(hipo::event &event, int index);
         void  getData(   hipo::data &data, int index);
-        int   getDataSize() const ;
-        void  reset()  ;
-
-    std::vector<char> build();
-    int  getDataBytesSize();
-    std::vector<char> buildIndexBytes();
-    std::vector<char> buildDataBytes();
-
-
-        /**
-         * add an byte array into the record.
-         * @param array 
-         */
-        void addEvent(const std::vector<char>& array);
-
     };
 }
 #endif /* HIPORECORD_H */

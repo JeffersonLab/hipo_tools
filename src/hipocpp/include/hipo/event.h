@@ -75,13 +75,6 @@ namespace hipo {
         void scanEventMap();
         std::vector<char> getEventBuffer();
         void reset();
-
-        void print() const {
-          std::cout << " ===== hipo::event =====\n";
-          std::cout << " # of nodes      : " << nodes.size() << "\n";
-          std::cout << " # of eventNodes : " << eventNodes.size() << "\n";
-        }
-
     };
     /*
     template<class T>   node<T> event::getNode(){
