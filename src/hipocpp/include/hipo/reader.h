@@ -91,33 +91,18 @@
 
 namespace hipo {
 
-  struct RecordIndex {
-      long  fPosition               ;
-      int   fLength                 ;
-      int   fEvents                 ;
-      int   fDataOffset             ;
-      int   fDataLengthCompressed   ;
-      int   fDataLengthUncompressed ;
-      int   fStartEvent             ;
-      int   fEndEvent               ;
+  typedef struct {
+      long  recordPosition;
+      int   recordLength;
+      int   recordEvents;
+      int   recordDataOffset;
+      int   recordDataLengthCompressed;
+      int   recordDataLengthUncompressed;
+      int   startEvent;
+      int   endEvent;
+  } recordIndex_t;
 
-    void print() const {
-      std::cout << " --------------------------------------------\n" ;
-      std::cout << " ---- RecordIndex ---------------------------\n" ;
-      std::cout << " Position               : " <<  fPosition               << "\n" ;
-      std::cout << " Length                 : " <<  fLength                 << "\n" ;
-      std::cout << " Events                 : " <<  fEvents                 << "\n" ; // in words (usually 14)
-      std::cout << " DataOffset             : " <<  fDataOffset             << "\n" ;
-      std::cout << " DataLengthCompressed   : " <<  fDataLengthCompressed   << "\n" ; // in bytes
-      std::cout << " DataLengthUncompressed : " <<  fDataLengthUncompressed << "\n" ;
-      std::cout << " startEvent                   : " <<  fStartEvent                   << "\n" ;
-      std::cout << " endEvent                     : " <<  fEndEvent                     << "\n" ;
-      std::cout << " ---------------------------------------------\n" ;
-    }
-  };
-  using recordIndex_t = RecordIndex;
-
-  struct FileHeader {
+  typedef struct {
     int  uniqueid;
     int  filenumber;
     int  headerLength; // in words (usually 14)
@@ -130,29 +115,7 @@ namespace hipo {
     long userRegister;
     long trailerPosition;
     long firstRecordPosition;
-
-    void print() const {
-      std::cout << " ----------------------------------\n" ;
-      std::cout << " - FileHeader --------------------\n" ;
-      std::cout << " uniqueid            : " <<  uniqueid            << "\n" ;
-      std::cout << " filenumber          : " <<  filenumber          << "\n" ;
-      std::cout << " headerLength        : " <<  headerLength        << "\n" ; // in words (usually 14)
-      std::cout << " recordCount         : " <<  recordCount         << "\n" ;
-      std::cout << " indexArrayLength    : " <<  indexArrayLength    << "\n" ; // in bytes
-      std::cout << " bitInfo             : " <<  bitInfo             << "\n" ;
-      std::cout << " version             : " <<  version             << "\n" ;
-      std::cout << " userHeaderLength    : " <<  userHeaderLength    << "\n" ;
-      std::cout << " magicNumber         : " <<  magicNumber         << "\n" ;
-      std::cout << " userRegister        : " <<  userRegister        << "\n" ;
-      std::cout << " trailerPosition     : " <<  trailerPosition     << "\n" ;
-      std::cout << " firstRecordPosition : " <<  firstRecordPosition << "\n" ;
-      std::cout << " ----------------------------------\n" ;
-    }
-
-  };
-  
-  using fileHeader_t = FileHeader;
-
+  } fileHeader_t;
   /**
   * READER index class is used to construct entire events
   * sequence from all records, and provides ability to canAdvance
@@ -181,14 +144,6 @@ namespace hipo {
         int  getRecordEventNumber() { return currentRecordEvent;}
         int  getMaxEvents();
         void addSize(int size);
-
-        void print() { 
-          std::cout << " = reader_index =\n ";
-          std::cout << " EventNumber       :  " << getEventNumber() << "\n";
-          std::cout << " RecordNumber      :  " << getRecordNumber() << "\n";
-          std::cout << " RecordEventNumber :  " << getRecordEventNumber() << "\n";
-          std::cout << " MaxEvents         :  " << getMaxEvents() << "\n";
-        }
 
         void reset(){
           currentRecord = 0;
@@ -226,26 +181,14 @@ namespace hipo {
       long  getNextPosition() { return nextPosition;}
       bool  hasEvents(){ return (currentEvent<recordEvents);}
       int   getCurrentEvent(){ return currentEvent;}
-
-        void print() {
-          std::cout << " = reader_sequence =\n";
-          std::cout << " RecordEvents      : " << getRecordEvents() << "\n";
-          std::cout << " CurrentEvent      : " << getCurrentEvent() << "\n";
-          std::cout << " Position          : " << getPosition() << "\n";
-          std::cout << " NextPosition      : " << getNextPosition() << "\n";
-          std::cout << " hasEvents         : " << hasEvents() << "\n";
-          std::cout << " length            : " << length << "\n";
-
-        }
   };
-
-
 
   class reader {
 
-    public:
+    private:
 
         std::vector<std::string>        fileDictionary;
+
         hipo::dictionary                schemaDictionary;
 
         std::vector<char>               headerBuffer;
@@ -253,7 +196,6 @@ namespace hipo {
         std::vector<recordIndex_t>      recordIndex;
         fileHeader_t                    header;
         hipo::utils                     hipoutils;
-
         /**
         * Internal buffers for record and events to be
         * read in sequence. When the next() is called on The
@@ -274,14 +216,15 @@ namespace hipo {
 
     public:
 
-        reader(bool ra = true);
+        reader();
+        reader(bool ra);
         ~reader();
 
         std::vector<std::string>  getDictionary();
 
         hipo::dictionary         *getSchemaDictionary();
 
-        bool  open(const char *filename);
+        void  open(const char *filename);
         void  readRecord(int index);
         void  readRecord(hipo::record &record, int index);
         void  readHeaderRecord(hipo::record &record);
@@ -293,23 +236,6 @@ namespace hipo {
         hipo::event    *getEvent(){return &inEventStream;}
         template<class T> hipo::node<T> *getBranch(int group, int item);
         template<class T> hipo::node<T> *getBranch(const char* group, const char* item);
-
-        void print() {
-          std::cout << "=== reader ===\n";
-          header.print();
-          std::cout << "record count      : " << getRecordCount() << "\n";
-          std::cout << "dictionary size   : " << getDictionary().size() << "\n";
-          std::cout << "recordIndex size  : " << recordIndex.size() << "\n";
-
-          if(isRandomAccess) {
-          inReaderIndex.print();
-          } else {
-          sequence.print();
-          }
-          inEventStream.print();
-
-        }
-
     };
 
 }
