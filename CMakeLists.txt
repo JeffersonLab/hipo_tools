@@ -1,13 +1,14 @@
-cmake_minimum_required(VERSION 3.6)
-project(hipoio VERSION 0.0.1 DESCRIPTION "hipo-io")
+cmake_minimum_required(VERSION 3.5)
+project(hipoio)
+set(VERSION 0.0.1)
 
 set(CMAKE_MODULE_PATH
    ${CMAKE_MODULE_PATH}
    ${PROJECT_SOURCE_DIR}/cmake
    ${PROJECT_SOURCE_DIR}/cmake/modules)
 
-## Use C++17 features
-set(CMAKE_CXX_STANDARD 17)
+## Use C++11 features
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ## OS Specific settings

@@ -6,8 +6,8 @@
 # LZ4_LIBRARY
 #
 
-find_path(LZ4_INCLUDE_DIR NAMES lz4.h)
-find_library(LZ4_LIBRARY NAMES lz4)
+find_path(LZ4_INCLUDE_DIR NAMES lz4.h HINTS ${LZ4_ROOT}/include )
+find_library(LZ4_LIBRARY NAMES lz4 HINTS ${LZ4_ROOT}/lib ${LZ4_ROOT}/lib64  )
 
 # We require LZ4_compress_default() which was added in v1.7.0
 if (LZ4_LIBRARY)

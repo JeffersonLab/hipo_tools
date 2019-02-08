@@ -3,11 +3,11 @@ cmake_minimum_required(VERSION 3.9)
 #file(GLOB hipo_headers ${CMAKE_CURRENT_SOURCE_DIR}/include/hipo/*.h)
 #
 #ROOT_GENERATE_DICTIONARY_ROOTMAP(hipocppDict libhipocpp
-#  -I${PROJECT_SOURCE_DIR}/src/Hipo -I${PROJECT_SOURCE_DIR}/src/Hipo/include ${hipo_headers} 
-#  LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/include/LinkDef.h 
+#  -I${PROJECT_SOURCE_DIR}/src/Hipo -I${PROJECT_SOURCE_DIR}/src/Hipo/include ${hipo_headers}
+#  LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/include/LinkDef.h
 #  OPTIONS -p)
 #
-#ADD_CUSTOM_TARGET(hipocppDict_ROOTDICTS 
+#ADD_CUSTOM_TARGET(hipocppDict_ROOTDICTS
 #  DEPENDS hipocppDict.cxx  )
 
 
@@ -22,18 +22,20 @@ add_library(hipocpp SHARED
   src/utils.cpp
   src/wrapper.cpp
   src/writer.cpp
-  #  hipocppDict.cxx 
+  #  hipocppDict.cxx
   )
-set_target_properties(hipocpp PROPERTIES VERSION ${PROJECT_VERSION})
+#set_target_properties(hipocpp PROPERTIES VERSION ${PROJECT_VERSION})
 #add_dependencies(hipocpp hipocppDict_ROOTDICTS)
 
-target_link_libraries(hipocpp 
-  PUBLIC ${LZ4_LIBRARY} 
+target_link_libraries(hipocpp
+  PUBLIC ${LZ4_LIBRARY}
 #  ${ROOT_LIBRARIES}
   )
 
 target_include_directories(hipocpp 
-  PRIVATE include)
+  PRIVATE include
+  PUBLIC ${LZ4_INCLUDE_DIR}
+  )
 
 install(TARGETS hipocpp
   EXPORT HipoToolsTargets
@@ -41,8 +43,8 @@ install(TARGETS hipocpp
     PUBLIC_HEADER DESTINATION include/hipocpp
     )
   #install(
-  #  FILES 
-  #  ${CMAKE_CURRENT_BINARY_DIR}/hipocppDict_rdict.pcm 
+  #  FILES
+  #  ${CMAKE_CURRENT_BINARY_DIR}/hipocppDict_rdict.pcm
   #  ${CMAKE_CURRENT_BINARY_DIR}/libhipocpp.rootmap
   #  DESTINATION lib )
 
@@ -57,4 +59,3 @@ install(
 
 configure_file(hipocpp.pc.in hipocpp.pc @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/src/hipocpp/hipocpp.pc DESTINATION share/pkgconfig)
-
