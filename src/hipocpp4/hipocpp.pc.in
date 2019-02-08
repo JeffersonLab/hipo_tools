@@ -1,0 +1,10 @@
+libdir=@CMAKE_INSTALL_PREFIX@/lib
+includedir=@CMAKE_INSTALL_PREFIX@/include/hipo4
+
+Name: @PROJECT_NAME@
+Description: @PROJECT_DESCRIPTION@
+Version: @PROJECT_VERSION@
+
+Requires:
+Libs: -L${libdir} -lhipocpp4
+Cflags: -I${includedir}

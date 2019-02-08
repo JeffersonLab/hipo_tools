@@ -26,9 +26,11 @@ include_directories(${ROOT_INCLUDE_DIRS})
 link_directories(${ROOT_LIBRARY_DIR})
 include(cmake/root.cmake)
 
-include_directories(src/hipocpp/include)
+include_directories(src/hipocpp3/include)
+include_directories(src/hipocpp4/include)
 
-add_subdirectory(src/hipocpp)
+add_subdirectory(src/hipocpp3)
+add_subdirectory(src/hipocpp4)
 add_subdirectory(src/recon2root)
 if(NOT APPLE)
   add_subdirectory(src/toohip4root)
@@ -40,14 +42,6 @@ find_package(Cython)
 if(Cython_FOUND)
     add_subdirectory(src/hipopy)
 endif()
-
-add_executable(hipo examples/hipo.cpp)
-target_link_libraries(hipo hipocpp ${LZ4_LIBRARY})
-install(TARGETS hipo RUNTIME DESTINATION bin)
-
-add_executable(hipo_write examples/write_file.cpp)
-target_link_libraries(hipo_write hipocpp ${LZ4_LIBRARY})
-install(TARGETS hipo_write RUNTIME DESTINATION bin)
 
 
 # -------------------------
