@@ -7,9 +7,10 @@ set(CMAKE_MODULE_PATH
    ${PROJECT_SOURCE_DIR}/cmake
    ${PROJECT_SOURCE_DIR}/cmake/modules)
 
-## Use C++11 features
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(EXTRA_FLAGS "-D__LZ4__ -pthread -m64")
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${EXTRA_FLAGS}" )
 
 ## OS Specific settings
 include(cmake/os.cmake)
@@ -32,6 +33,7 @@ include_directories(src/hipocpp4/include)
 add_subdirectory(src/hipocpp3)
 add_subdirectory(src/hipocpp4)
 add_subdirectory(src/recon2root)
+
 if(NOT APPLE)
   add_subdirectory(src/toohip4root)
   add_subdirectory(src/hipo-io)
