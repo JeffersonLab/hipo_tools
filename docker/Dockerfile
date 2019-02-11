@@ -3,8 +3,8 @@ USER root
 
 ENV HIPO_TOOLS /usr/local/hipo_tools
 ENV PATH $PATH:$HIPO_TOOLS/bin
-ENV LD_LIBRARY_PATH $HIPO_TOOLS:/usr/local/lib/root
-ENV PYTHONPATH $HIPO_TOOLS:/usr/local/lib/root
+ENV LD_LIBRARY_PATH $HIPO_TOOLS/lib:/usr/local/lib/root
+ENV PYTHONPATH $HIPO_TOOLS/lib:/usr/local/lib/root
 
 RUN apt-get update && apt-get install -y liblz4-dev python-pip python-dev && rm -rf /var/lib/apt/lists/*
 
