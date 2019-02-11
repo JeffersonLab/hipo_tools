@@ -34,6 +34,7 @@ namespace hipo {
    * If the signature does not match EVIO/HIPO template, the
    * file will be closed and warning message is printed.
    */
+
   void reader::open(const char* filename) {
 
     if (inputStream.is_open() == true) {
@@ -98,10 +99,8 @@ namespace hipo {
     inputRecord.readRecord(inputStream, header.trailerPosition, 0);
     hipo::event event;
     inputRecord.readHipoEvent(event, 0);
-    event.show();
     hipo::structure base;
     event.getStructure(base, 32111, 1);
-    base.show();
 
     int rows = base.getSize() / 32;
 
@@ -157,9 +156,9 @@ namespace hipo {
     }
   }
 
-  hipo::dictionary reader::dictionary() {
-    hipo::dictionary dict;
-    readDictionary(dict);
+  hipo::dictionary* reader::dictionary() {
+    hipo::dictionary* dict = new hipo::dictionary();
+    readDictionary(*dict);
     return dict;
   }
 

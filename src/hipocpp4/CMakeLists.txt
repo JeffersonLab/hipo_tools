@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.5)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS}")
 
-find_package(LZ4 REQUIRED)
-add_definitions(-D__LZ4__)
-
 set(hipo4_srcs
   src/bank.cpp
   src/dictionary.cpp
@@ -16,7 +13,7 @@ set(hipo4_srcs
   )
 
 add_library(hipo4_objlib OBJECT ${hipo4_srcs})
-set_property(TARGET hipo4_objlib PROPERTY POSITION_INDEPENDENT_CODE 1)
+set_property(TARGET hipo4_objlib PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # shared and static libraries built from the same object files
 add_library(hipocpp4 SHARED $<TARGET_OBJECTS:hipo4_objlib>)
@@ -41,7 +38,7 @@ install(TARGETS hipocpp4_static
 
 install(
     DIRECTORY
-    include/hipo
+    include/hipo4
     DESTINATION
     include
     FILES_MATCHING

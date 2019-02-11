@@ -67,8 +67,6 @@ namespace hipo {
 
     if (dataBufferLengthBytes > recordCompressedBuffer.size()) {
       int newSize = dataBufferLengthBytes + 5 * 1024;
-      printf("---> resizing internal compressed buffer size to from %ld to %d\n",
-             recordCompressedBuffer.size(), newSize);
       recordCompressedBuffer.resize(newSize);
     }
     // dataBufferLengthBytes    -= compressedDataLengthPadding;
@@ -83,13 +81,10 @@ namespace hipo {
                              recordHeader.userHeaderLengthPadding + recordHeader.recordDataLength;
 
     if (recordBuffer.size() < decompressedLength) {
-      printf(" resizing internal buffer from %lu to %d\n", recordBuffer.size(),
-             recordHeader.recordDataLength);
       recordBuffer.resize(decompressedLength + 1024);
     }
 
     if (recordHeader.compressionType == 0) {
-      printf("compression type = 0 data length = %d\n", decompressedLength);
       memcpy((&recordBuffer[0]), (&recordCompressedBuffer[0]), decompressedLength);
     } else {
       int unc_result =
@@ -156,8 +151,6 @@ namespace hipo {
 
     if (dataBufferLengthBytes > recordCompressedBuffer.size()) {
       int newSize = dataBufferLengthBytes + 5 * 1024;
-      printf("---> resizing internal compressed buffer size to from %ld to %d\n",
-             recordCompressedBuffer.size(), newSize);
       recordCompressedBuffer.resize(newSize);
     }
 
@@ -166,7 +159,8 @@ namespace hipo {
     stream.seekg(dataposition, std::ios::beg);
 
     if (position + dataBufferLengthBytes + recordHeader.headerLength > inputSize) {
-      printf("**** warning : record at position %ld is incomplete.", position);
+      std::cerr << "**** warning : record at position " << position << " is incomplete."
+                << std::endl;
       return false;
     }
     stream.read((&recordCompressedBuffer[0]), dataBufferLengthBytes);
@@ -175,13 +169,10 @@ namespace hipo {
                              recordHeader.userHeaderLengthPadding + recordHeader.recordDataLength;
 
     if (recordBuffer.size() < decompressedLength) {
-      printf(" resizing internal buffer from %lu to %d\n", recordBuffer.size(),
-             recordHeader.recordDataLength);
       recordBuffer.resize(decompressedLength + 1024);
     }
 
     if (recordHeader.compressionType == 0) {
-      printf("compression type = 0 data length = %d\n", decompressedLength);
       memcpy((&recordBuffer[0]), (&recordCompressedBuffer[0]), decompressedLength);
     } else {
       int unc_result =

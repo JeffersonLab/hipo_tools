@@ -9,8 +9,8 @@
 namespace hipo {
 
   event::event() {
-#if __cplusplus > 199711L
-    printf("\n*****>>>>> compiled with c++11 support.\n");
+#if __cplusplus < 199711L
+    std::cerr << "*****>>>>> NOT compiled with c++11 support." << std::endl;
 #endif
     // default allocation size for the event is 20 Kb
     //
@@ -97,7 +97,6 @@ namespace hipo {
       en.setAddress(NULL);
   } */
   void event::show() {
-    printf(" EVENT  SIZE = %d\n", getSize());
     int position  = 16;
     int eventSize = *(reinterpret_cast<uint32_t*>(&dataBuffer[4]));
     while (position + 8 < eventSize) {
@@ -105,9 +104,6 @@ namespace hipo {
       uint8_t  iid    = *(reinterpret_cast<uint8_t*>(&dataBuffer[position + 2]));
       uint8_t  type   = *(reinterpret_cast<uint8_t*>(&dataBuffer[position + 3]));
       int      length = *(reinterpret_cast<int*>(&dataBuffer[position + 4]));
-      // printf("group = %4d , item = %4d\n",(unsigned int) gid, (unsigned int) iid);
-      // if(gid==group&&iid==item) return std::make_pair(position,length);
-      printf("%12s %9d %4d %12d %12d\n", " ", gid, iid, type, length);
       position += (length + 8);
     }
   }

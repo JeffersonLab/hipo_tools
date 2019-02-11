@@ -1,11 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
-
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS}")
 
-find_package(LZ4 REQUIRED)
-add_definitions(-D__LZ4__)
-
-add_library(hipocpp3 SHARED
+set(hipo3_srcs
   src/data.cpp
   src/dictionary.cpp
   src/event.cpp
@@ -19,12 +16,17 @@ add_library(hipocpp3 SHARED
   )
 
 
-target_link_libraries(hipocpp3
-  PUBLIC ${LZ4_LIBRARY}
-  )
+add_library(hipo3_objlib OBJECT ${hipo3_srcs})
+set_property(TARGET hipo3_objlib PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-target_include_directories(hipocpp3
-  PRIVATE include)
+# shared and static libraries built from the same object files
+add_library(hipocpp3 SHARED $<TARGET_OBJECTS:hipo3_objlib>)
+add_library(hipocpp3_static STATIC $<TARGET_OBJECTS:hipo3_objlib>)
+
+target_link_libraries(hipocpp3 PUBLIC ${LZ4_LIBRARY})
+target_link_libraries(hipocpp3_static PUBLIC ${LZ4_LIBRARY})
+
+target_include_directories(hipocpp3 PRIVATE include)
 
 install(TARGETS hipocpp3
   EXPORT HipoToolsTargets
@@ -32,6 +34,11 @@ install(TARGETS hipocpp3
     PUBLIC_HEADER DESTINATION include/hipocpp3
     )
 
+install(TARGETS hipocpp3_static
+  EXPORT HipoToolsTargets
+    ARCHIVE DESTINATION lib
+    PUBLIC_HEADER DESTINATION include/hipocpp3
+    )
 
 install(
     DIRECTORY

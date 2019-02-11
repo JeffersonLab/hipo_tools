@@ -167,14 +167,16 @@ namespace hipo {
     reader(const char* filename) { open(filename); }
     ~reader();
 
-    void             readDictionary(hipo::dictionary& dict);
-    hipo::dictionary dictionary();
-    void             open(const char* filename);
-    bool             hasNext();
-    bool             next();
-    bool             next(hipo::event& dataevent);
-    void             read(hipo::event& dataevent);
-    void             printWarning();
+    void              readDictionary(hipo::dictionary& dict);
+    hipo::dictionary* dictionary();
+    void              open(const char* filename);
+    void              open(std::string filename) { open(filename.c_str()); };
+    bool              hasNext();
+    bool              next();
+    long              numEvents() { return readerEventIndex.getMaxEvents(); }
+    bool              next(hipo::event& dataevent);
+    void              read(hipo::event& dataevent);
+    void              printWarning();
   };
 } // namespace hipo
 #endif /* HIPOFILE_H */

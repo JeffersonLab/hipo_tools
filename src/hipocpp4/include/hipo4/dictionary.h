@@ -72,6 +72,7 @@ namespace hipo {
 
     void        parse(std::string schString);
     std::string getName() { return schemaName; }
+    std::string json();
     int         getGroup() { return groupid; }
     int         getItem() { return itemid; }
     int         getSizeForRows(int rows);

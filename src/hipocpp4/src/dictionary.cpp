@@ -76,6 +76,22 @@ namespace hipo {
     }
   }
 
+  std::string schema::json() {
+    std::string out;
+    out += "{ \"";
+    out += schemaName;
+    out += "\":\n";
+    for (int i = 0; i < schemaEntries.size(); i++) {
+      out += "\t\"";
+      out += schemaEntries[i].name;
+      out += "\" :  \"";
+      out += schemaEntries[i].type;
+      out += "\"\n";
+    }
+    out += "}\n";
+    return out;
+  }
+
   int schema::getOffset(int item, int order, int rows) {
     int offset = rows * schemaEntries[item].offset + order * schemaEntries[item].typeSize;
     return offset;
