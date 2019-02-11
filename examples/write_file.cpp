@@ -14,44 +14,44 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "hipo/reader.h"
-#include "hipo/writer.h"
-#include "hipo/event.h"
-#include "hipo/node.h"
-#include "hipo/text.h"
-#include "hipo/data.h"
-
+#include "hipo3/data.h"
+#include "hipo3/event.h"
+#include "hipo3/node.h"
+#include "hipo3/reader.h"
+#include "hipo3/text.h"
+#include "hipo3/writer.h"
 
 using namespace std;
 /*
  *
  */
 
-vector<int> getRandomVector(){
-   vector<int> vec;
-   int nelements = rand()%25+5;
-   for(int i = 0; i < nelements; i++) vec.push_back(rand()%16575);
-   //printf(" random number = %d\n",nelements);
-   return vec;
+vector<int> getRandomVector() {
+  vector<int> vec;
+  int         nelements = rand() % 25 + 5;
+  for (int i = 0; i < nelements; i++)
+    vec.push_back(rand() % 16575);
+  // printf(" random number = %d\n",nelements);
+  return vec;
 }
 
 int main(int argc, char** argv) {
 
-    int nevents = 1000;
-    hipo::writer  writer;
-    hipo::event   event;
+  int          nevents = 1000;
+  hipo::writer writer;
+  hipo::event  event;
 
-    writer.open("test_file.hipo");
-    printf("----> creating file : test_file.hipo\n");
-    for(int n = 0; n < nevents; n++){
-      vector<int> vec1 = getRandomVector();
-      vector<int> vec2 = getRandomVector();
-      event.reset();
-      event.appendNode(34,1,vec1);
-      event.appendNode(34,2,vec2);
-      writer.writeEvent(event);
-    }
-    writer.close();
-    printf("----> finished writing file with %d events\n\n",nevents);
-    return 0;
+  writer.open("test_file.hipo");
+  printf("----> creating file : test_file.hipo\n");
+  for (int n = 0; n < nevents; n++) {
+    vector<int> vec1 = getRandomVector();
+    vector<int> vec2 = getRandomVector();
+    event.reset();
+    event.appendNode(34, 1, vec1);
+    event.appendNode(34, 2, vec2);
+    writer.writeEvent(event);
+  }
+  writer.close();
+  printf("----> finished writing file with %d events\n\n", nevents);
+  return 0;
 }

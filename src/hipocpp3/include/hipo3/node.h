@@ -38,7 +38,7 @@ class generic_node {
     virtual void setAddress(char *address){}
 
     int  type();
-    int  length() const ;
+    int  length();
     int  group();
     int  item();
     const char *name();
@@ -69,7 +69,7 @@ class node : public generic_node {
         void   reset();
         void   show();
         int    getLength();
-        char*  getAddress();
+        char  *getAddress();
         int    getBytesLength();
         void   setLength(int l);
         void   setAddress(char *address);

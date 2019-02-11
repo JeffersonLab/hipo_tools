@@ -42,7 +42,7 @@ namespace hipo {
     static void printLogo();
 
     static std::string getHeader();
-    static std::string getFileHeader(std::string);
+    static std::string getFileHeader();
     static std::string getFileTrailer(const char *code);
     static std::string getSConstruct();
   };
