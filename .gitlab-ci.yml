@@ -8,9 +8,6 @@ build:
   - cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/hipo_tools
   - make
   - make install
-
-test:
-  script:
-    - python -c 'from hipopy4 import Event;'
-    - python -c 'from hipopy3 import hipo3_reader;'
-    - python -c 'from clas12 import clas12Event;'
+  - python -c 'from hipopy4 import Event;'
+  - python -c 'from hipopy3 import hipo3_reader;'
+  - python -c 'from clas12 import clas12Event;'
