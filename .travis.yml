@@ -5,4 +5,3 @@ services:
 script:
   - docker build -t hipo_tools . -f docker/Dockerfile.travis
   - docker images -a
-        

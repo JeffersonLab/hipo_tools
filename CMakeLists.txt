@@ -1,49 +1,48 @@
-cmake_minimum_required(VERSION 3.6)
-project(hipoio VERSION 0.0.1 DESCRIPTION "hipo-io")
+cmake_minimum_required(VERSION 3.5)
+project(hipoio)
+set(VERSION 0.0.1)
 
+# Add modules to find find packages
 set(CMAKE_MODULE_PATH
    ${CMAKE_MODULE_PATH}
-   ${PROJECT_SOURCE_DIR}/cmake
-   ${PROJECT_SOURCE_DIR}/cmake/modules)
+   ${PROJECT_SOURCE_DIR}/cmake)
 
-## Use C++17 features 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-## OS Specific settings
-include(cmake/os.cmake)
-
-find_package(LZ4 REQUIRED)
-add_definitions(-D__LZ4__)
-
+# Add root support
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS}/etc/cmake)
-find_package(ROOT REQUIRED COMPONENTS Tree)
+find_package(ROOT REQUIRED COMPONENTS RIO Net)
 include(${ROOT_USE_FILE})
-## extra root settings
-include_directories(${ROOT_INCLUDE_DIRS})
-link_directories(${ROOT_LIBRARY_DIR})
-include(cmake/root.cmake)
+set(CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS}")
 
-include_directories(src/hipocpp/include)
+# Find the lz4 package
+# Hopefully in the future if not found download and build
+find_package(LZ4)
+IF(LZ4_FOUND)
+  add_definitions(-D__LZ4__)
+ELSE()
+  add_subdirectory(src/lz4/contrib/cmake_unofficial)
+  set(LZ4_LIBRARY lz4_static)
+  set(LZ4_INCLUDE_DIR src/lz4/lib)
+  include_directories(${LZ4_INCLUDE_DIR})
+  add_definitions(-D__LZ4__)
+ENDIF()
 
-add_subdirectory(src/hipocpp)
-add_subdirectory(src/toohip4root)
-add_subdirectory(src/recon2root)
-add_subdirectory(src/hipo-io)
+# Add directory for hipo3 library
+include_directories(src/hipocpp3/include)
+add_subdirectory(src/hipocpp3)
 
+# Add directory for hipo4 library
+include_directories(src/hipocpp4/include)
+add_subdirectory(src/hipocpp4)
+
+# If cython found also build hipopy3/4
 find_package(Cython)
 if(Cython_FOUND)
-    add_subdirectory(src/hipopy)
+  add_subdirectory(src/hipopy)
 endif()
 
-add_executable(hipo examples/hipo.cpp)
-target_link_libraries(hipo hipocpp ${LZ4_LIBRARY})
-install(TARGETS hipo RUNTIME DESTINATION bin)
-
-add_executable(hipo_write examples/write_file.cpp)
-target_link_libraries(hipo_write hipocpp ${LZ4_LIBRARY})
-install(TARGETS hipo_write RUNTIME DESTINATION bin)
+# Build executables from their own folders
+add_subdirectory(src/recon2root)
+add_subdirectory(src/dst2root)
 
 
 # -------------------------
@@ -51,16 +50,16 @@ install(TARGETS hipo_write RUNTIME DESTINATION bin)
 include(CMakePackageConfigHelpers)
 
 # Install and export targets
-install(EXPORT HipoToolsTargets
-    FILE HipoToolsTargets.cmake
-    NAMESPACE HipoTools::
-    DESTINATION lib/hipo
-    )
+#install(EXPORT HipoToolsTargets
+#    FILE HipoToolsTargets.cmake
+#    NAMESPACE HipoTools::
+#    DESTINATION lib/hipo
+#    )
 
 
 set(TARGETS_INSTALL_PATH lib/hipo/HipoToolsTargets.cmake)
 CONFIGURE_PACKAGE_CONFIG_FILE(
-  cmake/HipoToolsConfig.cmake.in  
+  cmake/HipoToolsConfig.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/HipoToolsConfig.cmake
     INSTALL_DESTINATION lib/hipo
     PATH_VARS TARGETS_INSTALL_PATH
@@ -76,4 +75,3 @@ install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/HipoToolsConfigVersion.cmake
   DESTINATION lib/hipo
   )
-
