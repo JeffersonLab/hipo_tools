@@ -15,8 +15,16 @@ set(CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS}")
 
 # Find the lz4 package
 # Hopefully in the future if not found download and build
-find_package(LZ4 REQUIRED)
-add_definitions(-D__LZ4__)
+find_package(LZ4)
+IF(LZ4_FOUND)
+  add_definitions(-D__LZ4__)
+ELSE()
+  add_subdirectory(src/lz4/contrib/cmake_unofficial)
+  set(LZ4_LIBRARY lz4_static)
+  set(LZ4_INCLUDE_DIR src/lz4/lib)
+  include_directories(${LZ4_INCLUDE_DIR})
+  add_definitions(-D__LZ4__)
+ENDIF()
 
 # Add directory for hipo3 library
 include_directories(src/hipocpp3/include)
@@ -42,11 +50,11 @@ add_subdirectory(src/dst2root)
 include(CMakePackageConfigHelpers)
 
 # Install and export targets
-install(EXPORT HipoToolsTargets
-    FILE HipoToolsTargets.cmake
-    NAMESPACE HipoTools::
-    DESTINATION lib/hipo
-    )
+#install(EXPORT HipoToolsTargets
+#    FILE HipoToolsTargets.cmake
+#    NAMESPACE HipoTools::
+#    DESTINATION lib/hipo
+#    )
 
 
 set(TARGETS_INSTALL_PATH lib/hipo/HipoToolsTargets.cmake)
