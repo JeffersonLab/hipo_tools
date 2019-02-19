@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.5)
 enable_testing()
 
 add_executable(hipo_io src/hipo.cxx)
-#target_compile_features(toohipforroot 
+#target_compile_features(toohipforroot
 #  PRIVATE cxx_std_17)
-target_include_directories(hipo_io 
+target_include_directories(hipo_io
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -33,4 +33,3 @@ install(TARGETS hipo_io
 #  PUBLIC ${libname}
 #  )
 #add_test(NAME ${test_name} COMMAND ${test_name} -s)
-

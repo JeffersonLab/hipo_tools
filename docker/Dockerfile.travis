@@ -26,8 +26,3 @@ RUN mkdir -p /tmp/hipo_tools/build && cd /tmp/hipo_tools/build \
     && make -j$(nproc) \
     && make install \
     && rm -rf /tmp/*
-
-# Tests that hipopy loads
-RUN python -c 'from hipopy4 import hipo4_reader;'
-RUN python -c 'from hipopy3 import hipo3_reader;'
-RUN python -c 'from clas12 import clas12Event;'
