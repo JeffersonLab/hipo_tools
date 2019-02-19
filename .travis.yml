@@ -5,3 +5,8 @@ services:
 script:
   - docker build -t hipo_tools . -f docker/Dockerfile.travis
   - docker images -a
+  - docker run --rm -it hipo_tools python -c "from clas12 import clas12Event;"
+  - docker run --rm -it hipo_tools python -c "from hipopy3 import hipo3_reader;"
+  - docker run --rm -it hipo_tools python -c "from clas12 import clas12Event;"
+  - wget http://stash.osgconnect.net/~tylern/clas12/hipo/v0/4065_4.hipo
+  - docker run --rm -it -v $PWD:/data hipo_tools dst2root_3 /data/4065_4.hipo
