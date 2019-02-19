@@ -12,9 +12,8 @@
 #include "TFile.h"
 #include "TTree.h"
 // Hipo libs
-#include "hipo4/reader.h"
+#include "hipo3/reader.h"
 
-// Headers in same folder
 #include "clipp.h"
 #include "constants.h"
 
@@ -27,6 +26,7 @@ int main(int argc, char** argv) {
   bool        good_rec    = false;
   bool        elec_first  = false;
   bool        cov         = false;
+  bool        cvt         = false;
 
   auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
               clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
@@ -36,6 +36,8 @@ int main(int argc, char** argv) {
               clipp::option("-e", "--elec").set(elec_first) %
                   "Only save events with good electron as first particle",
               clipp::option("-c", "--cov").set(cov) % "Save Covariant Matrix for kinematic fitting",
+              clipp::option("-cvt", "--CVTDetector").set(cvt) %
+                  "Save CVT information for kinematic fitting",
               clipp::value("inputFile.hipo", InFileName),
               clipp::opt_value("outputFile.root", OutFileName));
 
@@ -53,36 +55,178 @@ int main(int argc, char** argv) {
   OutputFile->SetCompressionSettings(6);
 
   TTree*        clas12          = new TTree("clas12", "clas12");
-  hipo::reader* reader          = new hipo::reader(InFileName);
-  size_t        tot_hipo_events = reader->numEvents();
+  hipo::reader* reader          = new hipo::reader(InFileName.c_str());
+  long          tot_hipo_events = reader->numEvents();
 
-  hipo::dictionary* dict = new hipo::dictionary();
-  reader->readDictionary(*dict);
-  hipo::event* hipo_event = new hipo::event();
+  hipo::node<int32_t>* run_node      = reader->getBranch<int32_t>(11, 1);
+  hipo::node<int32_t>* event_node    = reader->getBranch<int32_t>(11, 2);
+  hipo::node<float>*   torus_node    = reader->getBranch<float>(11, 8);
+  hipo::node<float>*   solenoid_node = reader->getBranch<float>(11, 9);
+  hipo::node<int8_t>*  crate_node    = reader->getBranch<int8_t>(20013, 1);
+  hipo::node<int8_t>*  slot_node     = reader->getBranch<int8_t>(20013, 2);
+  hipo::node<int16_t>* channel_node  = reader->getBranch<int16_t>(20013, 3);
+  hipo::node<int8_t>*  helicity_node = reader->getBranch<int8_t>(20013, 4);
+  hipo::node<int8_t>*  quartet_node  = reader->getBranch<int8_t>(20013, 5);
+  hipo::node<int32_t>* value_node    = reader->getBranch<int32_t>(20013, 6);
+  hipo::node<int32_t>* NRUN_node     = reader->getBranch<int32_t>(330, 1);
+  hipo::node<int32_t>* NEVENT_node   = reader->getBranch<int32_t>(330, 2);
+  hipo::node<float>*   EVNTime_node  = reader->getBranch<float>(330, 3);
+  hipo::node<int8_t>*  TYPE_node     = reader->getBranch<int8_t>(330, 4);
+  hipo::node<int64_t>* TRG_node      = reader->getBranch<int64_t>(330, 7);
+  hipo::node<float>*   BCG_node      = reader->getBranch<float>(330, 8);
+  hipo::node<float>*   STTime_node   = reader->getBranch<float>(330, 10);
+  hipo::node<float>*   RFTime_node   = reader->getBranch<float>(330, 11);
+  hipo::node<int8_t>*  Helic_node    = reader->getBranch<int8_t>(330, 12);
 
-  hipo::bank* rec_ForwardTagger = new hipo::bank(dict->getSchema("REC::ForwardTagger"));
-  hipo::bank* rec_VertDoca      = new hipo::bank(dict->getSchema("REC::VertDoca"));
-  hipo::bank* rec_Track         = new hipo::bank(dict->getSchema("REC::Track"));
-  hipo::bank* rec_Cherenkov     = new hipo::bank(dict->getSchema("REC::Cherenkov"));
-  hipo::bank* rec_Event         = new hipo::bank(dict->getSchema("REC::Event"));
-  hipo::bank* rec_Particle      = new hipo::bank(dict->getSchema("REC::Particle"));
-  hipo::bank* rec_Scintillator  = new hipo::bank(dict->getSchema("REC::Scintillator"));
-  hipo::bank* rec_Calorimeter   = new hipo::bank(dict->getSchema("REC::Calorimeter"));
-  hipo::bank* rec_CovMat        = new hipo::bank(dict->getSchema("REC::CovMat"));
+  hipo::node<int32_t>* pid_node     = reader->getBranch<int32_t>(331, 1);
+  hipo::node<float>*   px_node      = reader->getBranch<float>(331, 2);
+  hipo::node<float>*   py_node      = reader->getBranch<float>(331, 3);
+  hipo::node<float>*   pz_node      = reader->getBranch<float>(331, 4);
+  hipo::node<float>*   vx_node      = reader->getBranch<float>(331, 5);
+  hipo::node<float>*   vy_node      = reader->getBranch<float>(331, 6);
+  hipo::node<float>*   vz_node      = reader->getBranch<float>(331, 7);
+  hipo::node<int8_t>*  charge_node  = reader->getBranch<int8_t>(331, 8);
+  hipo::node<float>*   beta_node    = reader->getBranch<float>(331, 9);
+  hipo::node<float>*   chi2pid_node = reader->getBranch<float>(331, 10);
+  hipo::node<int16_t>* status_node  = reader->getBranch<int16_t>(331, 11);
 
-  int    NRUN;
-  int    NEVENT;
-  float  EVNTime;
-  int    TYPE;
-  int    TRG;
-  float  BCG;
-  float  STTime;
-  float  RFTime;
-  int    Helic;
-  int    EvCAT;
-  int    NPGP;
-  double LT;
-  float  PTIME;
+  hipo::node<int16_t>* cal_pindex_node   = reader->getBranch<int16_t>(332, 2);
+  hipo::node<int8_t>*  cal_detector_node = reader->getBranch<int8_t>(332, 3);
+  hipo::node<int8_t>*  cal_sector_node   = reader->getBranch<int8_t>(332, 4);
+  hipo::node<int8_t>*  cal_layer_node    = reader->getBranch<int8_t>(332, 5);
+  hipo::node<float>*   cal_energy_node   = reader->getBranch<float>(332, 6);
+  hipo::node<float>*   cal_time_node     = reader->getBranch<float>(332, 7);
+  hipo::node<float>*   cal_path_node     = reader->getBranch<float>(332, 8);
+  hipo::node<float>*   cal_x_node        = reader->getBranch<float>(332, 10);
+  hipo::node<float>*   cal_y_node        = reader->getBranch<float>(332, 11);
+  hipo::node<float>*   cal_z_node        = reader->getBranch<float>(332, 12);
+  hipo::node<float>*   cal_lu_node       = reader->getBranch<float>(332, 16);
+  hipo::node<float>*   cal_lv_node       = reader->getBranch<float>(332, 17);
+  hipo::node<float>*   cal_lw_node       = reader->getBranch<float>(332, 18);
+
+  hipo::node<int16_t>* chern_pindex_node   = reader->getBranch<int16_t>(333, 2);
+  hipo::node<int8_t>*  chern_detector_node = reader->getBranch<int8_t>(333, 3);
+  hipo::node<int8_t>*  chern_sector_node   = reader->getBranch<int8_t>(333, 4);
+  hipo::node<float>*   chern_nphe_node     = reader->getBranch<float>(333, 5);
+  hipo::node<float>*   chern_time_node     = reader->getBranch<float>(333, 6);
+  hipo::node<float>*   chern_path_node     = reader->getBranch<float>(333, 7);
+  hipo::node<float>*   chern_theta_node    = reader->getBranch<float>(333, 12);
+  hipo::node<float>*   chern_phi_node      = reader->getBranch<float>(333, 13);
+
+  hipo::node<int16_t>* fortag_pindex_node   = reader->getBranch<int16_t>(334, 2);
+  hipo::node<int8_t>*  fortag_detector_node = reader->getBranch<int8_t>(334, 3);
+  hipo::node<float>*   fortag_energy_node   = reader->getBranch<float>(334, 4);
+  hipo::node<float>*   fortag_time_node     = reader->getBranch<float>(334, 5);
+  hipo::node<float>*   fortag_path_node     = reader->getBranch<float>(334, 6);
+  hipo::node<float>*   fortag_x_node        = reader->getBranch<float>(334, 8);
+  hipo::node<float>*   fortag_y_node        = reader->getBranch<float>(334, 9);
+  hipo::node<float>*   fortag_z_node        = reader->getBranch<float>(334, 10);
+  hipo::node<float>*   fortag_dx_node       = reader->getBranch<float>(334, 11);
+  hipo::node<float>*   fortag_dy_node       = reader->getBranch<float>(334, 12);
+  hipo::node<float>*   fortag_radius_node   = reader->getBranch<float>(334, 13);
+  hipo::node<int16_t>* fortag_size_node     = reader->getBranch<int16_t>(334, 14);
+
+  hipo::node<int16_t>* scint_pindex_node    = reader->getBranch<int16_t>(335, 2);
+  hipo::node<int8_t>*  scint_detector_node  = reader->getBranch<int8_t>(335, 3);
+  hipo::node<int8_t>*  scint_sector_node    = reader->getBranch<int8_t>(335, 4);
+  hipo::node<int8_t>*  scint_layer_node     = reader->getBranch<int8_t>(335, 5);
+  hipo::node<int16_t>* scint_component_node = reader->getBranch<int16_t>(335, 6);
+  hipo::node<float>*   scint_energy_node    = reader->getBranch<float>(335, 7);
+  hipo::node<float>*   scint_time_node      = reader->getBranch<float>(335, 8);
+  hipo::node<float>*   scint_path_node      = reader->getBranch<float>(335, 9);
+  // hipo::node<float> *scint_chi2_node = reader->getBranch<float>(335, 10);
+  hipo::node<float>* scint_x_node  = reader->getBranch<float>(335, 11);
+  hipo::node<float>* scint_y_node  = reader->getBranch<float>(335, 12);
+  hipo::node<float>* scint_z_node  = reader->getBranch<float>(335, 13);
+  hipo::node<float>* scint_hx_node = reader->getBranch<float>(335, 14);
+  hipo::node<float>* scint_hy_node = reader->getBranch<float>(335, 15);
+  hipo::node<float>* scint_hz_node = reader->getBranch<float>(335, 16);
+  // hipo::node<int16_t> *scint_status_node = reader->getBranch<int16_t>(335, 17);
+
+  hipo::node<int16_t>* track_pindex_node   = reader->getBranch<int16_t>(336, 2);
+  hipo::node<int8_t>*  track_detector_node = reader->getBranch<int8_t>(336, 3);
+  hipo::node<int8_t>*  track_sector_node   = reader->getBranch<int8_t>(336, 4);
+  hipo::node<float>*   track_px_nomm_node  = reader->getBranch<float>(336, 9);
+  hipo::node<float>*   track_py_nomm_node  = reader->getBranch<float>(336, 10);
+  hipo::node<float>*   track_pz_nomm_node  = reader->getBranch<float>(336, 11);
+  hipo::node<float>*   track_vx_nomm_node  = reader->getBranch<float>(336, 12);
+  hipo::node<float>*   track_vy_nomm_node  = reader->getBranch<float>(336, 13);
+  hipo::node<float>*   track_vz_nomm_node  = reader->getBranch<float>(336, 14);
+
+  hipo::node<float>*   MC_Header_helicity_node = reader->getBranch<float>(40, 4);
+  hipo::node<int16_t>* MC_Event_npart_node     = reader->getBranch<int16_t>(41, 1);
+  hipo::node<int32_t>* MC_pid_node             = reader->getBranch<int32_t>(42, 1);
+  hipo::node<float>*   MC_px_node              = reader->getBranch<float>(42, 2);
+  hipo::node<float>*   MC_py_node              = reader->getBranch<float>(42, 3);
+  hipo::node<float>*   MC_pz_node              = reader->getBranch<float>(42, 4);
+  hipo::node<float>*   MC_vx_node              = reader->getBranch<float>(42, 5);
+  hipo::node<float>*   MC_vy_node              = reader->getBranch<float>(42, 6);
+  hipo::node<float>*   MC_vz_node              = reader->getBranch<float>(42, 7);
+  hipo::node<float>*   MC_vt_node              = reader->getBranch<float>(42, 8);
+
+  hipo::node<int32_t>* MC_Lund_pid_node   = reader->getBranch<int32_t>(43, 3);
+  hipo::node<float>*   MC_Lund_px_node    = reader->getBranch<float>(43, 6);
+  hipo::node<float>*   MC_Lund_py_node    = reader->getBranch<float>(43, 7);
+  hipo::node<float>*   MC_Lund_pz_node    = reader->getBranch<float>(43, 8);
+  hipo::node<float>*   MC_Lund_E_node     = reader->getBranch<float>(43, 9);
+  hipo::node<float>*   MC_Lund_vx_node    = reader->getBranch<float>(43, 11);
+  hipo::node<float>*   MC_Lund_vy_node    = reader->getBranch<float>(43, 12);
+  hipo::node<float>*   MC_Lund_vz_node    = reader->getBranch<float>(43, 13);
+  hipo::node<float>*   MC_Lund_ltime_node = reader->getBranch<float>(43, 14);
+
+  hipo::node<int16_t>* CovMat_pindex_node = reader->getBranch<int16_t>(338, 2);
+  hipo::node<float>*   CovMat_C11_node    = reader->getBranch<float>(338, 3);
+  hipo::node<float>*   CovMat_C12_node    = reader->getBranch<float>(338, 4);
+  hipo::node<float>*   CovMat_C13_node    = reader->getBranch<float>(338, 5);
+  hipo::node<float>*   CovMat_C14_node    = reader->getBranch<float>(338, 6);
+  hipo::node<float>*   CovMat_C15_node    = reader->getBranch<float>(338, 7);
+  hipo::node<float>*   CovMat_C22_node    = reader->getBranch<float>(338, 8);
+  hipo::node<float>*   CovMat_C23_node    = reader->getBranch<float>(338, 9);
+  hipo::node<float>*   CovMat_C24_node    = reader->getBranch<float>(338, 10);
+  hipo::node<float>*   CovMat_C25_node    = reader->getBranch<float>(338, 11);
+  hipo::node<float>*   CovMat_C33_node    = reader->getBranch<float>(338, 12);
+  hipo::node<float>*   CovMat_C34_node    = reader->getBranch<float>(338, 13);
+  hipo::node<float>*   CovMat_C35_node    = reader->getBranch<float>(338, 14);
+  hipo::node<float>*   CovMat_C44_node    = reader->getBranch<float>(338, 15);
+  hipo::node<float>*   CovMat_C45_node    = reader->getBranch<float>(338, 16);
+  hipo::node<float>*   CovMat_C55_node    = reader->getBranch<float>(338, 17);
+
+  hipo::node<int16_t>* CVT_pid_node         = reader->getBranch<int16_t>(20526, 1);
+  hipo::node<int8_t>*  CVT_q_node           = reader->getBranch<int8_t>(20526, 10);
+  hipo::node<float>*   CVT_p_node           = reader->getBranch<float>(20526, 11);
+  hipo::node<float>*   CVT_pt_node          = reader->getBranch<float>(20526, 12);
+  hipo::node<float>*   CVT_phi0_node        = reader->getBranch<float>(20526, 13);
+  hipo::node<float>*   CVT_tandip_node      = reader->getBranch<float>(20526, 14);
+  hipo::node<float>*   CVT_z0_node          = reader->getBranch<float>(20526, 15);
+  hipo::node<float>*   CVT_d0_node          = reader->getBranch<float>(20526, 16);
+  hipo::node<float>*   CVT_Cov_d02_node     = reader->getBranch<float>(20526, 17);
+  hipo::node<float>*   CVT_Cov_d0phi0_node  = reader->getBranch<float>(20526, 18);
+  hipo::node<float>*   CVT_Cov_d0rho_node   = reader->getBranch<float>(20526, 19);
+  hipo::node<float>*   CVT_Cov_phi02_node   = reader->getBranch<float>(20526, 20);
+  hipo::node<float>*   CVT_Cov_phi0rho_node = reader->getBranch<float>(20526, 21);
+  hipo::node<float>*   CVT_Cov_rho2_node    = reader->getBranch<float>(20526, 22);
+  hipo::node<float>*   CVT_Cov_z02_node     = reader->getBranch<float>(20526, 23);
+  hipo::node<float>*   CVT_Cov_tandip2_node = reader->getBranch<float>(20526, 24);
+
+  std::vector<int>   run;
+  std::vector<int>   event;
+  std::vector<float> torus;
+  std::vector<float> solenoid;
+  std::vector<int>   crate;
+  std::vector<int>   slot;
+  std::vector<int>   channel;
+  std::vector<int>   helicity;
+  std::vector<int>   quartet;
+  std::vector<int>   value;
+  std::vector<int>   NRUN;
+  std::vector<int>   NEVENT;
+  std::vector<float> EVNTime;
+  std::vector<int>   TYPE;
+  std::vector<int>   TRG;
+  std::vector<float> BCG;
+  std::vector<float> STTime;
+  std::vector<float> RFTime;
+  std::vector<int>   Helic;
 
   std::vector<int>   pid;
   std::vector<float> p;
@@ -317,19 +461,35 @@ int main(int argc, char** argv) {
   std::vector<float> CovMat_45;
   std::vector<float> CovMat_55;
 
-  clas12->Branch("NRUN", &NRUN);
-  clas12->Branch("NEVENT", &NEVENT);
-  clas12->Branch("EVNTime", &EVNTime);
-  clas12->Branch("TYPE", &TYPE);
-  clas12->Branch("TRG", &TRG);
-  clas12->Branch("BCG", &BCG);
+  std::vector<int>   cvt_pid;
+  std::vector<int>   cvt_q;
+  std::vector<float> cvt_p;
+  std::vector<float> cvt_pt;
+  std::vector<float> cvt_phi0;
+  std::vector<float> cvt_tandip;
+  std::vector<float> cvt_z0;
+  std::vector<float> cvt_d0;
+  std::vector<float> cvt_CovMat_d02;
+  std::vector<float> cvt_CovMat_d0phi0;
+  std::vector<float> cvt_CovMat_d0rho;
+  std::vector<float> cvt_CovMat_phi02;
+  std::vector<float> cvt_CovMat_phi0rho;
+  std::vector<float> cvt_CovMat_rho2;
+  std::vector<float> cvt_CovMat_z02;
+  std::vector<float> cvt_CovMat_tandip2;
+
+  clas12->Branch("run", &run);
+  clas12->Branch("event", &event);
+  clas12->Branch("torus", &torus);
+  clas12->Branch("solenoid", &solenoid);
+  clas12->Branch("crate", &crate);
+  clas12->Branch("slot", &slot);
+  clas12->Branch("channel", &channel);
+  clas12->Branch("helicity", &helicity);
+  clas12->Branch("quartet", &quartet);
+  clas12->Branch("value", &value);
   clas12->Branch("STTime", &STTime);
   clas12->Branch("RFTime", &RFTime);
-  clas12->Branch("Helic", &Helic);
-  clas12->Branch("EvCAT", &EvCAT);
-  clas12->Branch("NPGP", &NPGP);
-  clas12->Branch("LT", &LT);
-  clas12->Branch("PTIME", &PTIME);
 
   clas12->Branch("pid", &pid);
   clas12->Branch("p", &p);
@@ -532,53 +692,80 @@ int main(int argc, char** argv) {
     clas12->Branch("CovMat_45", &CovMat_45);
     clas12->Branch("CovMat_55", &CovMat_55);
   }
+  if (cvt) {
+    clas12->Branch("cvt_pid", &cvt_pid);
+    clas12->Branch("cvt_q", &cvt_q);
+    clas12->Branch("cvt_p", &cvt_p);
+    clas12->Branch("cvt_pt", &cvt_pt);
+    clas12->Branch("cvt_phi0", &cvt_phi0);
+    clas12->Branch("cvt_tandip", &cvt_tandip);
+    clas12->Branch("cvt_z0", &cvt_z0);
+    clas12->Branch("cvt_d0", &cvt_d0);
+    clas12->Branch("cvt_CovMat_d02", &cvt_CovMat_d02);
+    clas12->Branch("cvt_CovMat_d0rho", &cvt_CovMat_d0rho);
+    clas12->Branch("cvt_CovMat_phi02", &cvt_CovMat_phi02);
+    clas12->Branch("cvt_CovMat_phi0rho", &cvt_CovMat_phi0rho);
+    clas12->Branch("cvt_CovMat_rho2", &cvt_CovMat_rho2);
+    clas12->Branch("cvt_CovMat_z02", &cvt_CovMat_z02);
+    clas12->Branch("cvt_CovMat_tandip2", &cvt_CovMat_tandip2);
+  }
 
   int entry      = 0;
   int l          = 0;
   int len_pid    = 0;
   int len_pindex = 0;
 
-  while (reader->next()) {
-    reader->read(*hipo_event);
-    hipo_event->getStructure(*rec_Particle);
-    hipo_event->getStructure(*rec_ForwardTagger);
-    hipo_event->getStructure(*rec_VertDoca);
-    hipo_event->getStructure(*rec_Track);
-    hipo_event->getStructure(*rec_Cherenkov);
-    hipo_event->getStructure(*rec_Event);
-    hipo_event->getStructure(*rec_Scintillator);
-    hipo_event->getStructure(*rec_Calorimeter);
-    hipo_event->getStructure(*rec_CovMat);
+  while (reader->next() == true) {
 
-    if (!is_batch && (++entry % 10000) == 0)
+    // entry++;
+    if (!is_batch && (++entry % 1000) == 0)
       std::cout << "\t" << floor(100 * entry / tot_hipo_events) << "%\r\r" << std::flush;
-    ////Testing
-    if ((entry % 20000) == 0)
-      break;
 
-    if (good_rec && rec_Particle->getRows() == 0)
+    if (good_rec && pid_node->getLength() == 0)
       continue;
-    if (elec_first && rec_Particle->getInt("pid", 0) != 11)
+    if (elec_first && pid_node->getValue(0) != 11)
       continue;
 
-    l = rec_Event->getRows();
-    if (l != 0) {
-      NRUN    = rec_Event->getInt("NRUN", 0);
-      NEVENT  = rec_Event->getInt("NEVENT", 0);
-      EVNTime = rec_Event->getFloat("EVNTime", 0);
-      TYPE    = rec_Event->getByte("TYPE", 0);
-      EvCAT   = rec_Event->getShort("EvCAT", 0);
-      NPGP    = rec_Event->getShort("NPGP", 0);
-      TRG     = rec_Event->getLong("TRG", 0);
-      BCG     = rec_Event->getFloat("BCG", 0);
-      LT      = rec_Event->getDouble("LT", 0);
-      STTime  = rec_Event->getFloat("STTime", 0);
-      RFTime  = rec_Event->getFloat("RFTime", 0);
-      Helic   = rec_Event->getByte("Helic", 0);
-      PTIME   = rec_Event->getFloat("PTIME", 0);
+    l = run_node->getLength();
+    run.resize(l);
+    event.resize(l);
+    torus.resize(l);
+    solenoid.resize(l);
+
+    for (int i = 0; i < l; i++) {
+      run[i]      = run_node->getValue(i);
+      event[i]    = event_node->getValue(i);
+      torus[i]    = torus_node->getValue(i);
+      solenoid[i] = solenoid_node->getValue(i);
     }
 
-    l = rec_Particle->getRows();
+    l = crate_node->getLength();
+    crate.resize(l);
+    slot.resize(l);
+    channel.resize(l);
+    helicity.resize(l);
+    quartet.resize(l);
+    value.resize(l);
+
+    for (int i = 0; i < l; i++) {
+      crate[i]    = crate_node->getValue(i);
+      slot[i]     = slot_node->getValue(i);
+      channel[i]  = channel_node->getValue(i);
+      helicity[i] = helicity_node->getValue(i);
+      quartet[i]  = quartet_node->getValue(i);
+      value[i]    = value_node->getValue(i);
+    }
+
+    l = STTime_node->getLength();
+    STTime.resize(l);
+    RFTime.resize(l);
+
+    for (int i = 0; i < l; i++) {
+      STTime[i] = STTime_node->getValue(i);
+      RFTime[i] = RFTime_node->getValue(i);
+    }
+
+    l = pid_node->getLength();
     pid.resize(l);
     p.resize(l);
     p2.resize(l);
@@ -594,70 +781,68 @@ int main(int argc, char** argv) {
     status.resize(l);
 
     for (int i = 0; i < l; i++) {
-      pid[i]    = rec_Particle->getInt("pid", i);
-      p2[i]     = (rec_Particle->getFloat("px", i) * rec_Particle->getFloat("px", i) +
-               rec_Particle->getFloat("py", i) * rec_Particle->getFloat("py", i) +
-               rec_Particle->getFloat("pz", i) * rec_Particle->getFloat("pz", i));
-      p[i]      = sqrt(p2[i]);
-      px[i]     = rec_Particle->getFloat("px", i);
-      py[i]     = rec_Particle->getFloat("py", i);
-      pz[i]     = rec_Particle->getFloat("pz", i);
-      vx[i]     = rec_Particle->getFloat("vx", i);
-      vy[i]     = rec_Particle->getFloat("vy", i);
-      vz[i]     = rec_Particle->getFloat("vz", i);
-      charge[i] = rec_Particle->getInt("charge", i);
-      beta[i] =
-          ((rec_Particle->getFloat("beta", i) != -9999) ? rec_Particle->getFloat("beta", i) : NAN);
-      chi2pid[i] = rec_Particle->getFloat("chi2pid", i);
-      status[i]  = rec_Particle->getInt("status", i);
+      pid[i]     = pid_node->getValue(i);
+      p2[i]      = (px_node->getValue(i) * px_node->getValue(i) +
+               py_node->getValue(i) * py_node->getValue(i) +
+               pz_node->getValue(i) * pz_node->getValue(i));
+      p[i]       = sqrt(p2[i]);
+      px[i]      = px_node->getValue(i);
+      py[i]      = py_node->getValue(i);
+      pz[i]      = pz_node->getValue(i);
+      vx[i]      = vx_node->getValue(i);
+      vy[i]      = vy_node->getValue(i);
+      vz[i]      = vz_node->getValue(i);
+      charge[i]  = charge_node->getValue(i);
+      beta[i]    = ((beta_node->getValue(i) != -9999) ? beta_node->getValue(i) : NAN);
+      chi2pid[i] = chi2pid_node->getValue(i);
+      status[i]  = status_node->getValue(i);
     }
 
-    /*
-        if (is_mc) {
-          l = MC_pid_node->getLength();
-          MC_helicity.resize(l);
-          MC_pid.resize(l);
-          MC_px.resize(l);
-          MC_py.resize(l);
-          MC_pz.resize(l);
-          MC_vx.resize(l);
-          MC_vy.resize(l);
-          MC_vz.resize(l);
-          MC_vt.resize(l);
-          Lund_pid.resize(l);
-          Lund_px.resize(l);
-          Lund_py.resize(l);
-          Lund_pz.resize(l);
-          Lund_E.resize(l);
-          Lund_vx.resize(l);
-          Lund_vy.resize(l);
-          Lund_vz.resize(l);
-          Lund_ltime.resize(l);
-          for (int i = 0; i < l; i++) {
-            MC_helicity[i] = MC_Header_helicity_node->getValue(i);
-            MC_pid[i] = MC_pid_node->getValue(i);
-            MC_px[i] = MC_px_node->getValue(i);
-            MC_py[i] = MC_py_node->getValue(i);
-            MC_pz[i] = MC_pz_node->getValue(i);
-            MC_vx[i] = MC_vx_node->getValue(i);
-            MC_vy[i] = MC_vy_node->getValue(i);
-            MC_vz[i] = MC_vz_node->getValue(i);
-            MC_vt[i] = MC_vt_node->getValue(i);
+    if (is_mc) {
+      l = MC_pid_node->getLength();
+      MC_helicity.resize(l);
+      MC_pid.resize(l);
+      MC_px.resize(l);
+      MC_py.resize(l);
+      MC_pz.resize(l);
+      MC_vx.resize(l);
+      MC_vy.resize(l);
+      MC_vz.resize(l);
+      MC_vt.resize(l);
+      Lund_pid.resize(l);
+      Lund_px.resize(l);
+      Lund_py.resize(l);
+      Lund_pz.resize(l);
+      Lund_E.resize(l);
+      Lund_vx.resize(l);
+      Lund_vy.resize(l);
+      Lund_vz.resize(l);
+      Lund_ltime.resize(l);
+      for (int i = 0; i < l; i++) {
+        MC_helicity[i] = MC_Header_helicity_node->getValue(i);
+        MC_pid[i]      = MC_pid_node->getValue(i);
+        MC_px[i]       = MC_px_node->getValue(i);
+        MC_py[i]       = MC_py_node->getValue(i);
+        MC_pz[i]       = MC_pz_node->getValue(i);
+        MC_vx[i]       = MC_vx_node->getValue(i);
+        MC_vy[i]       = MC_vy_node->getValue(i);
+        MC_vz[i]       = MC_vz_node->getValue(i);
+        MC_vt[i]       = MC_vt_node->getValue(i);
 
-            Lund_pid[i] = MC_Lund_pid_node->getValue(i);
-            Lund_px[i] = MC_Lund_px_node->getValue(i);
-            Lund_py[i] = MC_Lund_py_node->getValue(i);
-            Lund_pz[i] = MC_Lund_pz_node->getValue(i);
-            Lund_E[i] = MC_Lund_E_node->getValue(i);
-            Lund_vx[i] = MC_Lund_vx_node->getValue(i);
-            Lund_vy[i] = MC_Lund_vy_node->getValue(i);
-            Lund_vz[i] = MC_Lund_vz_node->getValue(i);
-            Lund_ltime[i] = MC_Lund_ltime_node->getValue(i);
-          }
-        }
-    */
-    len_pid    = rec_Particle->getRows();
-    len_pindex = rec_Calorimeter->getRows();
+        Lund_pid[i]   = MC_Lund_pid_node->getValue(i);
+        Lund_px[i]    = MC_Lund_px_node->getValue(i);
+        Lund_py[i]    = MC_Lund_py_node->getValue(i);
+        Lund_pz[i]    = MC_Lund_pz_node->getValue(i);
+        Lund_E[i]     = MC_Lund_E_node->getValue(i);
+        Lund_vx[i]    = MC_Lund_vx_node->getValue(i);
+        Lund_vy[i]    = MC_Lund_vy_node->getValue(i);
+        Lund_vz[i]    = MC_Lund_vz_node->getValue(i);
+        Lund_ltime[i] = MC_Lund_ltime_node->getValue(i);
+      }
+    }
+
+    len_pid    = pid_node->getLength();
+    len_pindex = cal_pindex_node->getLength();
 
     ec_tot_energy.resize(len_pid);
     ec_pcal_energy.resize(len_pid);
@@ -732,46 +917,46 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i < len_pid; i++) {
       for (int k = 0; k < len_pindex; k++) {
-        int   pindex   = rec_Calorimeter->getShort("pindex", k);
-        int   detector = rec_Calorimeter->getByte("detector", k);
-        int   layer    = rec_Calorimeter->getByte("layer", k);
-        float energy   = rec_Calorimeter->getFloat("energy", k);
+        int   pindex   = cal_pindex_node->getValue(k);
+        int   detector = cal_detector_node->getValue(k);
+        int   layer    = cal_layer_node->getValue(k);
+        float energy   = cal_energy_node->getValue(k);
 
         if (pindex == i && detector == ECAL) {
           etot += energy;
           if (layer == PCAL) {
             pcal += energy;
-            ec_pcal_sec[i]  = rec_Calorimeter->getByte("sector", k);
-            ec_pcal_time[i] = rec_Calorimeter->getFloat("time", k);
-            ec_pcal_path[i] = rec_Calorimeter->getFloat("path", k);
-            ec_pcal_x[i]    = rec_Calorimeter->getFloat("x", k);
-            ec_pcal_y[i]    = rec_Calorimeter->getFloat("y", k);
-            ec_pcal_z[i]    = rec_Calorimeter->getFloat("z", k);
-            ec_pcal_lu[i]   = rec_Calorimeter->getFloat("lu", k);
-            ec_pcal_lv[i]   = rec_Calorimeter->getFloat("lv", k);
-            ec_pcal_lw[i]   = rec_Calorimeter->getFloat("lw", k);
+            ec_pcal_sec[i]  = cal_sector_node->getValue(k);
+            ec_pcal_time[i] = cal_time_node->getValue(k);
+            ec_pcal_path[i] = cal_path_node->getValue(k);
+            ec_pcal_x[i]    = cal_x_node->getValue(k);
+            ec_pcal_y[i]    = cal_y_node->getValue(k);
+            ec_pcal_z[i]    = cal_z_node->getValue(k);
+            ec_pcal_lu[i]   = cal_lu_node->getValue(k);
+            ec_pcal_lv[i]   = cal_lv_node->getValue(k);
+            ec_pcal_lw[i]   = cal_lw_node->getValue(k);
           } else if (layer == EC_INNER) {
             einner += energy;
-            ec_ecin_sec[i]  = rec_Calorimeter->getByte("sector", k);
-            ec_ecin_time[i] = rec_Calorimeter->getFloat("time", k);
-            ec_ecin_path[i] = rec_Calorimeter->getFloat("path", k);
-            ec_ecin_x[i]    = rec_Calorimeter->getFloat("x", k);
-            ec_ecin_y[i]    = rec_Calorimeter->getFloat("y", k);
-            ec_ecin_z[i]    = rec_Calorimeter->getFloat("z", k);
-            ec_ecin_lu[i]   = rec_Calorimeter->getFloat("lu", k);
-            ec_ecin_lv[i]   = rec_Calorimeter->getFloat("lv", k);
-            ec_ecin_lw[i]   = rec_Calorimeter->getFloat("lw", k);
+            ec_ecin_sec[i]  = cal_sector_node->getValue(k);
+            ec_ecin_time[i] = cal_time_node->getValue(k);
+            ec_ecin_path[i] = cal_path_node->getValue(k);
+            ec_ecin_x[i]    = cal_x_node->getValue(k);
+            ec_ecin_y[i]    = cal_y_node->getValue(k);
+            ec_ecin_z[i]    = cal_z_node->getValue(k);
+            ec_ecin_lu[i]   = cal_lu_node->getValue(k);
+            ec_ecin_lv[i]   = cal_lv_node->getValue(k);
+            ec_ecin_lw[i]   = cal_lw_node->getValue(k);
           } else if (layer == EC_OUTER) {
             eouter += energy;
-            ec_ecout_sec[i]  = rec_Calorimeter->getByte("sector", k);
-            ec_ecout_time[i] = rec_Calorimeter->getFloat("time", k);
-            ec_ecout_path[i] = rec_Calorimeter->getFloat("path", k);
-            ec_ecout_x[i]    = rec_Calorimeter->getFloat("x", k);
-            ec_ecout_y[i]    = rec_Calorimeter->getFloat("y", k);
-            ec_ecout_z[i]    = rec_Calorimeter->getFloat("z", k);
-            ec_ecout_lu[i]   = rec_Calorimeter->getFloat("lu", k);
-            ec_ecout_lv[i]   = rec_Calorimeter->getFloat("lv", k);
-            ec_ecout_lw[i]   = rec_Calorimeter->getFloat("lw", k);
+            ec_ecout_sec[i]  = cal_sector_node->getValue(k);
+            ec_ecout_time[i] = cal_time_node->getValue(k);
+            ec_ecout_path[i] = cal_path_node->getValue(k);
+            ec_ecout_x[i]    = cal_x_node->getValue(k);
+            ec_ecout_y[i]    = cal_y_node->getValue(k);
+            ec_ecout_z[i]    = cal_z_node->getValue(k);
+            ec_ecout_lu[i]   = cal_lu_node->getValue(k);
+            ec_ecout_lv[i]   = cal_lv_node->getValue(k);
+            ec_ecout_lw[i]   = cal_lw_node->getValue(k);
           }
         }
       }
@@ -785,8 +970,8 @@ int main(int argc, char** argv) {
         ec_tot_energy[i] = ((etot != 0.0) ? etot : NAN);
     }
 
-    len_pid    = rec_Particle->getRows();
-    len_pindex = rec_Cherenkov->getRows();
+    len_pid    = pid_node->getLength();
+    len_pindex = chern_pindex_node->getLength();
 
     cc_nphe_tot.resize(len_pid);
 
@@ -837,41 +1022,41 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i < len_pid; i++) {
       for (int k = 0; k < len_pindex; k++) {
-        int pindex   = rec_Cherenkov->getShort("pindex", k);
-        int detector = rec_Cherenkov->getShort("detector", k);
+        int pindex   = chern_pindex_node->getValue(k);
+        int detector = chern_detector_node->getValue(k);
 
         if (pindex == i && (detector == HTCC || detector == LTCC || detector == RICH))
-          nphe_tot += rec_Cherenkov->getFloat("nphe", k);
+          nphe_tot += chern_nphe_node->getValue(k);
 
         if (pindex == i && detector == HTCC) {
-          cc_htcc_nphe[i]  = rec_Cherenkov->getFloat("nphe", k);
-          cc_htcc_sec[i]   = rec_Cherenkov->getByte("sector", k);
-          cc_htcc_time[i]  = rec_Cherenkov->getFloat("time", k);
-          cc_htcc_path[i]  = rec_Cherenkov->getFloat("path", k);
-          cc_htcc_theta[i] = rec_Cherenkov->getFloat("theta", k);
-          cc_htcc_phi[i]   = rec_Cherenkov->getFloat("phi", k);
+          cc_htcc_nphe[i]  = chern_nphe_node->getValue(k);
+          cc_htcc_sec[i]   = chern_sector_node->getValue(k);
+          cc_htcc_time[i]  = chern_time_node->getValue(k);
+          cc_htcc_path[i]  = chern_path_node->getValue(k);
+          cc_htcc_theta[i] = chern_theta_node->getValue(k);
+          cc_htcc_phi[i]   = chern_phi_node->getValue(k);
         } else if (pindex == i && detector == LTCC) {
-          cc_ltcc_nphe[i]  = rec_Cherenkov->getFloat("nphe", k);
-          cc_ltcc_sec[i]   = rec_Cherenkov->getByte("sector", k);
-          cc_ltcc_time[i]  = rec_Cherenkov->getFloat("time", k);
-          cc_ltcc_path[i]  = rec_Cherenkov->getFloat("path", k);
-          cc_ltcc_theta[i] = rec_Cherenkov->getFloat("theta", k);
-          cc_ltcc_phi[i]   = rec_Cherenkov->getFloat("phi", k);
+          cc_ltcc_nphe[i]  = chern_nphe_node->getValue(k);
+          cc_ltcc_sec[i]   = chern_sector_node->getValue(k);
+          cc_ltcc_time[i]  = chern_time_node->getValue(k);
+          cc_ltcc_path[i]  = chern_path_node->getValue(k);
+          cc_ltcc_theta[i] = chern_theta_node->getValue(k);
+          cc_ltcc_phi[i]   = chern_phi_node->getValue(k);
         } else if (pindex == i && detector == RICH) {
-          cc_rich_nphe[i]  = rec_Cherenkov->getFloat("nphe", k);
-          cc_rich_sec[i]   = rec_Cherenkov->getByte("sector", k);
-          cc_rich_time[i]  = rec_Cherenkov->getFloat("time", k);
-          cc_rich_path[i]  = rec_Cherenkov->getFloat("path", k);
-          cc_rich_theta[i] = rec_Cherenkov->getFloat("theta", k);
-          cc_rich_phi[i]   = rec_Cherenkov->getFloat("phi", k);
+          cc_rich_nphe[i]  = chern_nphe_node->getValue(k);
+          cc_rich_sec[i]   = chern_sector_node->getValue(k);
+          cc_rich_time[i]  = chern_time_node->getValue(k);
+          cc_rich_path[i]  = chern_path_node->getValue(k);
+          cc_rich_theta[i] = chern_theta_node->getValue(k);
+          cc_rich_phi[i]   = chern_phi_node->getValue(k);
         }
       }
       if (cc_nphe_tot[i] != cc_nphe_tot[i])
         cc_nphe_tot[i] = ((nphe_tot != 0.0) ? nphe_tot : NAN);
     }
 
-    len_pid    = rec_Particle->getRows();
-    len_pindex = rec_Scintillator->getRows();
+    len_pid    = pid_node->getLength();
+    len_pindex = scint_pindex_node->getLength();
 
     sc_ftof_1a_sec.resize(len_pid);
     sc_ftof_1a_time.resize(len_pid);
@@ -993,73 +1178,73 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i < len_pid; i++) {
       for (int k = 0; k < len_pindex; k++) {
-        int pindex   = rec_Scintillator->getShort("pindex", k);
-        int detector = rec_Scintillator->getByte("detector", k);
-        int layer    = rec_Scintillator->getByte("layer", k);
+        int pindex   = scint_pindex_node->getValue(k);
+        int detector = scint_detector_node->getValue(k);
+        int layer    = scint_layer_node->getValue(k);
         if (pindex == i && detector == FTOF && layer == FTOF_1A) {
-          sc_ftof_1a_sec[i]       = rec_Scintillator->getByte("sector", k);
-          sc_ftof_1a_time[i]      = rec_Scintillator->getFloat("time", k);
-          sc_ftof_1a_path[i]      = rec_Scintillator->getFloat("path", k);
-          sc_ftof_1a_energy[i]    = rec_Scintillator->getFloat("energy", k);
-          sc_ftof_1a_component[i] = rec_Scintillator->getShort("component", k);
-          sc_ftof_1a_x[i]         = rec_Scintillator->getFloat("x", k);
-          sc_ftof_1a_y[i]         = rec_Scintillator->getFloat("y", k);
-          sc_ftof_1a_z[i]         = rec_Scintillator->getFloat("z", k);
-          sc_ftof_1a_hx[i]        = rec_Scintillator->getFloat("hx", k);
-          sc_ftof_1a_hy[i]        = rec_Scintillator->getFloat("hy", k);
-          sc_ftof_1a_hz[i]        = rec_Scintillator->getFloat("hz", k);
+          sc_ftof_1a_sec[i]       = scint_sector_node->getValue(k);
+          sc_ftof_1a_time[i]      = scint_time_node->getValue(k);
+          sc_ftof_1a_path[i]      = scint_path_node->getValue(k);
+          sc_ftof_1a_energy[i]    = scint_energy_node->getValue(k);
+          sc_ftof_1a_component[i] = scint_component_node->getValue(k);
+          sc_ftof_1a_x[i]         = scint_x_node->getValue(k);
+          sc_ftof_1a_y[i]         = scint_y_node->getValue(k);
+          sc_ftof_1a_z[i]         = scint_z_node->getValue(k);
+          sc_ftof_1a_hx[i]        = scint_hx_node->getValue(k);
+          sc_ftof_1a_hy[i]        = scint_hy_node->getValue(k);
+          sc_ftof_1a_hz[i]        = scint_hz_node->getValue(k);
         } else if (pindex == i && detector == FTOF && layer == FTOF_1B) {
-          sc_ftof_1b_sec[i]       = rec_Scintillator->getByte("sector", k);
-          sc_ftof_1b_time[i]      = rec_Scintillator->getFloat("time", k);
-          sc_ftof_1b_path[i]      = rec_Scintillator->getFloat("path", k);
-          sc_ftof_1b_energy[i]    = rec_Scintillator->getFloat("energy", k);
-          sc_ftof_1b_component[i] = rec_Scintillator->getShort("component", k);
-          sc_ftof_1b_x[i]         = rec_Scintillator->getFloat("x", k);
-          sc_ftof_1b_y[i]         = rec_Scintillator->getFloat("y", k);
-          sc_ftof_1b_z[i]         = rec_Scintillator->getFloat("z", k);
-          sc_ftof_1b_hx[i]        = rec_Scintillator->getFloat("hx", k);
-          sc_ftof_1b_hy[i]        = rec_Scintillator->getFloat("hy", k);
-          sc_ftof_1b_hz[i]        = rec_Scintillator->getFloat("hz", k);
+          sc_ftof_1b_sec[i]       = scint_sector_node->getValue(k);
+          sc_ftof_1b_time[i]      = scint_time_node->getValue(k);
+          sc_ftof_1b_path[i]      = scint_path_node->getValue(k);
+          sc_ftof_1b_energy[i]    = scint_energy_node->getValue(k);
+          sc_ftof_1b_component[i] = scint_component_node->getValue(k);
+          sc_ftof_1b_x[i]         = scint_x_node->getValue(k);
+          sc_ftof_1b_y[i]         = scint_y_node->getValue(k);
+          sc_ftof_1b_z[i]         = scint_z_node->getValue(k);
+          sc_ftof_1b_hx[i]        = scint_hx_node->getValue(k);
+          sc_ftof_1b_hy[i]        = scint_hy_node->getValue(k);
+          sc_ftof_1b_hz[i]        = scint_hz_node->getValue(k);
         } else if (pindex == i && detector == FTOF && layer == FTOF_2) {
-          sc_ftof_2_sec[i]       = rec_Scintillator->getByte("sector", k);
-          sc_ftof_2_time[i]      = rec_Scintillator->getFloat("time", k);
-          sc_ftof_2_path[i]      = rec_Scintillator->getFloat("path", k);
-          sc_ftof_2_energy[i]    = rec_Scintillator->getFloat("energy", k);
-          sc_ftof_2_component[i] = rec_Scintillator->getShort("component", k);
-          sc_ftof_2_x[i]         = rec_Scintillator->getFloat("x", k);
-          sc_ftof_2_y[i]         = rec_Scintillator->getFloat("y", k);
-          sc_ftof_2_z[i]         = rec_Scintillator->getFloat("z", k);
-          sc_ftof_2_hx[i]        = rec_Scintillator->getFloat("hx", k);
-          sc_ftof_2_hy[i]        = rec_Scintillator->getFloat("hy", k);
-          sc_ftof_2_hz[i]        = rec_Scintillator->getFloat("hz", k);
+          sc_ftof_2_sec[i]       = scint_sector_node->getValue(k);
+          sc_ftof_2_time[i]      = scint_time_node->getValue(k);
+          sc_ftof_2_path[i]      = scint_path_node->getValue(k);
+          sc_ftof_2_energy[i]    = scint_energy_node->getValue(k);
+          sc_ftof_2_component[i] = scint_component_node->getValue(k);
+          sc_ftof_2_x[i]         = scint_x_node->getValue(k);
+          sc_ftof_2_y[i]         = scint_y_node->getValue(k);
+          sc_ftof_2_z[i]         = scint_z_node->getValue(k);
+          sc_ftof_2_hx[i]        = scint_hx_node->getValue(k);
+          sc_ftof_2_hy[i]        = scint_hy_node->getValue(k);
+          sc_ftof_2_hz[i]        = scint_hz_node->getValue(k);
         } else if (pindex == i && detector == CTOF) {
-          sc_ctof_time[i]      = rec_Scintillator->getFloat("time", k);
-          sc_ctof_path[i]      = rec_Scintillator->getFloat("path", k);
-          sc_ctof_energy[i]    = rec_Scintillator->getFloat("energy", k);
-          sc_ctof_component[i] = rec_Scintillator->getShort("component", k);
-          sc_ctof_x[i]         = rec_Scintillator->getFloat("x", k);
-          sc_ctof_y[i]         = rec_Scintillator->getFloat("y", k);
-          sc_ctof_z[i]         = rec_Scintillator->getFloat("z", k);
-          sc_ctof_hx[i]        = rec_Scintillator->getFloat("hx", k);
-          sc_ctof_hy[i]        = rec_Scintillator->getFloat("hy", k);
-          sc_ctof_hz[i]        = rec_Scintillator->getFloat("hz", k);
+          sc_ctof_time[i]      = scint_time_node->getValue(k);
+          sc_ctof_path[i]      = scint_path_node->getValue(k);
+          sc_ctof_energy[i]    = scint_energy_node->getValue(k);
+          sc_ctof_component[i] = scint_component_node->getValue(k);
+          sc_ctof_x[i]         = scint_x_node->getValue(k);
+          sc_ctof_y[i]         = scint_y_node->getValue(k);
+          sc_ctof_z[i]         = scint_z_node->getValue(k);
+          sc_ctof_hx[i]        = scint_hx_node->getValue(k);
+          sc_ctof_hy[i]        = scint_hy_node->getValue(k);
+          sc_ctof_hz[i]        = scint_hz_node->getValue(k);
         } else if (pindex == i && detector == CND) {
-          sc_cnd_time[i]      = rec_Scintillator->getFloat("time", k);
-          sc_cnd_path[i]      = rec_Scintillator->getFloat("path", k);
-          sc_cnd_energy[i]    = rec_Scintillator->getFloat("energy", k);
-          sc_cnd_component[i] = rec_Scintillator->getShort("component", k);
-          sc_cnd_x[i]         = rec_Scintillator->getFloat("x", k);
-          sc_cnd_y[i]         = rec_Scintillator->getFloat("y", k);
-          sc_cnd_z[i]         = rec_Scintillator->getFloat("z", k);
-          sc_cnd_hx[i]        = rec_Scintillator->getFloat("hx", k);
-          sc_cnd_hy[i]        = rec_Scintillator->getFloat("hy", k);
-          sc_cnd_hz[i]        = rec_Scintillator->getFloat("hz", k);
+          sc_cnd_time[i]      = scint_time_node->getValue(k);
+          sc_cnd_path[i]      = scint_path_node->getValue(k);
+          sc_cnd_energy[i]    = scint_energy_node->getValue(k);
+          sc_cnd_component[i] = scint_component_node->getValue(k);
+          sc_cnd_x[i]         = scint_x_node->getValue(k);
+          sc_cnd_y[i]         = scint_y_node->getValue(k);
+          sc_cnd_z[i]         = scint_z_node->getValue(k);
+          sc_cnd_hx[i]        = scint_hx_node->getValue(k);
+          sc_cnd_hy[i]        = scint_hy_node->getValue(k);
+          sc_cnd_hz[i]        = scint_hz_node->getValue(k);
         }
       }
     }
 
-    len_pid    = rec_Particle->getRows();
-    len_pindex = rec_Track->getRows();
+    len_pid    = pid_node->getLength();
+    len_pindex = track_pindex_node->getLength();
 
     dc_sec.resize(len_pid);
     dc_px.resize(len_pid);
@@ -1095,31 +1280,31 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i < len_pid; i++) {
       for (int k = 0; k < len_pindex; k++) {
-        int pindex   = rec_Track->getShort("pindex", k);
-        int detector = rec_Track->getByte("detector", k);
+        int pindex   = track_pindex_node->getValue(k);
+        int detector = track_detector_node->getValue(k);
 
         if (pindex == i && detector == CVT) {
-          cvt_px[i] = rec_Track->getFloat("px_nomm", k);
-          cvt_py[i] = rec_Track->getFloat("py_nomm", k);
-          cvt_pz[i] = rec_Track->getFloat("pz_nomm", k);
-          cvt_vx[i] = rec_Track->getFloat("vx_nomm", k);
-          cvt_vy[i] = rec_Track->getFloat("vy_nomm", k);
-          cvt_vz[i] = rec_Track->getFloat("vz_nomm", k);
+          cvt_px[i] = track_px_nomm_node->getValue(k);
+          cvt_py[i] = track_py_nomm_node->getValue(k);
+          cvt_pz[i] = track_pz_nomm_node->getValue(k);
+          cvt_vx[i] = track_vx_nomm_node->getValue(k);
+          cvt_vy[i] = track_vy_nomm_node->getValue(k);
+          cvt_vz[i] = track_vz_nomm_node->getValue(k);
 
         } else if (pindex == i && detector == DC) {
-          dc_sec[i] = rec_Track->getByte("sector", k);
-          dc_px[i]  = rec_Track->getFloat("px_nomm", k);
-          dc_py[i]  = rec_Track->getFloat("py_nomm", k);
-          dc_pz[i]  = rec_Track->getFloat("pz_nomm", k);
-          dc_vx[i]  = rec_Track->getFloat("vx_nomm", k);
-          dc_vy[i]  = rec_Track->getFloat("vy_nomm", k);
-          dc_vz[i]  = rec_Track->getFloat("vz_nomm", k);
+          dc_sec[i] = track_sector_node->getValue(k);
+          dc_px[i]  = track_px_nomm_node->getValue(k);
+          dc_py[i]  = track_py_nomm_node->getValue(k);
+          dc_pz[i]  = track_pz_nomm_node->getValue(k);
+          dc_vx[i]  = track_vx_nomm_node->getValue(k);
+          dc_vy[i]  = track_vy_nomm_node->getValue(k);
+          dc_vz[i]  = track_vz_nomm_node->getValue(k);
         }
       }
     }
 
-    len_pid    = rec_Particle->getRows();
-    len_pindex = rec_ForwardTagger->getRows();
+    len_pid    = pid_node->getLength();
+    len_pindex = fortag_pindex_node->getLength();
 
     ft_cal_energy.resize(len_pid);
     ft_cal_time.resize(len_pid);
@@ -1165,36 +1350,36 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i < len_pid; i++) {
       for (int k = 0; k < len_pindex; k++) {
-        int pindex   = rec_ForwardTagger->getShort("pindex", k);
-        int detector = rec_ForwardTagger->getByte("detector", k);
+        int pindex   = fortag_pindex_node->getValue(k);
+        int detector = fortag_detector_node->getValue(k);
 
         if (pindex == i && detector == FTCAL) {
-          ft_cal_energy[i] = rec_ForwardTagger->getFloat("energy", k);
-          ft_cal_time[i]   = rec_ForwardTagger->getFloat("time", k);
-          ft_cal_path[i]   = rec_ForwardTagger->getFloat("path", k);
-          ft_cal_x[i]      = rec_ForwardTagger->getFloat("x", k);
-          ft_cal_y[i]      = rec_ForwardTagger->getFloat("y", k);
-          ft_cal_z[i]      = rec_ForwardTagger->getFloat("z", k);
-          ft_cal_dx[i]     = rec_ForwardTagger->getFloat("dx", k);
-          ft_cal_dy[i]     = rec_ForwardTagger->getFloat("dy", k);
-          ft_cal_radius[i] = rec_ForwardTagger->getFloat("radius", k);
+          ft_cal_energy[i] = fortag_energy_node->getValue(k);
+          ft_cal_time[i]   = fortag_time_node->getValue(k);
+          ft_cal_path[i]   = fortag_path_node->getValue(k);
+          ft_cal_x[i]      = fortag_x_node->getValue(k);
+          ft_cal_y[i]      = fortag_y_node->getValue(k);
+          ft_cal_z[i]      = fortag_z_node->getValue(k);
+          ft_cal_dx[i]     = fortag_dx_node->getValue(k);
+          ft_cal_dy[i]     = fortag_dy_node->getValue(k);
+          ft_cal_radius[i] = fortag_radius_node->getValue(k);
         } else if (pindex == i && detector == FTHODO) {
-          ft_hodo_energy[i] = rec_ForwardTagger->getFloat("energy", k);
-          ft_hodo_time[i]   = rec_ForwardTagger->getFloat("time", k);
-          ft_hodo_path[i]   = rec_ForwardTagger->getFloat("path", k);
-          ft_hodo_x[i]      = rec_ForwardTagger->getFloat("x", k);
-          ft_hodo_y[i]      = rec_ForwardTagger->getFloat("y", k);
-          ft_hodo_z[i]      = rec_ForwardTagger->getFloat("z", k);
-          ft_hodo_dx[i]     = rec_ForwardTagger->getFloat("dx", k);
-          ft_hodo_dy[i]     = rec_ForwardTagger->getFloat("dy", k);
-          ft_hodo_radius[i] = rec_ForwardTagger->getFloat("radius", k);
+          ft_hodo_energy[i] = fortag_energy_node->getValue(k);
+          ft_hodo_time[i]   = fortag_time_node->getValue(k);
+          ft_hodo_path[i]   = fortag_path_node->getValue(k);
+          ft_hodo_x[i]      = fortag_x_node->getValue(k);
+          ft_hodo_y[i]      = fortag_y_node->getValue(k);
+          ft_hodo_z[i]      = fortag_z_node->getValue(k);
+          ft_hodo_dx[i]     = fortag_dx_node->getValue(k);
+          ft_hodo_dy[i]     = fortag_dy_node->getValue(k);
+          ft_hodo_radius[i] = fortag_radius_node->getValue(k);
         }
       }
     }
 
     if (cov) {
-      len_pid    = rec_Particle->getRows();
-      len_pindex = rec_CovMat->getRows();
+      len_pid    = pid_node->getLength();
+      len_pindex = CovMat_pindex_node->getLength();
 
       CovMat_11.resize(len_pid);
       CovMat_12.resize(len_pid);
@@ -1232,23 +1417,87 @@ int main(int argc, char** argv) {
 
       for (int i = 0; i < len_pid; i++) {
         for (int k = 0; k < len_pindex; ++k) {
-          int pindex = rec_CovMat->getShort("pindex", k);
+          int pindex = CovMat_pindex_node->getValue(k);
           if (pindex == i) {
-            CovMat_11[i] = rec_CovMat->getFloat("C11", k);
-            CovMat_12[i] = rec_CovMat->getFloat("C12", k);
-            CovMat_13[i] = rec_CovMat->getFloat("C13", k);
-            CovMat_14[i] = rec_CovMat->getFloat("C14", k);
-            CovMat_15[i] = rec_CovMat->getFloat("C15", k);
-            CovMat_22[i] = rec_CovMat->getFloat("C22", k);
-            CovMat_23[i] = rec_CovMat->getFloat("C23", k);
-            CovMat_24[i] = rec_CovMat->getFloat("C24", k);
-            CovMat_25[i] = rec_CovMat->getFloat("C25", k);
-            CovMat_33[i] = rec_CovMat->getFloat("C33", k);
-            CovMat_34[i] = rec_CovMat->getFloat("C34", k);
-            CovMat_35[i] = rec_CovMat->getFloat("C35", k);
-            CovMat_44[i] = rec_CovMat->getFloat("C44", k);
-            CovMat_45[i] = rec_CovMat->getFloat("C45", k);
-            CovMat_55[i] = rec_CovMat->getFloat("C55", k);
+            CovMat_11[i] = CovMat_C11_node->getValue(k);
+            CovMat_12[i] = CovMat_C12_node->getValue(k);
+            CovMat_13[i] = CovMat_C13_node->getValue(k);
+            CovMat_14[i] = CovMat_C14_node->getValue(k);
+            CovMat_15[i] = CovMat_C15_node->getValue(k);
+            CovMat_22[i] = CovMat_C22_node->getValue(k);
+            CovMat_23[i] = CovMat_C23_node->getValue(k);
+            CovMat_24[i] = CovMat_C24_node->getValue(k);
+            CovMat_25[i] = CovMat_C25_node->getValue(k);
+            CovMat_33[i] = CovMat_C33_node->getValue(k);
+            CovMat_34[i] = CovMat_C34_node->getValue(k);
+            CovMat_35[i] = CovMat_C35_node->getValue(k);
+            CovMat_44[i] = CovMat_C44_node->getValue(k);
+            CovMat_45[i] = CovMat_C45_node->getValue(k);
+            CovMat_55[i] = CovMat_C55_node->getValue(k);
+          }
+        }
+      }
+    }
+
+    if (cvt) {
+      len_pid = CVT_pid_node->getLength();
+      l       = CVT_pid_node->getLength();
+
+      cvt_pid.resize(len_pid);
+      cvt_q.resize(len_pid);
+      cvt_p.resize(len_pid);
+      cvt_pt.resize(len_pid);
+      cvt_phi0.resize(len_pid);
+      cvt_tandip.resize(len_pid);
+      cvt_z0.resize(len_pid);
+      cvt_d0.resize(len_pid);
+      cvt_CovMat_d02.resize(len_pid);
+      cvt_CovMat_d0phi0.resize(len_pid);
+      cvt_CovMat_d0rho.resize(len_pid);
+      cvt_CovMat_phi02.resize(len_pid);
+      cvt_CovMat_phi0rho.resize(len_pid);
+      cvt_CovMat_rho2.resize(len_pid);
+      cvt_CovMat_z02.resize(len_pid);
+      cvt_CovMat_tandip2.resize(len_pid);
+
+      for (int i = 0; i < len_pid; i++) {
+        cvt_pid[i]            = -1;
+        cvt_q[i]              = -1;
+        cvt_p[i]              = NAN;
+        cvt_pt[i]             = NAN;
+        cvt_phi0[i]           = NAN;
+        cvt_tandip[i]         = NAN;
+        cvt_z0[i]             = NAN;
+        cvt_d0[i]             = NAN;
+        cvt_CovMat_d02[i]     = NAN;
+        cvt_CovMat_d0phi0[i]  = NAN;
+        cvt_CovMat_d0rho[i]   = NAN;
+        cvt_CovMat_phi02[i]   = NAN;
+        cvt_CovMat_phi0rho[i] = NAN;
+        cvt_CovMat_rho2[i]    = NAN;
+        cvt_CovMat_z02[i]     = NAN;
+        cvt_CovMat_tandip2[i] = NAN;
+      }
+
+      for (int i = 0; i < len_pid; i++) {
+        for (int k = 0; k < len_pindex; ++k) {
+          int pindex = CovMat_pindex_node->getValue(k);
+          if (pindex == i) {
+            cvt_pid[i]            = CVT_pid_node->getValue(k);
+            cvt_q[i]              = CVT_q_node->getValue(k);
+            cvt_p[i]              = CVT_p_node->getValue(k);
+            cvt_phi0[i]           = CVT_phi0_node->getValue(k);
+            cvt_tandip[i]         = CVT_tandip_node->getValue(k);
+            cvt_z0[i]             = CVT_z0_node->getValue(k);
+            cvt_d0[i]             = CVT_d0_node->getValue(k);
+            cvt_CovMat_d02[i]     = CVT_Cov_d02_node->getValue(k);
+            cvt_CovMat_d0phi0[i]  = CVT_Cov_d0phi0_node->getValue(k);
+            cvt_CovMat_d0rho[i]   = CVT_Cov_d0rho_node->getValue(k);
+            cvt_CovMat_phi02[i]   = CVT_Cov_phi02_node->getValue(k);
+            cvt_CovMat_phi0rho[i] = CVT_Cov_phi0rho_node->getValue(k);
+            cvt_CovMat_rho2[i]    = CVT_Cov_rho2_node->getValue(k);
+            cvt_CovMat_z02[i]     = CVT_Cov_z02_node->getValue(k);
+            cvt_CovMat_tandip2[i] = CVT_Cov_tandip2_node->getValue(k);
           }
         }
       }
