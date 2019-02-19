@@ -30,3 +30,16 @@ foreach(exe ${EXAMPLES} )
       EXPORT ${PROJECT_NAME}Targets
       RUNTIME DESTINATION bin/hipo4_examples)
 endforeach( exe ${EXAMPLES} )
+
+
+file(GLOB EXAMPLES dst2root/*.cxx )
+foreach(exe ${EXAMPLES} )
+    get_filename_component(exename ${exe} NAME)
+    string( REPLACE ".cxx" "" exename ${exename} )
+    add_executable( ${exename} ${exe} )
+    target_link_libraries(${exename}
+      PUBLIC ${ROOT_LIBRARIES})
+    install(TARGETS ${exename}
+      EXPORT ${PROJECT_NAME}Targets
+    RUNTIME DESTINATION bin/dst2root_examples)
+endforeach( exe ${EXAMPLES} )

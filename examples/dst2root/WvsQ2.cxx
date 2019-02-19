@@ -1,8 +1,10 @@
 #include "TCanvas.h"
 #include "TChain.h"
+#include "TFile.h"
 #include "TH2.h"
 #include "TLorentzVector.h"
 #include <chrono>
+#include <iostream>
 
 std::vector<int>*   pid;
 std::vector<float>* p;
@@ -27,9 +29,8 @@ double Q2_calc(TLorentzVector e_mu, TLorentzVector e_mu_prime) {
 //	Sqrt√[M_p^2 - Q^2 + 2 M_p gamma]
 double W_calc(TLorentzVector e_mu, TLorentzVector e_mu_prime) {
   TLorentzVector q_mu = (e_mu - e_mu_prime);
-  TVector3       p_mu_3(0, 0, 0);
   TLorentzVector p_mu;
-  p_mu.SetVectM(p_mu_3, MASS_P);
+  p_mu.SetXYZM(0.0, 0.0, 0.0, MASS_P);
   return (p_mu + q_mu).Mag();
 }
 
@@ -96,7 +97,7 @@ int WvsQ2(std::string file = "test.root", double BEAM = 2.2) {
   w->Draw("same");
 
   TCanvas* c3 = new TCanvas("c3", "c3", 1600, 900);
-  gStyle->SetOptFit(1111);
+
   c3->Divide(3, 2);
   for (size_t i = 0; i < 6; i++) {
     c3->cd(i + 1);
@@ -111,5 +112,35 @@ int WvsQ2(std::string file = "test.root", double BEAM = 2.2) {
     wq2_s[i]->Draw("samecolor");
   }
 
+#ifndef __CLING__
+  TFile* outFile = new TFile("WvsQ2_output.root", "RECREATE");
+  outFile->cd();
+  wq2->Write();
+  w->Write();
+  for (size_t i = 0; i < 6; i++) {
+    w_s[i]->Write();
+  }
+  for (size_t i = 0; i < 6; i++) {
+    wq2_s[i]->Write();
+  }
+  c1->Write();
+  c2->Write();
+  c3->Write();
+  c4->Write();
+  outFile->Write();
+  outFile->Close();
+#endif
+
   return 0;
 }
+
+#ifndef __CLING__
+int main(int argc, char const* argv[]) {
+  if (argc < 3) {
+    std::cerr << "Not enough arguments" << std::endl;
+    std::cerr << "To Use:\tWvsQ2 dst2root_file.root beam_energy" << std::endl;
+    exit(1);
+  }
+  return WvsQ2(argv[1], atof(argv[2]));
+}
+#endif
