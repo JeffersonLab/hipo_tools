@@ -20,6 +20,8 @@ cimport numpy as np
 
 cdef float NAN = float("NAN")
 
+cdef dict det = {1:"FT", 2:"FD", 4:"CD"}
+
 cdef dict clas12_detector = {"BMT":  1,
 "BST":  2,
 "CND":  3,
@@ -105,6 +107,12 @@ cdef extern from "TLorentzVector.h":
   cdef cppclass TLorentzVector:
     TLorentzVector() except +
     TLorentzVector(double x, double y, double z, double t) except +
+    TLorentzVector operator*(double)
+    double operator*(TLorentzVector)
+    TLorentzVector operator+(TLorentzVector)
+    TLorentzVector operator-(TLorentzVector)
+    bool operator!=(TLorentzVector)
+    bool operator==(TLorentzVector)
     void Boost(double, double, double)
     void SetXYZM(double x, double y, double z, double m)
     void SetXYZT (double x, double y, double z, double t)
@@ -509,6 +517,10 @@ cdef class clas12Event:
     if i >= self.c_Particle.getRows():
       return -1
     return self.c_Particle.getShort(str_to_char("status"), i)
+  def detector_system(clas12Event self, int i):
+    if i >= self.c_Particle.getRows():
+      return "unknown"
+    return det[int(self.c_Particle.getShort(str_to_char("status"), i)/1000)]
 
   cdef void load_ft(clas12Event self):
     cdef int len_pid = self.c_Particle.getRows()

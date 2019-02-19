@@ -20,24 +20,14 @@ namespace hipo {
       fVecItems[in]->TreeBranch(branchname0, tree);
     }
   }
-  void THipoBank::Print(int verbose) {
+  void THipoBank::Print() {
     cout << "Printing Hipo Bank\n";
     cout << "Name = " << fName << "\n";
     cout << "Group = " << fGroup << "\n";
     cout << "Entry :" << fEntry << "\n";
     cout << "Items :" << fVecItems.size() << "\n";
-    if(verbose>0) {
-      if(verbose==1){
-        for (UInt_t i = 0; i < fVecItems.size(); i++){ 
-          cout << "  " << fVecItems[i]->GetName() << ", ";
-        }
-        cout << "\n";
-      } else {
-        for (UInt_t i = 0; i < fVecItems.size(); i++){ 
-          cout << "  " << fVecItems[i]->GetName() << " with type " << fVecItems[i]->Type() << "\n";
-        }
-      }
-    }
+    for (UInt_t i = 0; i < fVecItems.size(); i++)
+      cout << "  " << fVecItems[i]->GetName() << " with type " << fVecItems[i]->Type() << "\n";
   }
 
   THipoItem* THipoBank::GetItem(TString name) { 

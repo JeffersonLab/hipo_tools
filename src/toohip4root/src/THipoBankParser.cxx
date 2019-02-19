@@ -57,7 +57,7 @@ namespace hipo {
     }
 
     bank->SetConfigured();
-    bank->Print(1);
+    bank->Print();
     return kTRUE;
   }
 
@@ -102,7 +102,7 @@ namespace hipo {
       }
     }
 
-    bank->Print(1);
+    bank->Print();
     return kTRUE;
   }
   int THipoBankParser::CodeToType(string code) { 

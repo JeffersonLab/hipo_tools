@@ -44,6 +44,9 @@ endif()
 add_subdirectory(src/recon2root)
 add_subdirectory(src/dst2root)
 
+# Build examples
+add_subdirectory(examples)
+
 
 # -------------------------
 # install library config

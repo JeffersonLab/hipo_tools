@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
       printf("[code] ----> starting code generation....\n");
       printf("[open] ----> writing file : runFileLoop.cc\n");
       ofstream my_cc_file("runFileLoop.cc");
-      my_cc_file << hipo::utils::getFileHeader("runFileLoop").c_str() << std::endl;
+      // my_cc_file << hipo::utils::getFileHeader("runFileLoop").c_str() << std::endl;
 
       if (doAll == true) {
         banks.clear();
@@ -105,11 +105,11 @@ int main(int argc, char** argv) {
       }
       std::vector<std::string> access_code = dict->getSchema(banks[0].c_str()).branchesAccessCode();
       // printf("%s\n",hipo::utils::getFileTrailer(access_code[0].c_str()).c_str());
-      my_cc_file << hipo::utils::getFileTrailer(access_code[0].c_str()).c_str() << std::endl;
+      // my_cc_file << hipo::utils::getFileTrailer(access_code[0].c_str()).c_str() << std::endl;
       my_cc_file.close();
       printf("[open] ----> writing file : Sconstruct\n");
       ofstream my_scons_file("SConstruct");
-      my_scons_file << hipo::utils::getSConstruct().c_str();
+      // my_scons_file << hipo::utils::getSConstruct().c_str();
       my_scons_file.close();
       printf("\n\ndone..\n");
     }
