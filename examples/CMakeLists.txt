@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.5)
 
 file(GLOB EXAMPLES hipo3/*.cpp )
 foreach(exe ${EXAMPLES} )
