@@ -1,11 +1,7 @@
-matrix:
-  include:
-    - os: linux
-      sudo: false
-      dist: trusty
-      language: cpp
-      services:
-        - docker
-      script:
-        - docker build -t hipo_tools . -f docker/Dockerfile.travis
-        - docker images -a
+dist: trusty
+language: cpp
+services:
+  - docker
+script:
+  - docker build -t hipo_tools . -f docker/Dockerfile.travis
+  - docker images -a

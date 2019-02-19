@@ -4,11 +4,8 @@ find_package(PythonExtensions REQUIRED)
 find_package(Cython REQUIRED)
 find_package(NumPy REQUIRED)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 add_cython_target(hipopy3 hipopy3.pyx CXX PY3 OUTPUT_VAR _hipopy3)
-include_directories(${PYTHON_INCLUDE_DIRS} ${PYTHON_NUMPY_INCLUDE_DIR} ${NumPy_INCLUDE_DIR})
+include_directories(${PYTHON_INCLUDE_DIRS} ${NumPy_INCLUDE_DIR})
 set(EXTRA_FLAGS "-D__LZ4__ -pthread -m64")
 set(CMAKE_CXX_FLAGS  "-Wno-deprecated-register ${CMAKE_CXX_FLAGS} ${EXTRA_FLAGS}" )
 add_library(hipopy3 MODULE ${_hipopy3})
@@ -18,7 +15,7 @@ install(TARGETS hipopy3
         LIBRARY DESTINATION lib)
 
 add_cython_target(hipopy4 hipopy4.pyx CXX PY3 OUTPUT_VAR _hipopy4)
-include_directories(${PYTHON_INCLUDE_DIRS} ${PYTHON_NUMPY_INCLUDE_DIR} ${NumPy_INCLUDE_DIR})
+include_directories(${PYTHON_INCLUDE_DIRS} ${NumPy_INCLUDE_DIR})
 set(EXTRA_FLAGS "-D__LZ4__ -pthread -m64")
 set(CMAKE_CXX_FLAGS  "-Wno-deprecated-register ${CMAKE_CXX_FLAGS} ${EXTRA_FLAGS}" )
 add_library(hipopy4 MODULE ${_hipopy4})
@@ -28,7 +25,7 @@ install(TARGETS hipopy4
         LIBRARY DESTINATION lib)
 
 add_cython_target(clas12 clas12.pyx CXX PY3 OUTPUT_VAR _clas12)
-include_directories(${PYTHON_INCLUDE_DIRS} ${PYTHON_NUMPY_INCLUDE_DIR} ${NumPy_INCLUDE_DIR})
+include_directories(${PYTHON_INCLUDE_DIRS} ${NumPy_INCLUDE_DIR})
 set(EXTRA_FLAGS "-D__LZ4__ -pthread -m64")
 set(CMAKE_CXX_FLAGS  "-Wno-deprecated-register ${CMAKE_CXX_FLAGS} ${EXTRA_FLAGS}" )
 add_library(clas12 MODULE ${_clas12})
