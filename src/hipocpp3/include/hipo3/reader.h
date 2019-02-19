@@ -219,15 +219,19 @@ namespace hipo {
 
     hipo::dictionary* getSchemaDictionary();
 
-    void         open(const char* filename);
-    void         readRecord(int index);
-    void         readRecord(hipo::record& record, int index);
-    void         readHeaderRecord(hipo::record& record);
-    int          getRecordCount();
-    bool         isOpen();
-    void         showInfo();
-    void         printWarning();
-    bool         next();
+    void   open(const char* filename);
+    void   readRecord(int index);
+    void   readRecord(hipo::record& record, int index);
+    void   readHeaderRecord(hipo::record& record);
+    int    getRecordCount();
+    bool   isOpen();
+    void   showInfo();
+    void   printWarning();
+    bool   next();
+    size_t numEvents() {
+      readRecordIndex();
+      return inReaderIndex.getMaxEvents();
+    }
     hipo::event* getEvent() { return &inEventStream; }
     template <class T>
     hipo::node<T>* getBranch(int group, int item);
