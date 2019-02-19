@@ -3,6 +3,7 @@
 #include "TH2.h"
 #include "TLorentzVector.h"
 #include <chrono>
+#include <iostream>
 
 std::vector<int>*   pid;
 std::vector<float>* p;
@@ -18,12 +19,9 @@ std::vector<float>* MC_py;
 std::vector<float>* MC_pz;
 
 TChain* clas12 = new TChain("clas12", "clas12");
-
-TH1D* deltaP[8];
+TH1D*   deltaP[8];
 
 int MonteCarlo(std::string file = "test.root", double BEAM = 2.2) {
-  gStyle->SetOptStat(1111);
-  gStyle->SetOptFit(1111);
 
   deltaP[0] = new TH1D("delta_px_e", "#Delta P_{x}/P vetrex e^{-}", 100, -2, 2);
   deltaP[1] = new TH1D("delta_py_e", "#Delta P_{y}/P vetrex e^{-}", 100, -2, 2);
@@ -96,3 +94,14 @@ int MonteCarlo(std::string file = "test.root", double BEAM = 2.2) {
 
   return 0;
 }
+
+#if !defined(__CLING__)
+int main(int argc, char const* argv[]) {
+  if (argc < 3) {
+    std::cerr << "Not enough arguments" << std::endl;
+    std::cerr << "To Use:\tMonteCarlo dst2root_file.root beam_energy" << std::endl;
+    exit(1);
+  }
+  return MonteCarlo(argv[1], atof(argv[2]));
+}
+#endif

@@ -1,6 +1,9 @@
+#include "TCanvas.h"
+#include "TChain.h"
 #include "TH2.h"
 #include "TLorentzVector.h"
 #include <chrono>
+#include <iostream>
 
 std::vector<int>*   pid;
 std::vector<float>* p;
@@ -222,3 +225,14 @@ int deltat(std::string file = "test.root") {
 
   return 0;
 }
+
+#ifndef __CLING__
+int main(int argc, char const* argv[]) {
+  if (argc < 2) {
+    std::cerr << "Not enough arguments" << std::endl;
+    std::cerr << "To Use:\tdeltat dst2root_file.root" << std::endl;
+    exit(1);
+  }
+  return deltat(argv[1]);
+}
+#endif

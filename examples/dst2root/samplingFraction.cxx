@@ -1,5 +1,9 @@
+#include "TCanvas.h"
+#include "TChain.h"
+#include "TFile.h"
 #include "TH2.h"
 #include "TLorentzVector.h"
+#include <iostream>
 
 std::vector<int>*   pid;
 std::vector<float>* p;
@@ -30,5 +34,25 @@ int samplingFraction(std::string file = "test.root") {
   c1->cd();
   sf_hist->Draw("colz");
 
+#ifndef __CLING__
+  TFile* outFile = new TFile("samplingFraction_output.root", "RECREATE");
+  outFile->cd();
+  sf_hist->Write();
+  c1->Write();
+  outFile->Write();
+  outFile->Close();
+#endif
+
   return 0;
 }
+
+#ifndef __CLING__
+int main(int argc, char const* argv[]) {
+  if (argc < 2) {
+    std::cerr << "Not enough arguments" << std::endl;
+    std::cerr << "To Use:\tsamplingFraction dst2root_file.root" << std::endl;
+    exit(1);
+  }
+  return samplingFraction(argv[1]);
+}
+#endif
