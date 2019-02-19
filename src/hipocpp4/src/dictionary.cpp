@@ -78,17 +78,20 @@ namespace hipo {
 
   std::string schema::json() {
     std::string out;
-    out += "{ \"";
+    out += "{\"name\": \"";
     out += schemaName;
-    out += "\":\n";
+    out += "\",";
+    out += "\"entries\":[ ";
     for (int i = 0; i < schemaEntries.size(); i++) {
-      out += "\t\"";
+      out += "{";
+      out += "\"name\" : \"";
       out += schemaEntries[i].name;
-      out += "\" :  \"";
+      out += "\" , \"type\" : \"";
       out += schemaEntries[i].type;
-      out += "\"\n";
+      out += (i == schemaEntries.size() - 1) ? ("\" }") : ("\" },");
     }
-    out += "}\n";
+    out += "]";
+    out += "}";
     return out;
   }
 

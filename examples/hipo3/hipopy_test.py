@@ -29,5 +29,6 @@ while reader.next():
     momentum = np.sqrt(np.square(px[0]) + np.square(py[0]) + np.square(pz[0]))
 
 
+print("Total Events: " + str(total))
 print(str(time.time() - start_time), "sec")
 print(str(total / (time.time() - start_time)), "hz")

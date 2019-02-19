@@ -71,14 +71,24 @@ OPTIONS
 
 ```
 
-### recon2root
+### dst2root
 
-A clas12 specific converter to extract the `REC::*` banks from a hipo file and
+A clas12 specific converter to extract the DST banks from a hipo file and
 put them into a root file. Useful for analysis especially if downloading the
 files to an offsite location or a personal computer.
 
 ```
-$ recon2root <input file> [<output file>]
+$ dst2root -h
+SYNOPSIS
+        dst2root [-h] [-mc] [-b] [-r] [-e] [-c] <inputFile.hipo> [<outputFile.root>]
+
+OPTIONS
+        -h, --help  print help
+        -mc, --MC   Convert dst and mc banks
+        -b, --batch Don't show progress and statistics
+        -r, --rec   Only save events where number of partilces in the event > 0
+        -e, --elec  Only save events with good electron as first particle
+        -c, --cov   Save Covariant Matrix for kinematic fitting
 ```
 
 
@@ -97,32 +107,52 @@ Todo
 ```
 .
 ├── bin
-│   ├── hipo
+│   ├── dst2root
+│   ├── hipo3_examples
+│   │   ├── benchmark
+│   │   ├── hipo
+│   │   ├── pulse_compression
+│   │   ├── read_event_file
+│   │   ├── read_file
+│   │   ├── read_file_advanced
+│   │   └── write_file
 │   ├── recon2root
-│   └── toohip4root
+│   └── recon2root_mc
 ├── include
-│   └── hipo
-│       ├── data.h
+│   ├── hipo3
+│   │   ├── data.h
+│   │   ├── dictionary.h
+│   │   ├── event.h
+│   │   ├── hipoexceptions.h
+│   │   ├── node.h
+│   │   ├── reader.h
+│   │   ├── record.h
+│   │   ├── text.h
+│   │   ├── utils.h
+│   │   └── writer.h
+│   └── hipo4
+│       ├── bank.h
 │       ├── dictionary.h
 │       ├── event.h
 │       ├── hipoexceptions.h
-│       ├── node.h
 │       ├── reader.h
 │       ├── record.h
-│       ├── text.h
-│       ├── THipo.h
-│       ├── utils.h
-│       └── writer.h
+│       ├── recordbuilder.h
+│       └── utils.h
 ├── lib
+│   ├── clas12.so
 │   ├── hipo
 │   │   ├── HipoToolsConfig.cmake
-│   │   ├── HipoToolsConfigVersion.cmake
-│   │   ├── HipoToolsTargets.cmake
-│   │   └── HipoToolsTargets-noconfig.cmake
-│   ├── libhipocpp.so -> libhipocpp.so.0.0.1
-│   ├── libhipocpp.so.0.0.1
-│   └── libhiporoot.so
+│   │   └── HipoToolsConfigVersion.cmake
+│   ├── hipopy3.so
+│   ├── hipopy4.so
+│   ├── libhipocpp3.dylib
+│   ├── libhipocpp3_static.a
+│   ├── libhipocpp4.dylib
+│   └── libhipocpp4_static.a
 └── share
     └── pkgconfig
-        └── hipocpp.pc
+        ├── hipocpp3.pc
+        └── hipocpp4.pc
+
 ```
