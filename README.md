@@ -83,6 +83,14 @@ setenv PYTHONPATH $PYTHONPATH:$HIPO_TOOLS/lib
 * Don't write loops! Use [RDataFrame](https://root.cern.ch/doc/master/group__tutorial__dataframe.html)
 
 
+Reading hipo files in python
+---------------------
+### hipopy
+
+Easily read files in python using hipopy, which is build automatically if Cython is found.
+An example of reading a hipo4 file in python can be found [here](examples/hipo4/clas12_event.py).
+
+
 Converting hipo files
 ---------------------
 
