@@ -552,9 +552,6 @@ int main(int argc, char** argv) {
 
     if (!is_batch && (++entry % 10000) == 0)
       std::cout << "\t" << floor(100 * entry / tot_hipo_events) << "%\r\r" << std::flush;
-    ////Testing
-    if ((entry % 20000) == 0)
-      break;
 
     if (good_rec && rec_Particle->getRows() == 0)
       continue;
