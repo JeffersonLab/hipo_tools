@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.6)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 add_executable(dst2root_3 dst2root_3.cpp)
 target_link_libraries(dst2root_3
   PRIVATE hipocpp3_static

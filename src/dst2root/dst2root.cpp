@@ -10,6 +10,7 @@
 #include <vector>
 // ROOT libs
 #include "TFile.h"
+#include "TFileCacheWrite.h"
 #include "TTree.h"
 // Hipo libs
 #include "hipo4/reader.h"
@@ -18,11 +19,259 @@
 #include "clipp.h"
 #include "constants.h"
 
+int    NRUN;
+int    NEVENT;
+float  EVNTime;
+int    TYPE;
+int    TRG;
+float  BCG;
+float  STTime;
+float  RFTime;
+int    Helic;
+int    EvCAT;
+int    NPGP;
+double LT;
+float  PTIME;
+
+std::vector<int>   pid;
+std::vector<float> p;
+std::vector<float> p2;
+std::vector<float> px;
+std::vector<float> py;
+std::vector<float> pz;
+std::vector<float> vx;
+std::vector<float> vy;
+std::vector<float> vz;
+std::vector<int>   charge;
+std::vector<float> beta;
+std::vector<float> chi2pid;
+std::vector<int>   status;
+
+std::vector<int>   cal_pindex;
+std::vector<int>   cal_detector;
+std::vector<int>   cal_sector;
+std::vector<int>   cal_layer;
+std::vector<float> cal_energy;
+std::vector<float> cal_time;
+std::vector<float> cal_path;
+std::vector<float> cal_x;
+std::vector<float> cal_y;
+std::vector<float> cal_z;
+std::vector<float> cal_lu;
+std::vector<float> cal_lv;
+std::vector<float> cal_lw;
+
+std::vector<int>   chern_pindex;
+std::vector<int>   chern_detector;
+std::vector<int>   chern_sector;
+std::vector<float> chern_nphe;
+std::vector<float> chern_time;
+std::vector<float> chern_path;
+std::vector<float> chern_theta;
+std::vector<float> chern_phi;
+
+std::vector<int>   fortag_pindex;
+std::vector<int>   fortag_detector;
+std::vector<float> fortag_energy;
+std::vector<float> fortag_time;
+std::vector<float> fortag_path;
+std::vector<float> fortag_x;
+std::vector<float> fortag_y;
+std::vector<float> fortag_z;
+std::vector<float> fortag_dx;
+std::vector<float> fortag_dy;
+std::vector<float> fortag_radius;
+std::vector<int>   fortag_size;
+
+std::vector<int>   dc_sec;
+std::vector<float> dc_px;
+std::vector<float> dc_py;
+std::vector<float> dc_pz;
+std::vector<float> dc_vx;
+std::vector<float> dc_vy;
+std::vector<float> dc_vz;
+
+std::vector<float> cvt_px;
+std::vector<float> cvt_py;
+std::vector<float> cvt_pz;
+std::vector<float> cvt_vx;
+std::vector<float> cvt_vy;
+std::vector<float> cvt_vz;
+
+std::vector<float> ec_tot_energy;
+std::vector<float> ec_pcal_energy;
+std::vector<int>   ec_pcal_sec;
+std::vector<float> ec_pcal_time;
+std::vector<float> ec_pcal_path;
+std::vector<float> ec_pcal_x;
+std::vector<float> ec_pcal_y;
+std::vector<float> ec_pcal_z;
+std::vector<float> ec_pcal_lu;
+std::vector<float> ec_pcal_lv;
+std::vector<float> ec_pcal_lw;
+
+std::vector<float> ec_ecin_energy;
+std::vector<int>   ec_ecin_sec;
+std::vector<float> ec_ecin_time;
+std::vector<float> ec_ecin_path;
+std::vector<float> ec_ecin_x;
+std::vector<float> ec_ecin_y;
+std::vector<float> ec_ecin_z;
+std::vector<float> ec_ecin_lu;
+std::vector<float> ec_ecin_lv;
+std::vector<float> ec_ecin_lw;
+
+std::vector<float> ec_ecout_energy;
+std::vector<int>   ec_ecout_sec;
+std::vector<float> ec_ecout_time;
+std::vector<float> ec_ecout_path;
+std::vector<float> ec_ecout_x;
+std::vector<float> ec_ecout_y;
+std::vector<float> ec_ecout_z;
+std::vector<float> ec_ecout_lu;
+std::vector<float> ec_ecout_lv;
+std::vector<float> ec_ecout_lw;
+
+std::vector<float> cc_nphe_tot;
+std::vector<int>   cc_ltcc_sec;
+std::vector<float> cc_ltcc_nphe;
+std::vector<float> cc_ltcc_time;
+std::vector<float> cc_ltcc_path;
+std::vector<float> cc_ltcc_theta;
+std::vector<float> cc_ltcc_phi;
+std::vector<int>   cc_htcc_sec;
+std::vector<float> cc_htcc_nphe;
+std::vector<float> cc_htcc_time;
+std::vector<float> cc_htcc_path;
+std::vector<float> cc_htcc_theta;
+std::vector<float> cc_htcc_phi;
+std::vector<int>   cc_rich_sec;
+std::vector<float> cc_rich_nphe;
+std::vector<float> cc_rich_time;
+std::vector<float> cc_rich_path;
+std::vector<float> cc_rich_theta;
+std::vector<float> cc_rich_phi;
+
+std::vector<int>   sc_ftof_1a_sec;
+std::vector<float> sc_ftof_1a_time;
+std::vector<float> sc_ftof_1a_path;
+std::vector<float> sc_ftof_1a_energy;
+std::vector<int>   sc_ftof_1a_component;
+std::vector<float> sc_ftof_1a_x;
+std::vector<float> sc_ftof_1a_y;
+std::vector<float> sc_ftof_1a_z;
+std::vector<float> sc_ftof_1a_hx;
+std::vector<float> sc_ftof_1a_hy;
+std::vector<float> sc_ftof_1a_hz;
+
+std::vector<int>   sc_ftof_1b_sec;
+std::vector<float> sc_ftof_1b_time;
+std::vector<float> sc_ftof_1b_path;
+std::vector<float> sc_ftof_1b_energy;
+std::vector<int>   sc_ftof_1b_component;
+std::vector<float> sc_ftof_1b_x;
+std::vector<float> sc_ftof_1b_y;
+std::vector<float> sc_ftof_1b_z;
+std::vector<float> sc_ftof_1b_hx;
+std::vector<float> sc_ftof_1b_hy;
+std::vector<float> sc_ftof_1b_hz;
+
+std::vector<int>   sc_ftof_2_sec;
+std::vector<float> sc_ftof_2_time;
+std::vector<float> sc_ftof_2_path;
+std::vector<float> sc_ftof_2_energy;
+std::vector<int>   sc_ftof_2_component;
+std::vector<float> sc_ftof_2_x;
+std::vector<float> sc_ftof_2_y;
+std::vector<float> sc_ftof_2_z;
+std::vector<float> sc_ftof_2_hx;
+std::vector<float> sc_ftof_2_hy;
+std::vector<float> sc_ftof_2_hz;
+
+std::vector<float> sc_ctof_time;
+std::vector<float> sc_ctof_path;
+std::vector<float> sc_ctof_energy;
+std::vector<int>   sc_ctof_component;
+std::vector<float> sc_ctof_x;
+std::vector<float> sc_ctof_y;
+std::vector<float> sc_ctof_z;
+std::vector<float> sc_ctof_hx;
+std::vector<float> sc_ctof_hy;
+std::vector<float> sc_ctof_hz;
+
+std::vector<float> sc_cnd_time;
+std::vector<float> sc_cnd_path;
+std::vector<float> sc_cnd_energy;
+std::vector<int>   sc_cnd_component;
+std::vector<float> sc_cnd_x;
+std::vector<float> sc_cnd_y;
+std::vector<float> sc_cnd_z;
+std::vector<float> sc_cnd_hx;
+std::vector<float> sc_cnd_hy;
+std::vector<float> sc_cnd_hz;
+
+std::vector<float> ft_cal_energy;
+std::vector<float> ft_cal_time;
+std::vector<float> ft_cal_path;
+std::vector<float> ft_cal_x;
+std::vector<float> ft_cal_y;
+std::vector<float> ft_cal_z;
+std::vector<float> ft_cal_dx;
+std::vector<float> ft_cal_dy;
+std::vector<float> ft_cal_radius;
+
+std::vector<float> ft_hodo_energy;
+std::vector<float> ft_hodo_time;
+std::vector<float> ft_hodo_path;
+std::vector<float> ft_hodo_x;
+std::vector<float> ft_hodo_y;
+std::vector<float> ft_hodo_z;
+std::vector<float> ft_hodo_dx;
+std::vector<float> ft_hodo_dy;
+std::vector<float> ft_hodo_radius;
+
+std::vector<int>   MC_pid;
+std::vector<float> MC_helicity;
+std::vector<float> MC_px;
+std::vector<float> MC_py;
+std::vector<float> MC_pz;
+std::vector<float> MC_vx;
+std::vector<float> MC_vy;
+std::vector<float> MC_vz;
+std::vector<float> MC_vt;
+
+std::vector<int>   Lund_pid;
+std::vector<float> Lund_px;
+std::vector<float> Lund_py;
+std::vector<float> Lund_pz;
+std::vector<float> Lund_E;
+std::vector<float> Lund_vx;
+std::vector<float> Lund_vy;
+std::vector<float> Lund_vz;
+std::vector<float> Lund_ltime;
+
+std::vector<float> CovMat_11;
+std::vector<float> CovMat_12;
+std::vector<float> CovMat_13;
+std::vector<float> CovMat_14;
+std::vector<float> CovMat_15;
+std::vector<float> CovMat_22;
+std::vector<float> CovMat_23;
+std::vector<float> CovMat_24;
+std::vector<float> CovMat_25;
+std::vector<float> CovMat_33;
+std::vector<float> CovMat_34;
+std::vector<float> CovMat_35;
+std::vector<float> CovMat_44;
+std::vector<float> CovMat_45;
+std::vector<float> CovMat_55;
+
 int main(int argc, char** argv) {
   std::string InFileName  = "";
   std::string OutFileName = "";
   bool        is_mc       = false;
   bool        is_batch    = false;
+  bool        is_test     = false;
   bool        print_help  = false;
   bool        good_rec    = false;
   bool        elec_first  = false;
@@ -30,7 +279,8 @@ int main(int argc, char** argv) {
 
   auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
               clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
-              clipp::option("-b", "--batch").set(is_batch) % "Don't show progress and statistics",
+              clipp::option("-b", "--batch").set(is_test) % "Don't show progress and statistics",
+              clipp::option("-t", "--test").set(is_batch) % "Only run 5000 events for testing",
               clipp::option("-r", "--rec").set(good_rec) %
                   "Only save events where number of partilces in the event > 0",
               clipp::option("-e", "--elec").set(elec_first) %
@@ -48,9 +298,10 @@ int main(int argc, char** argv) {
   if (OutFileName == "")
     OutFileName = InFileName + ".root";
 
-  auto   start_full = std::chrono::high_resolution_clock::now();
-  TFile* OutputFile = new TFile(OutFileName.c_str(), "RECREATE");
-  OutputFile->SetCompressionSettings(6);
+  auto             start_full = std::chrono::high_resolution_clock::now();
+  TFile*           OutputFile = new TFile(OutFileName.c_str(), "RECREATE");
+  TFileCacheWrite* fileCache  = new TFileCacheWrite(OutputFile, 10000000);
+  OutputFile->SetCompressionSettings(404); // kUseAnalysis
 
   TTree*        clas12          = new TTree("clas12", "clas12");
   hipo::reader* reader          = new hipo::reader(InFileName);
@@ -69,253 +320,6 @@ int main(int argc, char** argv) {
   hipo::bank* rec_Scintillator  = new hipo::bank(dict->getSchema("REC::Scintillator"));
   hipo::bank* rec_Calorimeter   = new hipo::bank(dict->getSchema("REC::Calorimeter"));
   hipo::bank* rec_CovMat        = new hipo::bank(dict->getSchema("REC::CovMat"));
-
-  int    NRUN;
-  int    NEVENT;
-  float  EVNTime;
-  int    TYPE;
-  int    TRG;
-  float  BCG;
-  float  STTime;
-  float  RFTime;
-  int    Helic;
-  int    EvCAT;
-  int    NPGP;
-  double LT;
-  float  PTIME;
-
-  std::vector<int>   pid;
-  std::vector<float> p;
-  std::vector<float> p2;
-  std::vector<float> px;
-  std::vector<float> py;
-  std::vector<float> pz;
-  std::vector<float> vx;
-  std::vector<float> vy;
-  std::vector<float> vz;
-  std::vector<int>   charge;
-  std::vector<float> beta;
-  std::vector<float> chi2pid;
-  std::vector<int>   status;
-
-  std::vector<int>   cal_pindex;
-  std::vector<int>   cal_detector;
-  std::vector<int>   cal_sector;
-  std::vector<int>   cal_layer;
-  std::vector<float> cal_energy;
-  std::vector<float> cal_time;
-  std::vector<float> cal_path;
-  std::vector<float> cal_x;
-  std::vector<float> cal_y;
-  std::vector<float> cal_z;
-  std::vector<float> cal_lu;
-  std::vector<float> cal_lv;
-  std::vector<float> cal_lw;
-
-  std::vector<int>   chern_pindex;
-  std::vector<int>   chern_detector;
-  std::vector<int>   chern_sector;
-  std::vector<float> chern_nphe;
-  std::vector<float> chern_time;
-  std::vector<float> chern_path;
-  std::vector<float> chern_theta;
-  std::vector<float> chern_phi;
-
-  std::vector<int>   fortag_pindex;
-  std::vector<int>   fortag_detector;
-  std::vector<float> fortag_energy;
-  std::vector<float> fortag_time;
-  std::vector<float> fortag_path;
-  std::vector<float> fortag_x;
-  std::vector<float> fortag_y;
-  std::vector<float> fortag_z;
-  std::vector<float> fortag_dx;
-  std::vector<float> fortag_dy;
-  std::vector<float> fortag_radius;
-  std::vector<int>   fortag_size;
-
-  std::vector<int>   dc_sec;
-  std::vector<float> dc_px;
-  std::vector<float> dc_py;
-  std::vector<float> dc_pz;
-  std::vector<float> dc_vx;
-  std::vector<float> dc_vy;
-  std::vector<float> dc_vz;
-
-  std::vector<float> cvt_px;
-  std::vector<float> cvt_py;
-  std::vector<float> cvt_pz;
-  std::vector<float> cvt_vx;
-  std::vector<float> cvt_vy;
-  std::vector<float> cvt_vz;
-
-  std::vector<float> ec_tot_energy;
-  std::vector<float> ec_pcal_energy;
-  std::vector<int>   ec_pcal_sec;
-  std::vector<float> ec_pcal_time;
-  std::vector<float> ec_pcal_path;
-  std::vector<float> ec_pcal_x;
-  std::vector<float> ec_pcal_y;
-  std::vector<float> ec_pcal_z;
-  std::vector<float> ec_pcal_lu;
-  std::vector<float> ec_pcal_lv;
-  std::vector<float> ec_pcal_lw;
-
-  std::vector<float> ec_ecin_energy;
-  std::vector<int>   ec_ecin_sec;
-  std::vector<float> ec_ecin_time;
-  std::vector<float> ec_ecin_path;
-  std::vector<float> ec_ecin_x;
-  std::vector<float> ec_ecin_y;
-  std::vector<float> ec_ecin_z;
-  std::vector<float> ec_ecin_lu;
-  std::vector<float> ec_ecin_lv;
-  std::vector<float> ec_ecin_lw;
-
-  std::vector<float> ec_ecout_energy;
-  std::vector<int>   ec_ecout_sec;
-  std::vector<float> ec_ecout_time;
-  std::vector<float> ec_ecout_path;
-  std::vector<float> ec_ecout_x;
-  std::vector<float> ec_ecout_y;
-  std::vector<float> ec_ecout_z;
-  std::vector<float> ec_ecout_lu;
-  std::vector<float> ec_ecout_lv;
-  std::vector<float> ec_ecout_lw;
-
-  std::vector<float> cc_nphe_tot;
-  std::vector<int>   cc_ltcc_sec;
-  std::vector<float> cc_ltcc_nphe;
-  std::vector<float> cc_ltcc_time;
-  std::vector<float> cc_ltcc_path;
-  std::vector<float> cc_ltcc_theta;
-  std::vector<float> cc_ltcc_phi;
-  std::vector<int>   cc_htcc_sec;
-  std::vector<float> cc_htcc_nphe;
-  std::vector<float> cc_htcc_time;
-  std::vector<float> cc_htcc_path;
-  std::vector<float> cc_htcc_theta;
-  std::vector<float> cc_htcc_phi;
-  std::vector<int>   cc_rich_sec;
-  std::vector<float> cc_rich_nphe;
-  std::vector<float> cc_rich_time;
-  std::vector<float> cc_rich_path;
-  std::vector<float> cc_rich_theta;
-  std::vector<float> cc_rich_phi;
-
-  std::vector<int>   sc_ftof_1a_sec;
-  std::vector<float> sc_ftof_1a_time;
-  std::vector<float> sc_ftof_1a_path;
-  std::vector<float> sc_ftof_1a_energy;
-  std::vector<int>   sc_ftof_1a_component;
-  std::vector<float> sc_ftof_1a_x;
-  std::vector<float> sc_ftof_1a_y;
-  std::vector<float> sc_ftof_1a_z;
-  std::vector<float> sc_ftof_1a_hx;
-  std::vector<float> sc_ftof_1a_hy;
-  std::vector<float> sc_ftof_1a_hz;
-
-  std::vector<int>   sc_ftof_1b_sec;
-  std::vector<float> sc_ftof_1b_time;
-  std::vector<float> sc_ftof_1b_path;
-  std::vector<float> sc_ftof_1b_energy;
-  std::vector<int>   sc_ftof_1b_component;
-  std::vector<float> sc_ftof_1b_x;
-  std::vector<float> sc_ftof_1b_y;
-  std::vector<float> sc_ftof_1b_z;
-  std::vector<float> sc_ftof_1b_hx;
-  std::vector<float> sc_ftof_1b_hy;
-  std::vector<float> sc_ftof_1b_hz;
-
-  std::vector<int>   sc_ftof_2_sec;
-  std::vector<float> sc_ftof_2_time;
-  std::vector<float> sc_ftof_2_path;
-  std::vector<float> sc_ftof_2_energy;
-  std::vector<int>   sc_ftof_2_component;
-  std::vector<float> sc_ftof_2_x;
-  std::vector<float> sc_ftof_2_y;
-  std::vector<float> sc_ftof_2_z;
-  std::vector<float> sc_ftof_2_hx;
-  std::vector<float> sc_ftof_2_hy;
-  std::vector<float> sc_ftof_2_hz;
-
-  std::vector<float> sc_ctof_time;
-  std::vector<float> sc_ctof_path;
-  std::vector<float> sc_ctof_energy;
-  std::vector<int>   sc_ctof_component;
-  std::vector<float> sc_ctof_x;
-  std::vector<float> sc_ctof_y;
-  std::vector<float> sc_ctof_z;
-  std::vector<float> sc_ctof_hx;
-  std::vector<float> sc_ctof_hy;
-  std::vector<float> sc_ctof_hz;
-
-  std::vector<float> sc_cnd_time;
-  std::vector<float> sc_cnd_path;
-  std::vector<float> sc_cnd_energy;
-  std::vector<int>   sc_cnd_component;
-  std::vector<float> sc_cnd_x;
-  std::vector<float> sc_cnd_y;
-  std::vector<float> sc_cnd_z;
-  std::vector<float> sc_cnd_hx;
-  std::vector<float> sc_cnd_hy;
-  std::vector<float> sc_cnd_hz;
-
-  std::vector<float> ft_cal_energy;
-  std::vector<float> ft_cal_time;
-  std::vector<float> ft_cal_path;
-  std::vector<float> ft_cal_x;
-  std::vector<float> ft_cal_y;
-  std::vector<float> ft_cal_z;
-  std::vector<float> ft_cal_dx;
-  std::vector<float> ft_cal_dy;
-  std::vector<float> ft_cal_radius;
-
-  std::vector<float> ft_hodo_energy;
-  std::vector<float> ft_hodo_time;
-  std::vector<float> ft_hodo_path;
-  std::vector<float> ft_hodo_x;
-  std::vector<float> ft_hodo_y;
-  std::vector<float> ft_hodo_z;
-  std::vector<float> ft_hodo_dx;
-  std::vector<float> ft_hodo_dy;
-  std::vector<float> ft_hodo_radius;
-
-  std::vector<int>   MC_pid;
-  std::vector<float> MC_helicity;
-  std::vector<float> MC_px;
-  std::vector<float> MC_py;
-  std::vector<float> MC_pz;
-  std::vector<float> MC_vx;
-  std::vector<float> MC_vy;
-  std::vector<float> MC_vz;
-  std::vector<float> MC_vt;
-
-  std::vector<int>   Lund_pid;
-  std::vector<float> Lund_px;
-  std::vector<float> Lund_py;
-  std::vector<float> Lund_pz;
-  std::vector<float> Lund_E;
-  std::vector<float> Lund_vx;
-  std::vector<float> Lund_vy;
-  std::vector<float> Lund_vz;
-  std::vector<float> Lund_ltime;
-
-  std::vector<float> CovMat_11;
-  std::vector<float> CovMat_12;
-  std::vector<float> CovMat_13;
-  std::vector<float> CovMat_14;
-  std::vector<float> CovMat_15;
-  std::vector<float> CovMat_22;
-  std::vector<float> CovMat_23;
-  std::vector<float> CovMat_24;
-  std::vector<float> CovMat_25;
-  std::vector<float> CovMat_33;
-  std::vector<float> CovMat_34;
-  std::vector<float> CovMat_35;
-  std::vector<float> CovMat_44;
-  std::vector<float> CovMat_45;
-  std::vector<float> CovMat_55;
 
   clas12->Branch("NRUN", &NRUN);
   clas12->Branch("NEVENT", &NEVENT);
@@ -552,6 +556,9 @@ int main(int argc, char** argv) {
 
     if (!is_batch && (++entry % 10000) == 0)
       std::cout << "\t" << floor(100 * entry / tot_hipo_events) << "%\r\r" << std::flush;
+
+    if (is_test && entry > 50000)
+      break;
 
     if (good_rec && rec_Particle->getRows() == 0)
       continue;
