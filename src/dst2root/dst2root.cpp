@@ -298,12 +298,11 @@ int main(int argc, char** argv) {
   if (OutFileName == "")
     OutFileName = InFileName + ".root";
 
-  auto             start_full = std::chrono::high_resolution_clock::now();
   TFile*           OutputFile = new TFile(OutFileName.c_str(), "RECREATE");
   TFileCacheWrite* fileCache  = new TFileCacheWrite(OutputFile, 10000000);
   OutputFile->SetCompressionSettings(404); // kUseAnalysis
+  TTree* clas12 = new TTree("clas12", "clas12");
 
-  TTree*        clas12          = new TTree("clas12", "clas12");
   hipo::reader* reader          = new hipo::reader(InFileName);
   size_t        tot_hipo_events = reader->numEvents();
 
@@ -537,11 +536,11 @@ int main(int argc, char** argv) {
     clas12->Branch("CovMat_55", &CovMat_55);
   }
 
-  int entry      = 0;
-  int l          = 0;
-  int len_pid    = 0;
-  int len_pindex = 0;
-
+  int  entry      = 0;
+  int  l          = 0;
+  int  len_pid    = 0;
+  int  len_pindex = 0;
+  auto start_full = std::chrono::high_resolution_clock::now();
   while (reader->next()) {
     reader->read(*hipo_event);
     hipo_event->getStructure(*rec_Particle);

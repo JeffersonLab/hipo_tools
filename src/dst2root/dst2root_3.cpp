@@ -19,25 +19,19 @@
 #include "clipp.h"
 #include "constants.h"
 
-std::vector<int>   run;
-std::vector<int>   event;
-std::vector<float> torus;
-std::vector<float> solenoid;
-std::vector<int>   crate;
-std::vector<int>   slot;
-std::vector<int>   channel;
-std::vector<int>   helicity;
-std::vector<int>   quartet;
-std::vector<int>   value;
-std::vector<int>   NRUN;
-std::vector<int>   NEVENT;
-std::vector<float> EVNTime;
-std::vector<int>   TYPE;
-std::vector<int>   TRG;
-std::vector<float> BCG;
-std::vector<float> STTime;
-std::vector<float> RFTime;
-std::vector<int>   Helic;
+int    NRUN;
+int    NEVENT;
+float  EVNTime;
+int    TYPE;
+int    TRG;
+float  BCG;
+float  STTime;
+float  RFTime;
+int    Helic;
+int    EvCAT;
+int    NPGP;
+double LT;
+float  PTIME;
 
 std::vector<int>   pid;
 std::vector<float> p;
@@ -325,9 +319,8 @@ int main(int argc, char** argv) {
   TFile*           OutputFile = new TFile(OutFileName.c_str(), "RECREATE");
   TFileCacheWrite* fileCache  = new TFileCacheWrite(OutputFile, 10000000);
   OutputFile->SetCompressionSettings(404); // kUseAnalysis
+  TTree* clas12 = new TTree("clas12", "clas12");
 
-  TTree*        clas12          = new TTree("clas12", "clas12");
-  auto          start_full      = std::chrono::high_resolution_clock::now();
   hipo::reader* reader          = new hipo::reader(InFileName.c_str());
   long          tot_hipo_events = reader->numEvents();
 
@@ -481,18 +474,19 @@ int main(int argc, char** argv) {
   hipo::node<float>*   CVT_Cov_z02_node     = reader->getBranch<float>(20526, 23);
   hipo::node<float>*   CVT_Cov_tandip2_node = reader->getBranch<float>(20526, 24);
 
-  clas12->Branch("run", &run);
-  clas12->Branch("event", &event);
-  clas12->Branch("torus", &torus);
-  clas12->Branch("solenoid", &solenoid);
-  clas12->Branch("crate", &crate);
-  clas12->Branch("slot", &slot);
-  clas12->Branch("channel", &channel);
-  clas12->Branch("helicity", &helicity);
-  clas12->Branch("quartet", &quartet);
-  clas12->Branch("value", &value);
+  clas12->Branch("NRUN", &NRUN);
+  clas12->Branch("NEVENT", &NEVENT);
+  clas12->Branch("EVNTime", &EVNTime);
+  clas12->Branch("TYPE", &TYPE);
+  clas12->Branch("TRG", &TRG);
+  clas12->Branch("BCG", &BCG);
   clas12->Branch("STTime", &STTime);
   clas12->Branch("RFTime", &RFTime);
+  clas12->Branch("Helic", &Helic);
+  clas12->Branch("EvCAT", &EvCAT);
+  clas12->Branch("NPGP", &NPGP);
+  clas12->Branch("LT", &LT);
+  clas12->Branch("PTIME", &PTIME);
 
   clas12->Branch("pid", &pid);
   clas12->Branch("p", &p);
@@ -713,11 +707,11 @@ int main(int argc, char** argv) {
     clas12->Branch("cvt_CovMat_tandip2", &cvt_CovMat_tandip2);
   }
 
-  int entry      = 0;
-  int l          = 0;
-  int len_pid    = 0;
-  int len_pindex = 0;
-
+  int  entry      = 0;
+  int  l          = 0;
+  int  len_pid    = 0;
+  int  len_pindex = 0;
+  auto start_full = std::chrono::high_resolution_clock::now();
   while (reader->next()) {
     if (!is_batch && (++entry % 1000) == 0)
       std::cout << "\t" << floor(100 * entry / tot_hipo_events) << "%\r\r" << std::flush;
@@ -727,43 +721,16 @@ int main(int argc, char** argv) {
     if (elec_first && pid_node->getValue(0) != 11)
       continue;
 
-    l = run_node->getLength();
-    run.resize(l);
-    event.resize(l);
-    torus.resize(l);
-    solenoid.resize(l);
-
-    for (int i = 0; i < l; i++) {
-      run[i]      = run_node->getValue(i);
-      event[i]    = event_node->getValue(i);
-      torus[i]    = torus_node->getValue(i);
-      solenoid[i] = solenoid_node->getValue(i);
-    }
-
-    l = crate_node->getLength();
-    crate.resize(l);
-    slot.resize(l);
-    channel.resize(l);
-    helicity.resize(l);
-    quartet.resize(l);
-    value.resize(l);
-
-    for (int i = 0; i < l; i++) {
-      crate[i]    = crate_node->getValue(i);
-      slot[i]     = slot_node->getValue(i);
-      channel[i]  = channel_node->getValue(i);
-      helicity[i] = helicity_node->getValue(i);
-      quartet[i]  = quartet_node->getValue(i);
-      value[i]    = value_node->getValue(i);
-    }
-
-    l = STTime_node->getLength();
-    STTime.resize(l);
-    RFTime.resize(l);
-
-    for (int i = 0; i < l; i++) {
-      STTime[i] = STTime_node->getValue(i);
-      RFTime[i] = RFTime_node->getValue(i);
+    if (NRUN_node->getLength() > 0) {
+      NRUN    = NRUN_node->getValue(0);
+      NEVENT  = NEVENT_node->getValue(0);
+      EVNTime = EVNTime_node->getValue(0);
+      TYPE    = TYPE_node->getValue(0);
+      TRG     = TRG_node->getValue(0);
+      BCG     = BCG_node->getValue(0);
+      STTime  = STTime_node->getValue(0);
+      RFTime  = RFTime_node->getValue(0);
+      Helic   = Helic_node->getValue(0);
     }
 
     l = pid_node->getLength();
