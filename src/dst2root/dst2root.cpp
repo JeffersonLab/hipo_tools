@@ -536,11 +536,12 @@ int main(int argc, char** argv) {
     clas12->Branch("CovMat_55", &CovMat_55);
   }
 
-  int  entry      = 0;
-  int  l          = 0;
-  int  len_pid    = 0;
-  int  len_pindex = 0;
-  auto start_full = std::chrono::high_resolution_clock::now();
+  int  entry                = 0;
+  int  l                    = 0;
+  int  len_pid              = 0;
+  int  len_pindex           = 0;
+  int  tot_events_processed = 0;
+  auto start_full           = std::chrono::high_resolution_clock::now();
   while (reader->next()) {
     reader->read(*hipo_event);
     hipo_event->getStructure(*rec_Particle);
@@ -564,6 +565,7 @@ int main(int argc, char** argv) {
     if (elec_first && rec_Particle->getInt("pid", 0) != 11)
       continue;
 
+    tot_events_processed++;
     l = rec_Event->getRows();
     if (l != 0) {
       NRUN    = rec_Event->getInt("NRUN", 0);
@@ -1268,7 +1270,12 @@ int main(int argc, char** argv) {
     std::chrono::duration<double> elapsed_full =
         (std::chrono::high_resolution_clock::now() - start_full);
     std::cout << "Elapsed time: " << elapsed_full.count() << " s" << std::endl;
-    std::cout << "Events/Sec: " << entry / elapsed_full.count() << " Hz" << std::endl;
+    std::cout << "Events/Sec: " << tot_hipo_events / elapsed_full.count() << " Hz" << std::endl;
+    std::cout << "Total events in file: " << tot_hipo_events << std::endl;
+    std::cout << "Events converted: " << tot_events_processed << "\t ("
+              << 100.0 * tot_events_processed / tot_hipo_events << "%)" << std::endl;
+    std::cout << "Events converted/Sec: " << tot_events_processed / elapsed_full.count() << " Hz"
+              << std::endl;
   }
 
   return 0;
