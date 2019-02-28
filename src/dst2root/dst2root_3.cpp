@@ -47,42 +47,6 @@ std::vector<float> beta;
 std::vector<float> chi2pid;
 std::vector<int>   status;
 
-std::vector<int>   cal_pindex;
-std::vector<int>   cal_detector;
-std::vector<int>   cal_sector;
-std::vector<int>   cal_layer;
-std::vector<float> cal_energy;
-std::vector<float> cal_time;
-std::vector<float> cal_path;
-std::vector<float> cal_x;
-std::vector<float> cal_y;
-std::vector<float> cal_z;
-std::vector<float> cal_lu;
-std::vector<float> cal_lv;
-std::vector<float> cal_lw;
-
-std::vector<int>   chern_pindex;
-std::vector<int>   chern_detector;
-std::vector<int>   chern_sector;
-std::vector<float> chern_nphe;
-std::vector<float> chern_time;
-std::vector<float> chern_path;
-std::vector<float> chern_theta;
-std::vector<float> chern_phi;
-
-std::vector<int>   fortag_pindex;
-std::vector<int>   fortag_detector;
-std::vector<float> fortag_energy;
-std::vector<float> fortag_time;
-std::vector<float> fortag_path;
-std::vector<float> fortag_x;
-std::vector<float> fortag_y;
-std::vector<float> fortag_z;
-std::vector<float> fortag_dx;
-std::vector<float> fortag_dy;
-std::vector<float> fortag_radius;
-std::vector<int>   fortag_size;
-
 std::vector<int>   dc_sec;
 std::vector<float> dc_px;
 std::vector<float> dc_py;
@@ -230,6 +194,30 @@ std::vector<float> ft_hodo_dx;
 std::vector<float> ft_hodo_dy;
 std::vector<float> ft_hodo_radius;
 
+std::vector<int>   dc_q;
+std::vector<float> dc_chi2;
+std::vector<int>   dc_NDF;
+std::vector<float> dc_px_nomm;
+std::vector<float> dc_py_nomm;
+std::vector<float> dc_pz_nomm;
+std::vector<float> dc_vx_nomm;
+std::vector<float> dc_vy_nomm;
+std::vector<float> dc_vz_nomm;
+std::vector<float> dc_chi2_nomm;
+std::vector<int>   dc_NDF_nomm;
+
+std::vector<int>   cvt_q;
+std::vector<float> cvt_chi2;
+std::vector<int>   cvt_NDF;
+std::vector<float> cvt_px_nomm;
+std::vector<float> cvt_py_nomm;
+std::vector<float> cvt_pz_nomm;
+std::vector<float> cvt_vx_nomm;
+std::vector<float> cvt_vy_nomm;
+std::vector<float> cvt_vz_nomm;
+std::vector<float> cvt_chi2_nomm;
+std::vector<int>   cvt_NDF_nomm;
+
 std::vector<int>   MC_pid;
 std::vector<float> MC_helicity;
 std::vector<float> MC_px;
@@ -267,7 +255,7 @@ std::vector<float> CovMat_45;
 std::vector<float> CovMat_55;
 
 std::vector<int>   cvt_pid;
-std::vector<int>   cvt_q;
+std::vector<int>   cvt_CovMat_q;
 std::vector<float> cvt_p;
 std::vector<float> cvt_pt;
 std::vector<float> cvt_phi0;
@@ -409,15 +397,20 @@ int main(int argc, char** argv) {
   hipo::node<float>* scint_hz_node = reader->getBranch<float>(335, 16);
   // hipo::node<int16_t> *scint_status_node = reader->getBranch<int16_t>(335, 17);
 
-  hipo::node<int16_t>* track_pindex_node   = reader->getBranch<int16_t>(336, 2);
-  hipo::node<int8_t>*  track_detector_node = reader->getBranch<int8_t>(336, 3);
-  hipo::node<int8_t>*  track_sector_node   = reader->getBranch<int8_t>(336, 4);
-  hipo::node<float>*   track_px_nomm_node  = reader->getBranch<float>(336, 9);
-  hipo::node<float>*   track_py_nomm_node  = reader->getBranch<float>(336, 10);
-  hipo::node<float>*   track_pz_nomm_node  = reader->getBranch<float>(336, 11);
-  hipo::node<float>*   track_vx_nomm_node  = reader->getBranch<float>(336, 12);
-  hipo::node<float>*   track_vy_nomm_node  = reader->getBranch<float>(336, 13);
-  hipo::node<float>*   track_vz_nomm_node  = reader->getBranch<float>(336, 14);
+  hipo::node<int16_t>* track_pindex_node    = reader->getBranch<int16_t>(336, 2);
+  hipo::node<int8_t>*  track_detector_node  = reader->getBranch<int8_t>(336, 3);
+  hipo::node<int8_t>*  track_sector_node    = reader->getBranch<int8_t>(336, 4);
+  hipo::node<int8_t>*  track_q_node         = reader->getBranch<int8_t>(336, 6);
+  hipo::node<float>*   track_chi2_node      = reader->getBranch<float>(336, 7);
+  hipo::node<int16_t>* track_NDF_node       = reader->getBranch<int16_t>(336, 8);
+  hipo::node<float>*   track_px_nomm_node   = reader->getBranch<float>(336, 9);
+  hipo::node<float>*   track_py_nomm_node   = reader->getBranch<float>(336, 10);
+  hipo::node<float>*   track_pz_nomm_node   = reader->getBranch<float>(336, 11);
+  hipo::node<float>*   track_vx_nomm_node   = reader->getBranch<float>(336, 12);
+  hipo::node<float>*   track_vy_nomm_node   = reader->getBranch<float>(336, 13);
+  hipo::node<float>*   track_vz_nomm_node   = reader->getBranch<float>(336, 14);
+  hipo::node<float>*   track_chi2_nomm_node = reader->getBranch<float>(336, 15);
+  hipo::node<float>*   track_NDF_nomm_node  = reader->getBranch<float>(336, 16);
 
   hipo::node<float>*   MC_Header_helicity_node = reader->getBranch<float>(40, 4);
   hipo::node<int16_t>* MC_Event_npart_node     = reader->getBranch<int16_t>(41, 1);
@@ -672,6 +665,30 @@ int main(int argc, char** argv) {
   clas12->Branch("ft_hodo_dy", &ft_hodo_dy);
   clas12->Branch("ft_hodo_radius", &ft_hodo_radius);
 
+  clas12->Branch("dc_q", &dc_q);
+  clas12->Branch("dc_chi2", &dc_chi2);
+  clas12->Branch("dc_NDF", &dc_NDF);
+  clas12->Branch("dc_px_nomm", &dc_px_nomm);
+  clas12->Branch("dc_py_nomm", &dc_py_nomm);
+  clas12->Branch("dc_pz_nomm", &dc_pz_nomm);
+  clas12->Branch("dc_vx_nomm", &dc_vx_nomm);
+  clas12->Branch("dc_vy_nomm", &dc_vy_nomm);
+  clas12->Branch("dc_vz_nomm", &dc_vz_nomm);
+  clas12->Branch("dc_chi2_nomm", &dc_chi2_nomm);
+  clas12->Branch("dc_NDF_nomm", &dc_NDF_nomm);
+
+  clas12->Branch("cvt_q", &cvt_q);
+  clas12->Branch("cvt_chi2", &cvt_chi2);
+  clas12->Branch("cvt_NDF", &cvt_NDF);
+  clas12->Branch("cvt_px_nomm", &cvt_px_nomm);
+  clas12->Branch("cvt_py_nomm", &cvt_py_nomm);
+  clas12->Branch("cvt_pz_nomm", &cvt_pz_nomm);
+  clas12->Branch("cvt_vx_nomm", &cvt_vx_nomm);
+  clas12->Branch("cvt_vy_nomm", &cvt_vy_nomm);
+  clas12->Branch("cvt_vz_nomm", &cvt_vz_nomm);
+  clas12->Branch("cvt_chi2_nomm", &cvt_chi2_nomm);
+  clas12->Branch("cvt_NDF_nomm", &cvt_NDF_nomm);
+
   if (cov) {
     clas12->Branch("CovMat_11", &CovMat_11);
     clas12->Branch("CovMat_12", &CovMat_12);
@@ -691,7 +708,7 @@ int main(int argc, char** argv) {
   }
   if (cvt) {
     clas12->Branch("cvt_pid", &cvt_pid);
-    clas12->Branch("cvt_q", &cvt_q);
+    clas12->Branch("cvt_CovMat_q", &cvt_CovMat_q);
     clas12->Branch("cvt_p", &cvt_p);
     clas12->Branch("cvt_pt", &cvt_pt);
     clas12->Branch("cvt_phi0", &cvt_phi0);
@@ -1151,6 +1168,7 @@ int main(int argc, char** argv) {
         int pindex   = scint_pindex_node->getValue(k);
         int detector = scint_detector_node->getValue(k);
         int layer    = scint_layer_node->getValue(k);
+
         if (pindex == i && detector == FTOF && layer == FTOF_1A) {
           sc_ftof_1a_sec[i]       = scint_sector_node->getValue(k);
           sc_ftof_1a_time[i]      = scint_time_node->getValue(k);
@@ -1347,6 +1365,92 @@ int main(int argc, char** argv) {
       }
     }
 
+    len_pid    = pid_node->getLength();
+    len_pindex = track_pindex_node->getLength();
+
+    dc_q.resize(len_pid);
+    dc_chi2.resize(len_pid);
+    dc_NDF.resize(len_pid);
+    dc_px_nomm.resize(len_pid);
+    dc_py_nomm.resize(len_pid);
+    dc_pz_nomm.resize(len_pid);
+    dc_vx_nomm.resize(len_pid);
+    dc_vy_nomm.resize(len_pid);
+    dc_vz_nomm.resize(len_pid);
+    dc_chi2_nomm.resize(len_pid);
+    dc_NDF_nomm.resize(len_pid);
+
+    cvt_q.resize(len_pid);
+    cvt_chi2.resize(len_pid);
+    cvt_NDF.resize(len_pid);
+    cvt_px_nomm.resize(len_pid);
+    cvt_py_nomm.resize(len_pid);
+    cvt_pz_nomm.resize(len_pid);
+    cvt_vx_nomm.resize(len_pid);
+    cvt_vy_nomm.resize(len_pid);
+    cvt_vz_nomm.resize(len_pid);
+    cvt_chi2_nomm.resize(len_pid);
+    cvt_NDF_nomm.resize(len_pid);
+
+    for (int i = 0; i < len_pid; i++) {
+      dc_q[i]         = -9999;
+      dc_chi2[i]      = NAN;
+      dc_NDF[i]       = -1;
+      dc_px_nomm[i]   = NAN;
+      dc_py_nomm[i]   = NAN;
+      dc_pz_nomm[i]   = NAN;
+      dc_vx_nomm[i]   = NAN;
+      dc_vy_nomm[i]   = NAN;
+      dc_vz_nomm[i]   = NAN;
+      dc_chi2_nomm[i] = NAN;
+      dc_NDF_nomm[i]  = -1;
+
+      cvt_q[i]         = -9999;
+      cvt_chi2[i]      = NAN;
+      cvt_NDF[i]       = -1;
+      cvt_px_nomm[i]   = NAN;
+      cvt_py_nomm[i]   = NAN;
+      cvt_pz_nomm[i]   = NAN;
+      cvt_vx_nomm[i]   = NAN;
+      cvt_vy_nomm[i]   = NAN;
+      cvt_vz_nomm[i]   = NAN;
+      cvt_chi2_nomm[i] = NAN;
+      cvt_NDF_nomm[i]  = -1;
+    }
+
+    for (int i = 0; i < len_pid; i++) {
+      for (int k = 0; k < len_pindex; k++) {
+        int pindex   = track_pindex_node->getValue(k);
+        int detector = track_detector_node->getValue(k);
+
+        if (pindex == i && detector == DC) {
+          dc_q[i]         = track_q_node->getValue(k);
+          dc_chi2[i]      = track_chi2_node->getValue(k);
+          dc_NDF[i]       = track_NDF_node->getValue(k);
+          dc_px_nomm[i]   = track_px_nomm_node->getValue(k);
+          dc_py_nomm[i]   = track_py_nomm_node->getValue(k);
+          dc_pz_nomm[i]   = track_pz_nomm_node->getValue(k);
+          dc_vx_nomm[i]   = track_vx_nomm_node->getValue(k);
+          dc_vy_nomm[i]   = track_vy_nomm_node->getValue(k);
+          dc_vz_nomm[i]   = track_vz_nomm_node->getValue(k);
+          dc_chi2_nomm[i] = track_chi2_nomm_node->getValue(k);
+          dc_NDF_nomm[i]  = track_NDF_nomm_node->getValue(k);
+        } else if (pindex == i && detector == CVT) {
+          cvt_q[i]         = track_q_node->getValue(k);
+          cvt_chi2[i]      = track_chi2_node->getValue(k);
+          cvt_NDF[i]       = track_NDF_node->getValue(k);
+          cvt_px_nomm[i]   = track_px_nomm_node->getValue(k);
+          cvt_py_nomm[i]   = track_py_nomm_node->getValue(k);
+          cvt_pz_nomm[i]   = track_pz_nomm_node->getValue(k);
+          cvt_vx_nomm[i]   = track_vx_nomm_node->getValue(k);
+          cvt_vy_nomm[i]   = track_vy_nomm_node->getValue(k);
+          cvt_vz_nomm[i]   = track_vz_nomm_node->getValue(k);
+          cvt_chi2_nomm[i] = track_chi2_nomm_node->getValue(k);
+          cvt_NDF_nomm[i]  = track_NDF_nomm_node->getValue(k);
+        }
+      }
+    }
+
     if (cov) {
       len_pid    = pid_node->getLength();
       len_pindex = CovMat_pindex_node->getLength();
@@ -1414,7 +1518,7 @@ int main(int argc, char** argv) {
       l       = CVT_pid_node->getLength();
 
       cvt_pid.resize(len_pid);
-      cvt_q.resize(len_pid);
+      cvt_CovMat_q.resize(len_pid);
       cvt_p.resize(len_pid);
       cvt_pt.resize(len_pid);
       cvt_phi0.resize(len_pid);
@@ -1432,7 +1536,7 @@ int main(int argc, char** argv) {
 
       for (int i = 0; i < len_pid; i++) {
         cvt_pid[i]            = -1;
-        cvt_q[i]              = -1;
+        cvt_CovMat_q[i]       = -1;
         cvt_p[i]              = NAN;
         cvt_pt[i]             = NAN;
         cvt_phi0[i]           = NAN;
@@ -1454,7 +1558,7 @@ int main(int argc, char** argv) {
           int pindex = CovMat_pindex_node->getValue(k);
           if (pindex == i) {
             cvt_pid[i]            = CVT_pid_node->getValue(k);
-            cvt_q[i]              = CVT_q_node->getValue(k);
+            cvt_CovMat_q[i]       = CVT_q_node->getValue(k);
             cvt_p[i]              = CVT_p_node->getValue(k);
             cvt_phi0[i]           = CVT_phi0_node->getValue(k);
             cvt_tandip[i]         = CVT_tandip_node->getValue(k);

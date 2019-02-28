@@ -47,42 +47,6 @@ std::vector<float> beta;
 std::vector<float> chi2pid;
 std::vector<int>   status;
 
-std::vector<int>   cal_pindex;
-std::vector<int>   cal_detector;
-std::vector<int>   cal_sector;
-std::vector<int>   cal_layer;
-std::vector<float> cal_energy;
-std::vector<float> cal_time;
-std::vector<float> cal_path;
-std::vector<float> cal_x;
-std::vector<float> cal_y;
-std::vector<float> cal_z;
-std::vector<float> cal_lu;
-std::vector<float> cal_lv;
-std::vector<float> cal_lw;
-
-std::vector<int>   chern_pindex;
-std::vector<int>   chern_detector;
-std::vector<int>   chern_sector;
-std::vector<float> chern_nphe;
-std::vector<float> chern_time;
-std::vector<float> chern_path;
-std::vector<float> chern_theta;
-std::vector<float> chern_phi;
-
-std::vector<int>   fortag_pindex;
-std::vector<int>   fortag_detector;
-std::vector<float> fortag_energy;
-std::vector<float> fortag_time;
-std::vector<float> fortag_path;
-std::vector<float> fortag_x;
-std::vector<float> fortag_y;
-std::vector<float> fortag_z;
-std::vector<float> fortag_dx;
-std::vector<float> fortag_dy;
-std::vector<float> fortag_radius;
-std::vector<int>   fortag_size;
-
 std::vector<int>   dc_sec;
 std::vector<float> dc_px;
 std::vector<float> dc_py;
@@ -229,6 +193,30 @@ std::vector<float> ft_hodo_z;
 std::vector<float> ft_hodo_dx;
 std::vector<float> ft_hodo_dy;
 std::vector<float> ft_hodo_radius;
+
+std::vector<int>   dc_q;
+std::vector<float> dc_chi2;
+std::vector<int>   dc_NDF;
+std::vector<float> dc_px_nomm;
+std::vector<float> dc_py_nomm;
+std::vector<float> dc_pz_nomm;
+std::vector<float> dc_vx_nomm;
+std::vector<float> dc_vy_nomm;
+std::vector<float> dc_vz_nomm;
+std::vector<float> dc_chi2_nomm;
+std::vector<int>   dc_NDF_nomm;
+
+std::vector<int>   cvt_q;
+std::vector<float> cvt_chi2;
+std::vector<int>   cvt_NDF;
+std::vector<float> cvt_px_nomm;
+std::vector<float> cvt_py_nomm;
+std::vector<float> cvt_pz_nomm;
+std::vector<float> cvt_vx_nomm;
+std::vector<float> cvt_vy_nomm;
+std::vector<float> cvt_vz_nomm;
+std::vector<float> cvt_chi2_nomm;
+std::vector<int>   cvt_NDF_nomm;
 
 std::vector<int>   MC_pid;
 std::vector<float> MC_helicity;
@@ -517,6 +505,30 @@ int main(int argc, char** argv) {
   clas12->Branch("ft_hodo_dx", &ft_hodo_dx);
   clas12->Branch("ft_hodo_dy", &ft_hodo_dy);
   clas12->Branch("ft_hodo_radius", &ft_hodo_radius);
+
+  clas12->Branch("dc_q", &dc_q);
+  clas12->Branch("dc_chi2", &dc_chi2);
+  clas12->Branch("dc_NDF", &dc_NDF);
+  clas12->Branch("dc_px_nomm", &dc_px_nomm);
+  clas12->Branch("dc_py_nomm", &dc_py_nomm);
+  clas12->Branch("dc_pz_nomm", &dc_pz_nomm);
+  clas12->Branch("dc_vx_nomm", &dc_vx_nomm);
+  clas12->Branch("dc_vy_nomm", &dc_vy_nomm);
+  clas12->Branch("dc_vz_nomm", &dc_vz_nomm);
+  clas12->Branch("dc_chi2_nomm", &dc_chi2_nomm);
+  clas12->Branch("dc_NDF_nomm", &dc_NDF_nomm);
+
+  clas12->Branch("cvt_q", &cvt_q);
+  clas12->Branch("cvt_chi2", &cvt_chi2);
+  clas12->Branch("cvt_NDF", &cvt_NDF);
+  clas12->Branch("cvt_px_nomm", &cvt_px_nomm);
+  clas12->Branch("cvt_py_nomm", &cvt_py_nomm);
+  clas12->Branch("cvt_pz_nomm", &cvt_pz_nomm);
+  clas12->Branch("cvt_vx_nomm", &cvt_vx_nomm);
+  clas12->Branch("cvt_vy_nomm", &cvt_vy_nomm);
+  clas12->Branch("cvt_vz_nomm", &cvt_vz_nomm);
+  clas12->Branch("cvt_chi2_nomm", &cvt_chi2_nomm);
+  clas12->Branch("cvt_NDF_nomm", &cvt_NDF_nomm);
 
   if (cov) {
     clas12->Branch("CovMat_11", &CovMat_11);
@@ -1193,6 +1205,92 @@ int main(int argc, char** argv) {
           ft_hodo_dx[i]     = rec_ForwardTagger->getFloat("dx", k);
           ft_hodo_dy[i]     = rec_ForwardTagger->getFloat("dy", k);
           ft_hodo_radius[i] = rec_ForwardTagger->getFloat("radius", k);
+        }
+      }
+    }
+
+    len_pid    = rec_Particle->getRows();
+    len_pindex = rec_Track->getRows();
+
+    dc_q.resize(len_pid);
+    dc_chi2.resize(len_pid);
+    dc_NDF.resize(len_pid);
+    dc_px_nomm.resize(len_pid);
+    dc_py_nomm.resize(len_pid);
+    dc_pz_nomm.resize(len_pid);
+    dc_vx_nomm.resize(len_pid);
+    dc_vy_nomm.resize(len_pid);
+    dc_vz_nomm.resize(len_pid);
+    dc_chi2_nomm.resize(len_pid);
+    dc_NDF_nomm.resize(len_pid);
+
+    cvt_q.resize(len_pid);
+    cvt_chi2.resize(len_pid);
+    cvt_NDF.resize(len_pid);
+    cvt_px_nomm.resize(len_pid);
+    cvt_py_nomm.resize(len_pid);
+    cvt_pz_nomm.resize(len_pid);
+    cvt_vx_nomm.resize(len_pid);
+    cvt_vy_nomm.resize(len_pid);
+    cvt_vz_nomm.resize(len_pid);
+    cvt_chi2_nomm.resize(len_pid);
+    cvt_NDF_nomm.resize(len_pid);
+
+    for (int i = 0; i < len_pid; i++) {
+      dc_q[i]         = -9999;
+      dc_chi2[i]      = NAN;
+      dc_NDF[i]       = -1;
+      dc_px_nomm[i]   = NAN;
+      dc_py_nomm[i]   = NAN;
+      dc_pz_nomm[i]   = NAN;
+      dc_vx_nomm[i]   = NAN;
+      dc_vy_nomm[i]   = NAN;
+      dc_vz_nomm[i]   = NAN;
+      dc_chi2_nomm[i] = NAN;
+      dc_NDF_nomm[i]  = -1;
+
+      cvt_q[i]         = -9999;
+      cvt_chi2[i]      = NAN;
+      cvt_NDF[i]       = -1;
+      cvt_px_nomm[i]   = NAN;
+      cvt_py_nomm[i]   = NAN;
+      cvt_pz_nomm[i]   = NAN;
+      cvt_vx_nomm[i]   = NAN;
+      cvt_vy_nomm[i]   = NAN;
+      cvt_vz_nomm[i]   = NAN;
+      cvt_chi2_nomm[i] = NAN;
+      cvt_NDF_nomm[i]  = -1;
+    }
+
+    for (int i = 0; i < len_pid; i++) {
+      for (int k = 0; k < len_pindex; k++) {
+        int pindex   = rec_Track->getShort("pindex", k);
+        int detector = rec_Track->getByte("detector", k);
+
+        if (pindex == i && detector == DC) {
+          dc_q[i]         = rec_Track->getByte("q", k);
+          dc_chi2[i]      = rec_Track->getFloat("chi2", k);
+          dc_NDF[i]       = rec_Track->getShort("NDF", k);
+          dc_px_nomm[i]   = rec_Track->getFloat("px_nomm", k);
+          dc_py_nomm[i]   = rec_Track->getFloat("py_nomm", k);
+          dc_pz_nomm[i]   = rec_Track->getFloat("pz_nomm", k);
+          dc_vx_nomm[i]   = rec_Track->getFloat("vx_nomm", k);
+          dc_vy_nomm[i]   = rec_Track->getFloat("vy_nomm", k);
+          dc_vz_nomm[i]   = rec_Track->getFloat("vz_nomm", k);
+          dc_chi2_nomm[i] = rec_Track->getFloat("chi2_nomm", k);
+          dc_NDF_nomm[i]  = rec_Track->getShort("NDF_nomm", k);
+        } else if (pindex == i && detector == CVT) {
+          cvt_q[i]         = rec_Track->getByte("q", k);
+          cvt_chi2[i]      = rec_Track->getFloat("chi2", k);
+          cvt_NDF[i]       = rec_Track->getShort("NDF", k);
+          cvt_px_nomm[i]   = rec_Track->getFloat("px_nomm", k);
+          cvt_py_nomm[i]   = rec_Track->getFloat("py_nomm", k);
+          cvt_pz_nomm[i]   = rec_Track->getFloat("pz_nomm", k);
+          cvt_vx_nomm[i]   = rec_Track->getFloat("vx_nomm", k);
+          cvt_vy_nomm[i]   = rec_Track->getFloat("vy_nomm", k);
+          cvt_vz_nomm[i]   = rec_Track->getFloat("vz_nomm", k);
+          cvt_chi2_nomm[i] = rec_Track->getFloat("chi2_nomm", k);
+          cvt_NDF_nomm[i]  = rec_Track->getShort("NDF_nomm", k);
         }
       }
     }
