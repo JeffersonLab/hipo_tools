@@ -103,12 +103,18 @@ std::vector<float> cc_ltcc_time;
 std::vector<float> cc_ltcc_path;
 std::vector<float> cc_ltcc_theta;
 std::vector<float> cc_ltcc_phi;
+std::vector<float> cc_ltcc_x;
+std::vector<float> cc_ltcc_y;
+std::vector<float> cc_ltcc_z;
 std::vector<int>   cc_htcc_sec;
 std::vector<float> cc_htcc_nphe;
 std::vector<float> cc_htcc_time;
 std::vector<float> cc_htcc_path;
 std::vector<float> cc_htcc_theta;
 std::vector<float> cc_htcc_phi;
+std::vector<float> cc_htcc_x;
+std::vector<float> cc_htcc_y;
+std::vector<float> cc_htcc_z;
 std::vector<int>   cc_rich_sec;
 std::vector<float> cc_rich_nphe;
 std::vector<float> cc_rich_time;
@@ -364,6 +370,9 @@ int main(int argc, char** argv) {
   hipo::node<float>*   chern_nphe_node     = reader->getBranch<float>(333, 5);
   hipo::node<float>*   chern_time_node     = reader->getBranch<float>(333, 6);
   hipo::node<float>*   chern_path_node     = reader->getBranch<float>(333, 7);
+  hipo::node<float>*   chern_x_node        = reader->getBranch<float>(333, 9);
+  hipo::node<float>*   chern_y_node        = reader->getBranch<float>(333, 10);
+  hipo::node<float>*   chern_z_node        = reader->getBranch<float>(333, 11);
   hipo::node<float>*   chern_theta_node    = reader->getBranch<float>(333, 12);
   hipo::node<float>*   chern_phi_node      = reader->getBranch<float>(333, 13);
 
@@ -572,6 +581,9 @@ int main(int argc, char** argv) {
   clas12->Branch("cc_ltcc_path", &cc_ltcc_path);
   clas12->Branch("cc_ltcc_theta", &cc_ltcc_theta);
   clas12->Branch("cc_ltcc_phi", &cc_ltcc_phi);
+  clas12->Branch("cc_ltcc_x", &cc_ltcc_x);
+  clas12->Branch("cc_ltcc_y", &cc_ltcc_y);
+  clas12->Branch("cc_ltcc_z", &cc_ltcc_z);
 
   clas12->Branch("cc_htcc_sec", &cc_htcc_sec);
   clas12->Branch("cc_htcc_nphe", &cc_htcc_nphe);
@@ -579,6 +591,9 @@ int main(int argc, char** argv) {
   clas12->Branch("cc_htcc_path", &cc_htcc_path);
   clas12->Branch("cc_htcc_theta", &cc_htcc_theta);
   clas12->Branch("cc_htcc_phi", &cc_htcc_phi);
+  clas12->Branch("cc_htcc_x", &cc_htcc_x);
+  clas12->Branch("cc_htcc_y", &cc_htcc_y);
+  clas12->Branch("cc_htcc_z", &cc_htcc_z);
 
   clas12->Branch("cc_rich_sec", &cc_rich_sec);
   clas12->Branch("cc_rich_nphe", &cc_rich_nphe);
@@ -968,6 +983,9 @@ int main(int argc, char** argv) {
     cc_ltcc_path.resize(len_pid);
     cc_ltcc_theta.resize(len_pid);
     cc_ltcc_phi.resize(len_pid);
+    cc_ltcc_x.resize(len_pid);
+    cc_ltcc_y.resize(len_pid);
+    cc_ltcc_z.resize(len_pid);
 
     cc_htcc_sec.resize(len_pid);
     cc_htcc_nphe.resize(len_pid);
@@ -975,6 +993,9 @@ int main(int argc, char** argv) {
     cc_htcc_path.resize(len_pid);
     cc_htcc_theta.resize(len_pid);
     cc_htcc_phi.resize(len_pid);
+    cc_htcc_x.resize(len_pid);
+    cc_htcc_y.resize(len_pid);
+    cc_htcc_z.resize(len_pid);
 
     cc_rich_sec.resize(len_pid);
     cc_rich_nphe.resize(len_pid);
@@ -991,12 +1012,18 @@ int main(int argc, char** argv) {
       cc_ltcc_path[i]  = NAN;
       cc_ltcc_theta[i] = NAN;
       cc_ltcc_phi[i]   = NAN;
+      cc_ltcc_x[i]     = NAN;
+      cc_ltcc_y[i]     = NAN;
+      cc_ltcc_z[i]     = NAN;
       cc_htcc_sec[i]   = -1;
       cc_htcc_nphe[i]  = NAN;
       cc_htcc_time[i]  = NAN;
       cc_htcc_path[i]  = NAN;
       cc_htcc_theta[i] = NAN;
       cc_htcc_phi[i]   = NAN;
+      cc_htcc_x[i]     = NAN;
+      cc_htcc_y[i]     = NAN;
+      cc_htcc_z[i]     = NAN;
       cc_rich_sec[i]   = -1;
       cc_rich_nphe[i]  = NAN;
       cc_rich_time[i]  = NAN;
@@ -1022,6 +1049,9 @@ int main(int argc, char** argv) {
           cc_htcc_path[i]  = chern_path_node->getValue(k);
           cc_htcc_theta[i] = chern_theta_node->getValue(k);
           cc_htcc_phi[i]   = chern_phi_node->getValue(k);
+          cc_htcc_x[i]     = chern_x_node->getValue(k);
+          cc_htcc_y[i]     = chern_y_node->getValue(k);
+          cc_htcc_z[i]     = chern_z_node->getValue(k);
         } else if (pindex == i && detector == LTCC) {
           cc_ltcc_nphe[i]  = chern_nphe_node->getValue(k);
           cc_ltcc_sec[i]   = chern_sector_node->getValue(k);
@@ -1029,6 +1059,9 @@ int main(int argc, char** argv) {
           cc_ltcc_path[i]  = chern_path_node->getValue(k);
           cc_ltcc_theta[i] = chern_theta_node->getValue(k);
           cc_ltcc_phi[i]   = chern_phi_node->getValue(k);
+          cc_ltcc_x[i]     = chern_x_node->getValue(k);
+          cc_ltcc_y[i]     = chern_y_node->getValue(k);
+          cc_ltcc_z[i]     = chern_z_node->getValue(k);
         } else if (pindex == i && detector == RICH) {
           cc_rich_nphe[i]  = chern_nphe_node->getValue(k);
           cc_rich_sec[i]   = chern_sector_node->getValue(k);
