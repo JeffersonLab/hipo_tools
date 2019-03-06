@@ -11,11 +11,11 @@
 // ROOT libs
 #include "TFile.h"
 #include "TFileCacheWrite.h"
-#include "TMemFile.h"
 #include "TTree.h"
 // Hipo libs
 #include "hipo3/reader.h"
 
+// Headers in same folder
 #include "clipp.h"
 #include "constants.h"
 
@@ -200,30 +200,6 @@ std::vector<float> ft_hodo_dx;
 std::vector<float> ft_hodo_dy;
 std::vector<float> ft_hodo_radius;
 
-std::vector<int>   dc_q;
-std::vector<float> dc_chi2;
-std::vector<int>   dc_NDF;
-std::vector<float> dc_px_nomm;
-std::vector<float> dc_py_nomm;
-std::vector<float> dc_pz_nomm;
-std::vector<float> dc_vx_nomm;
-std::vector<float> dc_vy_nomm;
-std::vector<float> dc_vz_nomm;
-std::vector<float> dc_chi2_nomm;
-std::vector<int>   dc_NDF_nomm;
-
-std::vector<int>   cvt_q;
-std::vector<float> cvt_chi2;
-std::vector<int>   cvt_NDF;
-std::vector<float> cvt_px_nomm;
-std::vector<float> cvt_py_nomm;
-std::vector<float> cvt_pz_nomm;
-std::vector<float> cvt_vx_nomm;
-std::vector<float> cvt_vy_nomm;
-std::vector<float> cvt_vz_nomm;
-std::vector<float> cvt_chi2_nomm;
-std::vector<int>   cvt_NDF_nomm;
-
 std::vector<int>   MC_pid;
 std::vector<float> MC_helicity;
 std::vector<float> MC_px;
@@ -260,22 +236,36 @@ std::vector<float> CovMat_44;
 std::vector<float> CovMat_45;
 std::vector<float> CovMat_55;
 
-std::vector<int>   cvt_pid;
-std::vector<int>   cvt_CovMat_q;
-std::vector<float> cvt_p;
-std::vector<float> cvt_pt;
-std::vector<float> cvt_phi0;
-std::vector<float> cvt_tandip;
-std::vector<float> cvt_z0;
-std::vector<float> cvt_d0;
-std::vector<float> cvt_CovMat_d02;
-std::vector<float> cvt_CovMat_d0phi0;
-std::vector<float> cvt_CovMat_d0rho;
-std::vector<float> cvt_CovMat_phi02;
-std::vector<float> cvt_CovMat_phi0rho;
-std::vector<float> cvt_CovMat_rho2;
-std::vector<float> cvt_CovMat_z02;
-std::vector<float> cvt_CovMat_tandip2;
+std::vector<int>   VertDoca_index1_vec;
+std::vector<int>   VertDoca_index2_vec;
+std::vector<float> VertDoca_x_vec;
+std::vector<float> VertDoca_y_vec;
+std::vector<float> VertDoca_z_vec;
+std::vector<float> VertDoca_x1_vec;
+std::vector<float> VertDoca_y1_vec;
+std::vector<float> VertDoca_z1_vec;
+std::vector<float> VertDoca_cx1_vec;
+std::vector<float> VertDoca_cy1_vec;
+std::vector<float> VertDoca_cz1_vec;
+std::vector<float> VertDoca_x2_vec;
+std::vector<float> VertDoca_y2_vec;
+std::vector<float> VertDoca_z2_vec;
+std::vector<float> VertDoca_cx2_vec;
+std::vector<float> VertDoca_cy2_vec;
+std::vector<float> VertDoca_cz2_vec;
+std::vector<float> VertDoca_r_vec;
+
+std::vector<int>   traj_pindex_vec;
+std::vector<int>   traj_index_vec;
+std::vector<int>   traj_detId_vec;
+std::vector<int>   traj_q_vec;
+std::vector<float> traj_x_vec;
+std::vector<float> traj_y_vec;
+std::vector<float> traj_z_vec;
+std::vector<float> traj_cx_vec;
+std::vector<float> traj_cy_vec;
+std::vector<float> traj_cz_vec;
+std::vector<float> traj_pathlength_vec;
 
 int main(int argc, char** argv) {
   std::string InFileName  = "";
@@ -286,7 +276,7 @@ int main(int argc, char** argv) {
   bool        good_rec    = false;
   bool        elec_first  = false;
   bool        cov         = false;
-  bool        cvt         = false;
+  bool        VertDoca    = false;
 
   auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
               clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
@@ -296,8 +286,7 @@ int main(int argc, char** argv) {
               clipp::option("-e", "--elec").set(elec_first) %
                   "Only save events with good electron as first particle",
               clipp::option("-c", "--cov").set(cov) % "Save Covariant Matrix for kinematic fitting",
-              clipp::option("-cvt", "--CVTDetector").set(cvt) %
-                  "Save CVT information for kinematic fitting",
+              clipp::option("-v", "--VertDoca").set(VertDoca) % "Save VertDoca information",
               clipp::value("inputFile.hipo", InFileName),
               clipp::opt_value("outputFile.root", OutFileName));
 
@@ -318,25 +307,15 @@ int main(int argc, char** argv) {
   hipo::reader* reader          = new hipo::reader(InFileName.c_str());
   long          tot_hipo_events = reader->numEvents();
 
-  hipo::node<int32_t>* run_node      = reader->getBranch<int32_t>(11, 1);
-  hipo::node<int32_t>* event_node    = reader->getBranch<int32_t>(11, 2);
-  hipo::node<float>*   torus_node    = reader->getBranch<float>(11, 8);
-  hipo::node<float>*   solenoid_node = reader->getBranch<float>(11, 9);
-  hipo::node<int8_t>*  crate_node    = reader->getBranch<int8_t>(20013, 1);
-  hipo::node<int8_t>*  slot_node     = reader->getBranch<int8_t>(20013, 2);
-  hipo::node<int16_t>* channel_node  = reader->getBranch<int16_t>(20013, 3);
-  hipo::node<int8_t>*  helicity_node = reader->getBranch<int8_t>(20013, 4);
-  hipo::node<int8_t>*  quartet_node  = reader->getBranch<int8_t>(20013, 5);
-  hipo::node<int32_t>* value_node    = reader->getBranch<int32_t>(20013, 6);
-  hipo::node<int32_t>* NRUN_node     = reader->getBranch<int32_t>(330, 1);
-  hipo::node<int32_t>* NEVENT_node   = reader->getBranch<int32_t>(330, 2);
-  hipo::node<float>*   EVNTime_node  = reader->getBranch<float>(330, 3);
-  hipo::node<int8_t>*  TYPE_node     = reader->getBranch<int8_t>(330, 4);
-  hipo::node<int64_t>* TRG_node      = reader->getBranch<int64_t>(330, 7);
-  hipo::node<float>*   BCG_node      = reader->getBranch<float>(330, 8);
-  hipo::node<float>*   STTime_node   = reader->getBranch<float>(330, 10);
-  hipo::node<float>*   RFTime_node   = reader->getBranch<float>(330, 11);
-  hipo::node<int8_t>*  Helic_node    = reader->getBranch<int8_t>(330, 12);
+  hipo::node<int32_t>* NRUN_node    = reader->getBranch<int32_t>(330, 1);
+  hipo::node<int32_t>* NEVENT_node  = reader->getBranch<int32_t>(330, 2);
+  hipo::node<float>*   EVNTime_node = reader->getBranch<float>(330, 3);
+  hipo::node<int8_t>*  TYPE_node    = reader->getBranch<int8_t>(330, 4);
+  hipo::node<int64_t>* TRG_node     = reader->getBranch<int64_t>(330, 7);
+  hipo::node<float>*   BCG_node     = reader->getBranch<float>(330, 8);
+  hipo::node<float>*   STTime_node  = reader->getBranch<float>(330, 10);
+  hipo::node<float>*   RFTime_node  = reader->getBranch<float>(330, 11);
+  hipo::node<int8_t>*  Helic_node   = reader->getBranch<int8_t>(330, 12);
 
   hipo::node<int32_t>* pid_node     = reader->getBranch<int32_t>(331, 1);
   hipo::node<float>*   px_node      = reader->getBranch<float>(331, 2);
@@ -397,14 +376,12 @@ int main(int argc, char** argv) {
   hipo::node<float>*   scint_energy_node    = reader->getBranch<float>(335, 7);
   hipo::node<float>*   scint_time_node      = reader->getBranch<float>(335, 8);
   hipo::node<float>*   scint_path_node      = reader->getBranch<float>(335, 9);
-  // hipo::node<float> *scint_chi2_node = reader->getBranch<float>(335, 10);
-  hipo::node<float>* scint_x_node  = reader->getBranch<float>(335, 11);
-  hipo::node<float>* scint_y_node  = reader->getBranch<float>(335, 12);
-  hipo::node<float>* scint_z_node  = reader->getBranch<float>(335, 13);
-  hipo::node<float>* scint_hx_node = reader->getBranch<float>(335, 14);
-  hipo::node<float>* scint_hy_node = reader->getBranch<float>(335, 15);
-  hipo::node<float>* scint_hz_node = reader->getBranch<float>(335, 16);
-  // hipo::node<int16_t> *scint_status_node = reader->getBranch<int16_t>(335, 17);
+  hipo::node<float>*   scint_x_node         = reader->getBranch<float>(335, 11);
+  hipo::node<float>*   scint_y_node         = reader->getBranch<float>(335, 12);
+  hipo::node<float>*   scint_z_node         = reader->getBranch<float>(335, 13);
+  hipo::node<float>*   scint_hx_node        = reader->getBranch<float>(335, 14);
+  hipo::node<float>*   scint_hy_node        = reader->getBranch<float>(335, 15);
+  hipo::node<float>*   scint_hz_node        = reader->getBranch<float>(335, 16);
 
   hipo::node<int16_t>* track_pindex_node    = reader->getBranch<int16_t>(336, 2);
   hipo::node<int8_t>*  track_detector_node  = reader->getBranch<int8_t>(336, 3);
@@ -420,6 +397,37 @@ int main(int argc, char** argv) {
   hipo::node<float>*   track_vz_nomm_node   = reader->getBranch<float>(336, 14);
   hipo::node<float>*   track_chi2_nomm_node = reader->getBranch<float>(336, 15);
   hipo::node<float>*   track_NDF_nomm_node  = reader->getBranch<float>(336, 16);
+
+  hipo::node<int16_t>* VertDoca_index1_node = reader->getBranch<int16_t>(339, 1);
+  hipo::node<int16_t>* VertDoca_index2_node = reader->getBranch<int16_t>(339, 2);
+  hipo::node<float>*   VertDoca_x_node      = reader->getBranch<float>(339, 3);
+  hipo::node<float>*   VertDoca_y_node      = reader->getBranch<float>(339, 4);
+  hipo::node<float>*   VertDoca_z_node      = reader->getBranch<float>(339, 5);
+  hipo::node<float>*   VertDoca_x1_node     = reader->getBranch<float>(339, 6);
+  hipo::node<float>*   VertDoca_y1_node     = reader->getBranch<float>(339, 7);
+  hipo::node<float>*   VertDoca_z1_node     = reader->getBranch<float>(339, 8);
+  hipo::node<float>*   VertDoca_cx1_node    = reader->getBranch<float>(339, 9);
+  hipo::node<float>*   VertDoca_cy1_node    = reader->getBranch<float>(339, 10);
+  hipo::node<float>*   VertDoca_cz1_node    = reader->getBranch<float>(339, 11);
+  hipo::node<float>*   VertDoca_x2_node     = reader->getBranch<float>(339, 12);
+  hipo::node<float>*   VertDoca_y2_node     = reader->getBranch<float>(339, 13);
+  hipo::node<float>*   VertDoca_z2_node     = reader->getBranch<float>(339, 14);
+  hipo::node<float>*   VertDoca_cx2_node    = reader->getBranch<float>(339, 15);
+  hipo::node<float>*   VertDoca_cy2_node    = reader->getBranch<float>(339, 16);
+  hipo::node<float>*   VertDoca_cz2_node    = reader->getBranch<float>(339, 17);
+  hipo::node<float>*   VertDoca_r_node      = reader->getBranch<float>(339, 18);
+
+  hipo::node<int16_t>* traj_pindex_node     = reader->getBranch<int16_t>(340, 1);
+  hipo::node<int16_t>* traj_index_node      = reader->getBranch<int16_t>(340, 2);
+  hipo::node<int16_t>* traj_detId_node      = reader->getBranch<int16_t>(340, 3);
+  hipo::node<int8_t>*  traj_q_node          = reader->getBranch<int8_t>(340, 4);
+  hipo::node<float>*   traj_x_node          = reader->getBranch<float>(340, 5);
+  hipo::node<float>*   traj_y_node          = reader->getBranch<float>(340, 6);
+  hipo::node<float>*   traj_z_node          = reader->getBranch<float>(340, 7);
+  hipo::node<float>*   traj_cx_node         = reader->getBranch<float>(340, 8);
+  hipo::node<float>*   traj_cy_node         = reader->getBranch<float>(340, 9);
+  hipo::node<float>*   traj_cz_node         = reader->getBranch<float>(340, 10);
+  hipo::node<float>*   traj_pathlength_node = reader->getBranch<float>(340, 11);
 
   hipo::node<float>*   MC_Header_helicity_node = reader->getBranch<float>(40, 4);
   hipo::node<int16_t>* MC_Event_npart_node     = reader->getBranch<int16_t>(41, 1);
@@ -458,23 +466,6 @@ int main(int argc, char** argv) {
   hipo::node<float>*   CovMat_C44_node    = reader->getBranch<float>(338, 15);
   hipo::node<float>*   CovMat_C45_node    = reader->getBranch<float>(338, 16);
   hipo::node<float>*   CovMat_C55_node    = reader->getBranch<float>(338, 17);
-
-  hipo::node<int16_t>* CVT_pid_node         = reader->getBranch<int16_t>(20526, 1);
-  hipo::node<int8_t>*  CVT_q_node           = reader->getBranch<int8_t>(20526, 10);
-  hipo::node<float>*   CVT_p_node           = reader->getBranch<float>(20526, 11);
-  hipo::node<float>*   CVT_pt_node          = reader->getBranch<float>(20526, 12);
-  hipo::node<float>*   CVT_phi0_node        = reader->getBranch<float>(20526, 13);
-  hipo::node<float>*   CVT_tandip_node      = reader->getBranch<float>(20526, 14);
-  hipo::node<float>*   CVT_z0_node          = reader->getBranch<float>(20526, 15);
-  hipo::node<float>*   CVT_d0_node          = reader->getBranch<float>(20526, 16);
-  hipo::node<float>*   CVT_Cov_d02_node     = reader->getBranch<float>(20526, 17);
-  hipo::node<float>*   CVT_Cov_d0phi0_node  = reader->getBranch<float>(20526, 18);
-  hipo::node<float>*   CVT_Cov_d0rho_node   = reader->getBranch<float>(20526, 19);
-  hipo::node<float>*   CVT_Cov_phi02_node   = reader->getBranch<float>(20526, 20);
-  hipo::node<float>*   CVT_Cov_phi0rho_node = reader->getBranch<float>(20526, 21);
-  hipo::node<float>*   CVT_Cov_rho2_node    = reader->getBranch<float>(20526, 22);
-  hipo::node<float>*   CVT_Cov_z02_node     = reader->getBranch<float>(20526, 23);
-  hipo::node<float>*   CVT_Cov_tandip2_node = reader->getBranch<float>(20526, 24);
 
   clas12->Branch("NRUN", &NRUN);
   clas12->Branch("NEVENT", &NEVENT);
@@ -525,6 +516,21 @@ int main(int argc, char** argv) {
     clas12->Branch("lund_ltime", &Lund_ltime);
   }
 
+  clas12->Branch("dc_sec", &dc_sec);
+  clas12->Branch("dc_px", &dc_px);
+  clas12->Branch("dc_py", &dc_py);
+  clas12->Branch("dc_pz", &dc_pz);
+  clas12->Branch("dc_vx", &dc_vx);
+  clas12->Branch("dc_vy", &dc_vy);
+  clas12->Branch("dc_vz", &dc_vz);
+
+  clas12->Branch("cvt_px", &cvt_px);
+  clas12->Branch("cvt_py", &cvt_py);
+  clas12->Branch("cvt_pz", &cvt_pz);
+  clas12->Branch("cvt_vx", &cvt_vx);
+  clas12->Branch("cvt_vy", &cvt_vy);
+  clas12->Branch("cvt_vz", &cvt_vz);
+
   clas12->Branch("ec_tot_energy", &ec_tot_energy);
   clas12->Branch("ec_pcal_energy", &ec_pcal_energy);
   clas12->Branch("ec_pcal_sec", &ec_pcal_sec);
@@ -558,21 +564,6 @@ int main(int argc, char** argv) {
   clas12->Branch("ec_ecout_lu", &ec_ecout_lu);
   clas12->Branch("ec_ecout_lv", &ec_ecout_lv);
   clas12->Branch("ec_ecout_lw", &ec_ecout_lw);
-
-  clas12->Branch("dc_sec", &dc_sec);
-  clas12->Branch("dc_px", &dc_px);
-  clas12->Branch("dc_py", &dc_py);
-  clas12->Branch("dc_pz", &dc_pz);
-  clas12->Branch("dc_vx", &dc_vx);
-  clas12->Branch("dc_vy", &dc_vy);
-  clas12->Branch("dc_vz", &dc_vz);
-
-  clas12->Branch("cvt_px", &cvt_px);
-  clas12->Branch("cvt_py", &cvt_py);
-  clas12->Branch("cvt_pz", &cvt_pz);
-  clas12->Branch("cvt_vx", &cvt_vx);
-  clas12->Branch("cvt_vy", &cvt_vy);
-  clas12->Branch("cvt_vz", &cvt_vz);
 
   clas12->Branch("cc_nphe_tot", &cc_nphe_tot);
   clas12->Branch("cc_ltcc_sec", &cc_ltcc_sec);
@@ -680,30 +671,6 @@ int main(int argc, char** argv) {
   clas12->Branch("ft_hodo_dy", &ft_hodo_dy);
   clas12->Branch("ft_hodo_radius", &ft_hodo_radius);
 
-  clas12->Branch("dc_q", &dc_q);
-  clas12->Branch("dc_chi2", &dc_chi2);
-  clas12->Branch("dc_NDF", &dc_NDF);
-  clas12->Branch("dc_px_nomm", &dc_px_nomm);
-  clas12->Branch("dc_py_nomm", &dc_py_nomm);
-  clas12->Branch("dc_pz_nomm", &dc_pz_nomm);
-  clas12->Branch("dc_vx_nomm", &dc_vx_nomm);
-  clas12->Branch("dc_vy_nomm", &dc_vy_nomm);
-  clas12->Branch("dc_vz_nomm", &dc_vz_nomm);
-  clas12->Branch("dc_chi2_nomm", &dc_chi2_nomm);
-  clas12->Branch("dc_NDF_nomm", &dc_NDF_nomm);
-
-  clas12->Branch("cvt_q", &cvt_q);
-  clas12->Branch("cvt_chi2", &cvt_chi2);
-  clas12->Branch("cvt_NDF", &cvt_NDF);
-  clas12->Branch("cvt_px_nomm", &cvt_px_nomm);
-  clas12->Branch("cvt_py_nomm", &cvt_py_nomm);
-  clas12->Branch("cvt_pz_nomm", &cvt_pz_nomm);
-  clas12->Branch("cvt_vx_nomm", &cvt_vx_nomm);
-  clas12->Branch("cvt_vy_nomm", &cvt_vy_nomm);
-  clas12->Branch("cvt_vz_nomm", &cvt_vz_nomm);
-  clas12->Branch("cvt_chi2_nomm", &cvt_chi2_nomm);
-  clas12->Branch("cvt_NDF_nomm", &cvt_NDF_nomm);
-
   if (cov) {
     clas12->Branch("CovMat_11", &CovMat_11);
     clas12->Branch("CovMat_12", &CovMat_12);
@@ -721,23 +688,37 @@ int main(int argc, char** argv) {
     clas12->Branch("CovMat_45", &CovMat_45);
     clas12->Branch("CovMat_55", &CovMat_55);
   }
-  if (cvt) {
-    clas12->Branch("cvt_pid", &cvt_pid);
-    clas12->Branch("cvt_CovMat_q", &cvt_CovMat_q);
-    clas12->Branch("cvt_p", &cvt_p);
-    clas12->Branch("cvt_pt", &cvt_pt);
-    clas12->Branch("cvt_phi0", &cvt_phi0);
-    clas12->Branch("cvt_tandip", &cvt_tandip);
-    clas12->Branch("cvt_z0", &cvt_z0);
-    clas12->Branch("cvt_d0", &cvt_d0);
-    clas12->Branch("cvt_CovMat_d02", &cvt_CovMat_d02);
-    clas12->Branch("cvt_CovMat_d0rho", &cvt_CovMat_d0rho);
-    clas12->Branch("cvt_CovMat_phi02", &cvt_CovMat_phi02);
-    clas12->Branch("cvt_CovMat_phi0rho", &cvt_CovMat_phi0rho);
-    clas12->Branch("cvt_CovMat_rho2", &cvt_CovMat_rho2);
-    clas12->Branch("cvt_CovMat_z02", &cvt_CovMat_z02);
-    clas12->Branch("cvt_CovMat_tandip2", &cvt_CovMat_tandip2);
+  if (VertDoca) {
+    clas12->Branch("VertDoca_index1", &VertDoca_index1_vec);
+    clas12->Branch("VertDoca_index2", &VertDoca_index2_vec);
+    clas12->Branch("VertDoca_x", &VertDoca_x_vec);
+    clas12->Branch("VertDoca_y", &VertDoca_y_vec);
+    clas12->Branch("VertDoca_z", &VertDoca_z_vec);
+    clas12->Branch("VertDoca_x1", &VertDoca_x1_vec);
+    clas12->Branch("VertDoca_y1", &VertDoca_y1_vec);
+    clas12->Branch("VertDoca_z1", &VertDoca_z1_vec);
+    clas12->Branch("VertDoca_cx1", &VertDoca_cx1_vec);
+    clas12->Branch("VertDoca_cy1", &VertDoca_cy1_vec);
+    clas12->Branch("VertDoca_cz1", &VertDoca_cz1_vec);
+    clas12->Branch("VertDoca_x2", &VertDoca_x2_vec);
+    clas12->Branch("VertDoca_y2", &VertDoca_y2_vec);
+    clas12->Branch("VertDoca_z2", &VertDoca_z2_vec);
+    clas12->Branch("VertDoca_cx2", &VertDoca_cx2_vec);
+    clas12->Branch("VertDoca_cy2", &VertDoca_cy2_vec);
+    clas12->Branch("VertDoca_cz2", &VertDoca_cz2_vec);
+    clas12->Branch("VertDoca_r", &VertDoca_r_vec);
   }
+  clas12->Branch("traj_pindex", &traj_pindex_vec);
+  clas12->Branch("traj_index", &traj_index_vec);
+  clas12->Branch("traj_detId", &traj_detId_vec);
+  clas12->Branch("traj_q", &traj_q_vec);
+  clas12->Branch("traj_x", &traj_x_vec);
+  clas12->Branch("traj_y", &traj_y_vec);
+  clas12->Branch("traj_z", &traj_z_vec);
+  clas12->Branch("traj_cx", &traj_cx_vec);
+  clas12->Branch("traj_cy", &traj_cy_vec);
+  clas12->Branch("traj_cz", &traj_cz_vec);
+  clas12->Branch("traj_pathlength", &traj_pathlength_vec);
 
   int  entry                = 0;
   int  l                    = 0;
@@ -1398,92 +1379,6 @@ int main(int argc, char** argv) {
       }
     }
 
-    len_pid    = pid_node->getLength();
-    len_pindex = track_pindex_node->getLength();
-
-    dc_q.resize(len_pid);
-    dc_chi2.resize(len_pid);
-    dc_NDF.resize(len_pid);
-    dc_px_nomm.resize(len_pid);
-    dc_py_nomm.resize(len_pid);
-    dc_pz_nomm.resize(len_pid);
-    dc_vx_nomm.resize(len_pid);
-    dc_vy_nomm.resize(len_pid);
-    dc_vz_nomm.resize(len_pid);
-    dc_chi2_nomm.resize(len_pid);
-    dc_NDF_nomm.resize(len_pid);
-
-    cvt_q.resize(len_pid);
-    cvt_chi2.resize(len_pid);
-    cvt_NDF.resize(len_pid);
-    cvt_px_nomm.resize(len_pid);
-    cvt_py_nomm.resize(len_pid);
-    cvt_pz_nomm.resize(len_pid);
-    cvt_vx_nomm.resize(len_pid);
-    cvt_vy_nomm.resize(len_pid);
-    cvt_vz_nomm.resize(len_pid);
-    cvt_chi2_nomm.resize(len_pid);
-    cvt_NDF_nomm.resize(len_pid);
-
-    for (int i = 0; i < len_pid; i++) {
-      dc_q[i]         = -9999;
-      dc_chi2[i]      = NAN;
-      dc_NDF[i]       = -1;
-      dc_px_nomm[i]   = NAN;
-      dc_py_nomm[i]   = NAN;
-      dc_pz_nomm[i]   = NAN;
-      dc_vx_nomm[i]   = NAN;
-      dc_vy_nomm[i]   = NAN;
-      dc_vz_nomm[i]   = NAN;
-      dc_chi2_nomm[i] = NAN;
-      dc_NDF_nomm[i]  = -1;
-
-      cvt_q[i]         = -9999;
-      cvt_chi2[i]      = NAN;
-      cvt_NDF[i]       = -1;
-      cvt_px_nomm[i]   = NAN;
-      cvt_py_nomm[i]   = NAN;
-      cvt_pz_nomm[i]   = NAN;
-      cvt_vx_nomm[i]   = NAN;
-      cvt_vy_nomm[i]   = NAN;
-      cvt_vz_nomm[i]   = NAN;
-      cvt_chi2_nomm[i] = NAN;
-      cvt_NDF_nomm[i]  = -1;
-    }
-
-    for (int i = 0; i < len_pid; i++) {
-      for (int k = 0; k < len_pindex; k++) {
-        int pindex   = track_pindex_node->getValue(k);
-        int detector = track_detector_node->getValue(k);
-
-        if (pindex == i && detector == DC) {
-          dc_q[i]         = track_q_node->getValue(k);
-          dc_chi2[i]      = track_chi2_node->getValue(k);
-          dc_NDF[i]       = track_NDF_node->getValue(k);
-          dc_px_nomm[i]   = track_px_nomm_node->getValue(k);
-          dc_py_nomm[i]   = track_py_nomm_node->getValue(k);
-          dc_pz_nomm[i]   = track_pz_nomm_node->getValue(k);
-          dc_vx_nomm[i]   = track_vx_nomm_node->getValue(k);
-          dc_vy_nomm[i]   = track_vy_nomm_node->getValue(k);
-          dc_vz_nomm[i]   = track_vz_nomm_node->getValue(k);
-          dc_chi2_nomm[i] = track_chi2_nomm_node->getValue(k);
-          dc_NDF_nomm[i]  = track_NDF_nomm_node->getValue(k);
-        } else if (pindex == i && detector == CVT) {
-          cvt_q[i]         = track_q_node->getValue(k);
-          cvt_chi2[i]      = track_chi2_node->getValue(k);
-          cvt_NDF[i]       = track_NDF_node->getValue(k);
-          cvt_px_nomm[i]   = track_px_nomm_node->getValue(k);
-          cvt_py_nomm[i]   = track_py_nomm_node->getValue(k);
-          cvt_pz_nomm[i]   = track_pz_nomm_node->getValue(k);
-          cvt_vx_nomm[i]   = track_vx_nomm_node->getValue(k);
-          cvt_vy_nomm[i]   = track_vy_nomm_node->getValue(k);
-          cvt_vz_nomm[i]   = track_vz_nomm_node->getValue(k);
-          cvt_chi2_nomm[i] = track_chi2_nomm_node->getValue(k);
-          cvt_NDF_nomm[i]  = track_NDF_nomm_node->getValue(k);
-        }
-      }
-    }
-
     if (cov) {
       len_pid    = pid_node->getLength();
       len_pindex = CovMat_pindex_node->getLength();
@@ -1546,68 +1441,74 @@ int main(int argc, char** argv) {
       }
     }
 
-    if (cvt) {
-      len_pid = CVT_pid_node->getLength();
-      l       = CVT_pid_node->getLength();
+    if (VertDoca) {
+      l = VertDoca_index1_node->getLength();
+      VertDoca_index1_vec.resize(l);
+      VertDoca_index2_vec.resize(l);
+      VertDoca_x_vec.resize(l);
+      VertDoca_y_vec.resize(l);
+      VertDoca_z_vec.resize(l);
+      VertDoca_x1_vec.resize(l);
+      VertDoca_y1_vec.resize(l);
+      VertDoca_z1_vec.resize(l);
+      VertDoca_cx1_vec.resize(l);
+      VertDoca_cy1_vec.resize(l);
+      VertDoca_cz1_vec.resize(l);
+      VertDoca_x2_vec.resize(l);
+      VertDoca_y2_vec.resize(l);
+      VertDoca_z2_vec.resize(l);
+      VertDoca_cx2_vec.resize(l);
+      VertDoca_cy2_vec.resize(l);
+      VertDoca_cz2_vec.resize(l);
+      VertDoca_r_vec.resize(l);
 
-      cvt_pid.resize(len_pid);
-      cvt_CovMat_q.resize(len_pid);
-      cvt_p.resize(len_pid);
-      cvt_pt.resize(len_pid);
-      cvt_phi0.resize(len_pid);
-      cvt_tandip.resize(len_pid);
-      cvt_z0.resize(len_pid);
-      cvt_d0.resize(len_pid);
-      cvt_CovMat_d02.resize(len_pid);
-      cvt_CovMat_d0phi0.resize(len_pid);
-      cvt_CovMat_d0rho.resize(len_pid);
-      cvt_CovMat_phi02.resize(len_pid);
-      cvt_CovMat_phi0rho.resize(len_pid);
-      cvt_CovMat_rho2.resize(len_pid);
-      cvt_CovMat_z02.resize(len_pid);
-      cvt_CovMat_tandip2.resize(len_pid);
-
-      for (int i = 0; i < len_pid; i++) {
-        cvt_pid[i]            = -1;
-        cvt_CovMat_q[i]       = -1;
-        cvt_p[i]              = NAN;
-        cvt_pt[i]             = NAN;
-        cvt_phi0[i]           = NAN;
-        cvt_tandip[i]         = NAN;
-        cvt_z0[i]             = NAN;
-        cvt_d0[i]             = NAN;
-        cvt_CovMat_d02[i]     = NAN;
-        cvt_CovMat_d0phi0[i]  = NAN;
-        cvt_CovMat_d0rho[i]   = NAN;
-        cvt_CovMat_phi02[i]   = NAN;
-        cvt_CovMat_phi0rho[i] = NAN;
-        cvt_CovMat_rho2[i]    = NAN;
-        cvt_CovMat_z02[i]     = NAN;
-        cvt_CovMat_tandip2[i] = NAN;
+      for (int i = 0; i < l; i++) {
+        VertDoca_index1_vec[i] = VertDoca_index1_node->getValue(i);
+        VertDoca_index2_vec[i] = VertDoca_index2_node->getValue(i);
+        VertDoca_x_vec[i]      = VertDoca_x_node->getValue(i);
+        VertDoca_y_vec[i]      = VertDoca_y_node->getValue(i);
+        VertDoca_z_vec[i]      = VertDoca_z_node->getValue(i);
+        VertDoca_x1_vec[i]     = VertDoca_x1_node->getValue(i);
+        VertDoca_y1_vec[i]     = VertDoca_y1_node->getValue(i);
+        VertDoca_z1_vec[i]     = VertDoca_z1_node->getValue(i);
+        VertDoca_cx1_vec[i]    = VertDoca_cx1_node->getValue(i);
+        VertDoca_cy1_vec[i]    = VertDoca_cy1_node->getValue(i);
+        VertDoca_cz1_vec[i]    = VertDoca_cz1_node->getValue(i);
+        VertDoca_x2_vec[i]     = VertDoca_x2_node->getValue(i);
+        VertDoca_y2_vec[i]     = VertDoca_y2_node->getValue(i);
+        VertDoca_z2_vec[i]     = VertDoca_z2_node->getValue(i);
+        VertDoca_cx2_vec[i]    = VertDoca_cx2_node->getValue(i);
+        VertDoca_cy2_vec[i]    = VertDoca_cy2_node->getValue(i);
+        VertDoca_cz2_vec[i]    = VertDoca_cz2_node->getValue(i);
+        VertDoca_r_vec[i]      = VertDoca_r_node->getValue(i);
       }
+    }
 
-      for (int i = 0; i < len_pid; i++) {
-        for (int k = 0; k < len_pindex; ++k) {
-          int pindex = CovMat_pindex_node->getValue(k);
-          if (pindex == i) {
-            cvt_pid[i]            = CVT_pid_node->getValue(k);
-            cvt_CovMat_q[i]       = CVT_q_node->getValue(k);
-            cvt_p[i]              = CVT_p_node->getValue(k);
-            cvt_phi0[i]           = CVT_phi0_node->getValue(k);
-            cvt_tandip[i]         = CVT_tandip_node->getValue(k);
-            cvt_z0[i]             = CVT_z0_node->getValue(k);
-            cvt_d0[i]             = CVT_d0_node->getValue(k);
-            cvt_CovMat_d02[i]     = CVT_Cov_d02_node->getValue(k);
-            cvt_CovMat_d0phi0[i]  = CVT_Cov_d0phi0_node->getValue(k);
-            cvt_CovMat_d0rho[i]   = CVT_Cov_d0rho_node->getValue(k);
-            cvt_CovMat_phi02[i]   = CVT_Cov_phi02_node->getValue(k);
-            cvt_CovMat_phi0rho[i] = CVT_Cov_phi0rho_node->getValue(k);
-            cvt_CovMat_rho2[i]    = CVT_Cov_rho2_node->getValue(k);
-            cvt_CovMat_z02[i]     = CVT_Cov_z02_node->getValue(k);
-            cvt_CovMat_tandip2[i] = CVT_Cov_tandip2_node->getValue(k);
-          }
-        }
-      }
+    l = traj_pindex_node->getLength();
+    traj_pindex_vec.resize(l);
+    traj_index_vec.resize(l);
+    traj_detId_vec.resize(l);
+    traj_q_vec.resize(l);
+    traj_x_vec.resize(l);
+    traj_y_vec.resize(l);
+    traj_z_vec.resize(l);
+    traj_cx_vec.resize(l);
+    traj_cy_vec.resize(l);
+    traj_cz_vec.resize(l);
+    traj_pathlength_vec.resize(l);
+
+    for (int i = 0; i < l; i++) {
+      traj_pindex_vec[i]     = traj_pindex_node->getValue(i);
+      traj_index_vec[i]      = traj_index_node->getValue(i);
+      traj_detId_vec[i]      = traj_detId_node->getValue(i);
+      traj_q_vec[i]          = traj_q_node->getValue(i);
+      traj_x_vec[i]          = traj_x_node->getValue(i);
+      traj_y_vec[i]          = traj_y_node->getValue(i);
+      traj_z_vec[i]          = traj_z_node->getValue(i);
+      traj_cx_vec[i]         = traj_cx_node->getValue(i);
+      traj_cy_vec[i]         = traj_cy_node->getValue(i);
+      traj_cz_vec[i]         = traj_cz_node->getValue(i);
+      traj_pathlength_vec[i] = traj_pathlength_node->getValue(i);
     }
 
     clas12->Fill();

@@ -254,6 +254,37 @@ std::vector<float> CovMat_44;
 std::vector<float> CovMat_45;
 std::vector<float> CovMat_55;
 
+std::vector<int>   VertDoca_index1_vec;
+std::vector<int>   VertDoca_index2_vec;
+std::vector<float> VertDoca_x_vec;
+std::vector<float> VertDoca_y_vec;
+std::vector<float> VertDoca_z_vec;
+std::vector<float> VertDoca_x1_vec;
+std::vector<float> VertDoca_y1_vec;
+std::vector<float> VertDoca_z1_vec;
+std::vector<float> VertDoca_cx1_vec;
+std::vector<float> VertDoca_cy1_vec;
+std::vector<float> VertDoca_cz1_vec;
+std::vector<float> VertDoca_x2_vec;
+std::vector<float> VertDoca_y2_vec;
+std::vector<float> VertDoca_z2_vec;
+std::vector<float> VertDoca_cx2_vec;
+std::vector<float> VertDoca_cy2_vec;
+std::vector<float> VertDoca_cz2_vec;
+std::vector<float> VertDoca_r_vec;
+
+std::vector<int>   traj_pindex_vec;
+std::vector<int>   traj_index_vec;
+std::vector<int>   traj_detId_vec;
+std::vector<int>   traj_q_vec;
+std::vector<float> traj_x_vec;
+std::vector<float> traj_y_vec;
+std::vector<float> traj_z_vec;
+std::vector<float> traj_cx_vec;
+std::vector<float> traj_cy_vec;
+std::vector<float> traj_cz_vec;
+std::vector<float> traj_pathlength_vec;
+
 int main(int argc, char** argv) {
   std::string InFileName  = "";
   std::string OutFileName = "";
@@ -264,16 +295,17 @@ int main(int argc, char** argv) {
   bool        good_rec    = false;
   bool        elec_first  = false;
   bool        cov         = false;
+  bool        VertDoca    = false;
 
   auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
               clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
-              clipp::option("-b", "--batch").set(is_test) % "Don't show progress and statistics",
-              clipp::option("-t", "--test").set(is_batch) % "Only run 5000 events for testing",
+              clipp::option("-b", "--batch").set(is_batch) % "Don't show progress and statistics",
               clipp::option("-r", "--rec").set(good_rec) %
                   "Only save events where number of partilces in the event > 0",
               clipp::option("-e", "--elec").set(elec_first) %
                   "Only save events with good electron as first particle",
               clipp::option("-c", "--cov").set(cov) % "Save Covariant Matrix for kinematic fitting",
+              clipp::option("-v", "--VertDoca").set(VertDoca) % "Save VertDoca information",
               clipp::value("inputFile.hipo", InFileName),
               clipp::opt_value("outputFile.root", OutFileName));
 
@@ -301,6 +333,7 @@ int main(int argc, char** argv) {
   hipo::bank* rec_ForwardTagger = new hipo::bank(dict->getSchema("REC::ForwardTagger"));
   hipo::bank* rec_VertDoca      = new hipo::bank(dict->getSchema("REC::VertDoca"));
   hipo::bank* rec_Track         = new hipo::bank(dict->getSchema("REC::Track"));
+  hipo::bank* rec_Traj          = new hipo::bank(dict->getSchema("REC::Traj"));
   hipo::bank* rec_Cherenkov     = new hipo::bank(dict->getSchema("REC::Cherenkov"));
   hipo::bank* rec_Event         = new hipo::bank(dict->getSchema("REC::Event"));
   hipo::bank* rec_Particle      = new hipo::bank(dict->getSchema("REC::Particle"));
@@ -548,6 +581,38 @@ int main(int argc, char** argv) {
     clas12->Branch("CovMat_55", &CovMat_55);
   }
 
+  if (VertDoca) {
+    clas12->Branch("VertDoca_index1", &VertDoca_index1_vec);
+    clas12->Branch("VertDoca_index2", &VertDoca_index2_vec);
+    clas12->Branch("VertDoca_x", &VertDoca_x_vec);
+    clas12->Branch("VertDoca_y", &VertDoca_y_vec);
+    clas12->Branch("VertDoca_z", &VertDoca_z_vec);
+    clas12->Branch("VertDoca_x1", &VertDoca_x1_vec);
+    clas12->Branch("VertDoca_y1", &VertDoca_y1_vec);
+    clas12->Branch("VertDoca_z1", &VertDoca_z1_vec);
+    clas12->Branch("VertDoca_cx1", &VertDoca_cx1_vec);
+    clas12->Branch("VertDoca_cy1", &VertDoca_cy1_vec);
+    clas12->Branch("VertDoca_cz1", &VertDoca_cz1_vec);
+    clas12->Branch("VertDoca_x2", &VertDoca_x2_vec);
+    clas12->Branch("VertDoca_y2", &VertDoca_y2_vec);
+    clas12->Branch("VertDoca_z2", &VertDoca_z2_vec);
+    clas12->Branch("VertDoca_cx2", &VertDoca_cx2_vec);
+    clas12->Branch("VertDoca_cy2", &VertDoca_cy2_vec);
+    clas12->Branch("VertDoca_cz2", &VertDoca_cz2_vec);
+    clas12->Branch("VertDoca_r", &VertDoca_r_vec);
+  }
+  clas12->Branch("traj_pindex", &traj_pindex_vec);
+  clas12->Branch("traj_index", &traj_index_vec);
+  clas12->Branch("traj_detId", &traj_detId_vec);
+  clas12->Branch("traj_q", &traj_q_vec);
+  clas12->Branch("traj_x", &traj_x_vec);
+  clas12->Branch("traj_y", &traj_y_vec);
+  clas12->Branch("traj_z", &traj_z_vec);
+  clas12->Branch("traj_cx", &traj_cx_vec);
+  clas12->Branch("traj_cy", &traj_cy_vec);
+  clas12->Branch("traj_cz", &traj_cz_vec);
+  clas12->Branch("traj_pathlength", &traj_pathlength_vec);
+
   int  entry                = 0;
   int  l                    = 0;
   int  len_pid              = 0;
@@ -560,6 +625,7 @@ int main(int argc, char** argv) {
     hipo_event->getStructure(*rec_ForwardTagger);
     hipo_event->getStructure(*rec_VertDoca);
     hipo_event->getStructure(*rec_Track);
+    hipo_event->getStructure(*rec_Traj);
     hipo_event->getStructure(*rec_Cherenkov);
     hipo_event->getStructure(*rec_Event);
     hipo_event->getStructure(*rec_Scintillator);
@@ -1355,6 +1421,76 @@ int main(int argc, char** argv) {
           }
         }
       }
+    }
+
+    if (VertDoca) {
+      l = rec_VertDoca->getRows();
+      VertDoca_index1_vec.resize(l);
+      VertDoca_index2_vec.resize(l);
+      VertDoca_x_vec.resize(l);
+      VertDoca_y_vec.resize(l);
+      VertDoca_z_vec.resize(l);
+      VertDoca_x1_vec.resize(l);
+      VertDoca_y1_vec.resize(l);
+      VertDoca_z1_vec.resize(l);
+      VertDoca_cx1_vec.resize(l);
+      VertDoca_cy1_vec.resize(l);
+      VertDoca_cz1_vec.resize(l);
+      VertDoca_x2_vec.resize(l);
+      VertDoca_y2_vec.resize(l);
+      VertDoca_z2_vec.resize(l);
+      VertDoca_cx2_vec.resize(l);
+      VertDoca_cy2_vec.resize(l);
+      VertDoca_cz2_vec.resize(l);
+      VertDoca_r_vec.resize(l);
+
+      for (int i = 0; i < l; i++) {
+        VertDoca_index1_vec[i] = rec_VertDoca->getShort("index1", i);
+        VertDoca_index2_vec[i] = rec_VertDoca->getShort("index2", i);
+        VertDoca_x_vec[i]      = rec_VertDoca->getFloat("x", i);
+        VertDoca_y_vec[i]      = rec_VertDoca->getFloat("y", i);
+        VertDoca_z_vec[i]      = rec_VertDoca->getFloat("z", i);
+        VertDoca_x1_vec[i]     = rec_VertDoca->getFloat("x1", i);
+        VertDoca_y1_vec[i]     = rec_VertDoca->getFloat("y1", i);
+        VertDoca_z1_vec[i]     = rec_VertDoca->getFloat("z1", i);
+        VertDoca_cx1_vec[i]    = rec_VertDoca->getFloat("cx1", i);
+        VertDoca_cy1_vec[i]    = rec_VertDoca->getFloat("cy1", i);
+        VertDoca_cz1_vec[i]    = rec_VertDoca->getFloat("cz1", i);
+        VertDoca_x2_vec[i]     = rec_VertDoca->getFloat("x2", i);
+        VertDoca_y2_vec[i]     = rec_VertDoca->getFloat("y2", i);
+        VertDoca_z2_vec[i]     = rec_VertDoca->getFloat("z2", i);
+        VertDoca_cx2_vec[i]    = rec_VertDoca->getFloat("cx2", i);
+        VertDoca_cy2_vec[i]    = rec_VertDoca->getFloat("cy2", i);
+        VertDoca_cz2_vec[i]    = rec_VertDoca->getFloat("cz2", i);
+        VertDoca_r_vec[i]      = rec_VertDoca->getFloat("r", i);
+      }
+    }
+
+    l = rec_Traj->getRows();
+    traj_pindex_vec.resize(l);
+    traj_index_vec.resize(l);
+    traj_detId_vec.resize(l);
+    traj_q_vec.resize(l);
+    traj_x_vec.resize(l);
+    traj_y_vec.resize(l);
+    traj_z_vec.resize(l);
+    traj_cx_vec.resize(l);
+    traj_cy_vec.resize(l);
+    traj_cz_vec.resize(l);
+    traj_pathlength_vec.resize(l);
+
+    for (int i = 0; i < l; i++) {
+      traj_pindex_vec[i]     = rec_Traj->getShort("pindex", i);
+      traj_index_vec[i]      = rec_Traj->getShort("index", i);
+      traj_detId_vec[i]      = rec_Traj->getShort("detId", i);
+      traj_q_vec[i]          = rec_Traj->getFloat("q", i);
+      traj_x_vec[i]          = rec_Traj->getFloat("x", i);
+      traj_y_vec[i]          = rec_Traj->getFloat("y", i);
+      traj_z_vec[i]          = rec_Traj->getFloat("z", i);
+      traj_cx_vec[i]         = rec_Traj->getFloat("cx", i);
+      traj_cy_vec[i]         = rec_Traj->getFloat("cy", i);
+      traj_cz_vec[i]         = rec_Traj->getFloat("cz", i);
+      traj_pathlength_vec[i] = rec_Traj->getFloat("pathlength", i);
     }
 
     clas12->Fill();
