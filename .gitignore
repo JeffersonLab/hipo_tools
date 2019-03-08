@@ -4,7 +4,8 @@ DEBUG*/*
 BUILD*/*
 RELEASE*/*
 TEST*/*
-
+.idea
+cmake-build-debug
 
 # Compiled Object files
 *.slo

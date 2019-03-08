@@ -6,7 +6,9 @@ endif()
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-add_executable(dst2root_3 dst2root_3.cpp)
+include_directories(include)
+
+add_executable(dst2root_3 src/dst2root_3.cpp)
 target_link_libraries(dst2root_3
   PRIVATE hipocpp3_static
   PUBLIC ${ROOT_LIBRARIES}
@@ -18,7 +20,7 @@ install(TARGETS dst2root_3
   RUNTIME DESTINATION bin)
 
 
-add_executable(dst2root dst2root.cpp)
+add_executable(dst2root src/dst2root.cpp)
 target_link_libraries(dst2root
   PRIVATE hipocpp4_static
   PUBLIC ${ROOT_LIBRARIES}

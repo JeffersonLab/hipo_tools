@@ -19,8 +19,8 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
-
 //#include "reader.h"
 
 namespace hipo {
@@ -35,8 +35,8 @@ namespace hipo {
 
   class schema {
   private:
-    std::map<std::string, int> schemaEntriesMap;
-    std::vector<schemaEntry_t> schemaEntries;
+    std::unordered_map<std::string, int> schemaEntriesMap;
+    std::vector<schemaEntry_t>           schemaEntries;
 
     int         groupid;
     int         itemid;
@@ -77,7 +77,7 @@ namespace hipo {
     int         getItem() { return itemid; }
     int         getSizeForRows(int rows);
     int         getRowLength();
-    int         getEntryOrder(const char* name);
+    int         getEntryOrder(std::string name);
     int         getOffset(int item, int order, int rows);
     int         getOffset(const char* name, int order, int rows);
     int         getEntryType(int item) { return schemaEntries[item].typeId; }
