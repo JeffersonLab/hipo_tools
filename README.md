@@ -14,13 +14,23 @@ This code was adopted from source code on the jlab CUE
 
 Installing
 ----------
+First choose where to install hipo_tools.
+
+For bash/zsh:
+```
+export HIPO_TOOLS=/path/to/hipo_tools
+```
+or for csh/tcsh:
+```
+setenv HIPO_TOOLS /path/to/hipo_tools
+```
 
 **Note**: These instructions are for Linux. For MacOS, refer to the next subsection.
 ```
-git clone https://github.com/JeffersonLab/hipo_tools.git
+git clone --recurse-submodules https://github.com/JeffersonLab/hipo_tools.git
 cd hipo_tools && mkdir build
 cd build
-cmake ../. -DCMAKE_INSTALL_PREFIX=$HOME
+cmake .. -DCMAKE_INSTALL_PREFIX=$HIPO_TOOLS
 make && make install
 ```
 
@@ -39,8 +49,30 @@ llvm/clang. The installation instructions for MacOS are:
 git clone https://github.com/JeffersonLab/hipo_tools.git
 cd hipo_tools && mkdir build
 cd build
-CXX=/usr/local/opt/llvm/bin/clang++ cmake ../. -DCMAKE_INSTALL_PREFIX=$HOME
+CXX=/usr/local/opt/llvm/bin/clang++ cmake ../. -DCMAKE_INSTALL_PREFIX=$HIPO_TOOLS
 make && make install
+```
+
+### Setting up the environment
+
+Once installed add this to the end of your .bashrc/.zshrc to get hipo_tools to work:
+
+```
+#Hipo_tools
+export HIPO_TOOLS=/path/to/hipo_tools
+export PATH=$PATH:$HIPO_TOOLS/bin
+export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HIPO_TOOLS/share/pkgconfig
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HIPO_TOOLS/lib
+export PYTHONPATH=$PYTHONPATH:$HIPO_TOOLS/lib
+```
+Or for csh/tcsh add:
+```
+#Hipo_tools
+setenv HIPO_TOOLS /path/to/hipo_tools
+setenv PATH $PATH:$HIPO_TOOLS/bin
+setenv PKG_CONFIG_PATH $PKG_CONFIG_PATH:$HIPO_TOOLS/share/pkgconfig
+setenv LD_LIBRARY_PATH $LD_LIBRARY_PATH:$HIPO_TOOLS/lib
+setenv PYTHONPATH $PYTHONPATH:$HIPO_TOOLS/lib
 ```
 
 ### Some tips
@@ -49,6 +81,14 @@ make && make install
 * Use **C++17** because you have no reason not to!
 * Compile root with "-Droot7:bool=ON -Dcxx17:BOOL=ON"
 * Don't write loops! Use [RDataFrame](https://root.cern.ch/doc/master/group__tutorial__dataframe.html)
+
+
+Reading hipo files in python
+---------------------
+### hipopy
+
+Easily read files in python using hipopy, which is build automatically if Cython is found.
+An example of reading a hipo4 file in python can be found [here](examples/hipo4/clas12_event.py).
 
 
 Converting hipo files
@@ -90,6 +130,66 @@ OPTIONS
         -e, --elec  Only save events with good electron as first particle
         -c, --cov   Save Covariant Matrix for kinematic fitting
 ```
+
+The contents of the file have been re-ordered from the original file and places
+into banks specific to each detector system. This is done to reduce the amount
+of looping increase the speed for the end user. There are also a few banks
+which are added for connivence to the user such as the total number of
+photoelectrons for a particle, the total energy deposited for a particle, as
+well as the magnitude of the momentum and the momentum squared.
+
+For particles with missing banks, due to the particle not being detected by that detector/layer/etc.
+then the information in the bank is filled with a flag value. For integers the flag value is set to
+be -1 and for floats the flag value is set to be std::nan.
+
+Here are a few examples of equivalent java and c++ code to complete the same tasks:
+
+##### Sampling Fraction
+```C++
+// C++ example filling sampling fraction histogram
+sf_hist->Fill(p->at(ipart), ec_tot_energy->at(ipart) / p->at(ipart));
+```
+
+```Java
+// Java example to get get EC energy:
+double energy=0;
+for (int icalo=0; icalo<calos.getMaxSize(); icalo++) {
+    if (calos.getNode("pindex").getShort(icalo) == ipart) {
+          energy += calos.getNode("energy").getFloat(icalo);
+    }
+}
+// and then fill the sampling fraction histogram
+if (energy>0) {
+    final float px   = parts.getNode("px").getFloat(ipart);
+    final float py   = parts.getNode("py").getFloat(ipart);
+    final float pz   = parts.getNode("pz").getFloat(ipart);
+    final float p = Math.sqrt(px*px+py*py+pz*pz);
+    hist.fill(p, energy/p);
+}
+```
+
+##### FTOF time and path
+```C++
+// get FTOF path length and time
+float time = sc_ftof_1b_time->at(ipart);
+float path = sc_ftof_1b_path->at(ipart);
+```
+
+```Java
+// get FTOF path length and time
+for (int iscin=0; iscin<scins.getNode("pindex").getShort().size(); iscin++) {
+    if (scins.getNode("pindex").getShort(iscin) == ipart) {
+        if (scins.getNode("detector").getByte(iscin) == 12) {
+            final float path = scins.getNode("path").getFloat(iscin);
+            final float time = scins.getNode("time").getFloat(iscin);
+            break;
+        }
+    }
+}
+```
+For more detailed examples of using dst2root converted files checkout the more detailed [examples](examples/dst2root).
+
+[java examples](https://userweb.jlab.org/~gavalian/docs/sphinx/hipo/html/chapters/java_groovy_analysis.html#ec-sampling-fraction)
 
 
 Todo
