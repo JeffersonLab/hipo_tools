@@ -10,10 +10,13 @@
 #include <vector>
 // ROOT libs
 #include "TFile.h"
+#include "TFileCacheWrite.h"
 #include "TTree.h"
 // Hipo libs
 #include "hipo3/reader.h"
 
+// Headers in same folder
+#include "banks.h"
 #include "clipp.h"
 #include "constants.h"
 
@@ -26,7 +29,8 @@ int main(int argc, char** argv) {
   bool        good_rec    = false;
   bool        elec_first  = false;
   bool        cov         = false;
-  bool        cvt         = false;
+  bool        VertDoca    = false;
+  bool        traj        = false;
 
   auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
               clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
@@ -36,8 +40,8 @@ int main(int argc, char** argv) {
               clipp::option("-e", "--elec").set(elec_first) %
                   "Only save events with good electron as first particle",
               clipp::option("-c", "--cov").set(cov) % "Save Covariant Matrix for kinematic fitting",
-              clipp::option("-cvt", "--CVTDetector").set(cvt) %
-                  "Save CVT information for kinematic fitting",
+              clipp::option("-v", "--VertDoca").set(VertDoca) % "Save VertDoca information",
+              clipp::option("-t", "--traj").set(traj) % "Save traj information",
               clipp::value("inputFile.hipo", InFileName),
               clipp::opt_value("outputFile.root", OutFileName));
 
@@ -50,33 +54,23 @@ int main(int argc, char** argv) {
   if (OutFileName == "")
     OutFileName = InFileName + ".root";
 
-  auto   start_full = std::chrono::high_resolution_clock::now();
-  TFile* OutputFile = new TFile(OutFileName.c_str(), "RECREATE");
-  OutputFile->SetCompressionSettings(6);
+  TFile*           OutputFile = new TFile(OutFileName.c_str(), "RECREATE");
+  TFileCacheWrite* fileCache  = new TFileCacheWrite(OutputFile, 10000000);
+  OutputFile->SetCompressionSettings(404); // kUseAnalysis
+  TTree* clas12 = new TTree("clas12", "clas12");
 
-  TTree*        clas12          = new TTree("clas12", "clas12");
   hipo::reader* reader          = new hipo::reader(InFileName.c_str());
   long          tot_hipo_events = reader->numEvents();
 
-  hipo::node<int32_t>* run_node      = reader->getBranch<int32_t>(11, 1);
-  hipo::node<int32_t>* event_node    = reader->getBranch<int32_t>(11, 2);
-  hipo::node<float>*   torus_node    = reader->getBranch<float>(11, 8);
-  hipo::node<float>*   solenoid_node = reader->getBranch<float>(11, 9);
-  hipo::node<int8_t>*  crate_node    = reader->getBranch<int8_t>(20013, 1);
-  hipo::node<int8_t>*  slot_node     = reader->getBranch<int8_t>(20013, 2);
-  hipo::node<int16_t>* channel_node  = reader->getBranch<int16_t>(20013, 3);
-  hipo::node<int8_t>*  helicity_node = reader->getBranch<int8_t>(20013, 4);
-  hipo::node<int8_t>*  quartet_node  = reader->getBranch<int8_t>(20013, 5);
-  hipo::node<int32_t>* value_node    = reader->getBranch<int32_t>(20013, 6);
-  hipo::node<int32_t>* NRUN_node     = reader->getBranch<int32_t>(330, 1);
-  hipo::node<int32_t>* NEVENT_node   = reader->getBranch<int32_t>(330, 2);
-  hipo::node<float>*   EVNTime_node  = reader->getBranch<float>(330, 3);
-  hipo::node<int8_t>*  TYPE_node     = reader->getBranch<int8_t>(330, 4);
-  hipo::node<int64_t>* TRG_node      = reader->getBranch<int64_t>(330, 7);
-  hipo::node<float>*   BCG_node      = reader->getBranch<float>(330, 8);
-  hipo::node<float>*   STTime_node   = reader->getBranch<float>(330, 10);
-  hipo::node<float>*   RFTime_node   = reader->getBranch<float>(330, 11);
-  hipo::node<int8_t>*  Helic_node    = reader->getBranch<int8_t>(330, 12);
+  hipo::node<int32_t>* NRUN_node    = reader->getBranch<int32_t>(330, 1);
+  hipo::node<int32_t>* NEVENT_node  = reader->getBranch<int32_t>(330, 2);
+  hipo::node<float>*   EVNTime_node = reader->getBranch<float>(330, 3);
+  hipo::node<int8_t>*  TYPE_node    = reader->getBranch<int8_t>(330, 4);
+  hipo::node<int64_t>* TRG_node     = reader->getBranch<int64_t>(330, 7);
+  hipo::node<float>*   BCG_node     = reader->getBranch<float>(330, 8);
+  hipo::node<float>*   STTime_node  = reader->getBranch<float>(330, 10);
+  hipo::node<float>*   RFTime_node  = reader->getBranch<float>(330, 11);
+  hipo::node<int8_t>*  Helic_node   = reader->getBranch<int8_t>(330, 12);
 
   hipo::node<int32_t>* pid_node     = reader->getBranch<int32_t>(331, 1);
   hipo::node<float>*   px_node      = reader->getBranch<float>(331, 2);
@@ -100,9 +94,21 @@ int main(int argc, char** argv) {
   hipo::node<float>*   cal_x_node        = reader->getBranch<float>(332, 10);
   hipo::node<float>*   cal_y_node        = reader->getBranch<float>(332, 11);
   hipo::node<float>*   cal_z_node        = reader->getBranch<float>(332, 12);
+  hipo::node<float>*   cal_hx_node       = reader->getBranch<float>(332, 13);
+  hipo::node<float>*   cal_hy_node       = reader->getBranch<float>(332, 14);
+  hipo::node<float>*   cal_hz_node       = reader->getBranch<float>(332, 15);
   hipo::node<float>*   cal_lu_node       = reader->getBranch<float>(332, 16);
   hipo::node<float>*   cal_lv_node       = reader->getBranch<float>(332, 17);
   hipo::node<float>*   cal_lw_node       = reader->getBranch<float>(332, 18);
+  hipo::node<float>*   cal_du_node       = reader->getBranch<float>(332, 19);
+  hipo::node<float>*   cal_dv_node       = reader->getBranch<float>(332, 20);
+  hipo::node<float>*   cal_dw_node       = reader->getBranch<float>(332, 21);
+  hipo::node<float>*   cal_m2u_node      = reader->getBranch<float>(332, 22);
+  hipo::node<float>*   cal_m2v_node      = reader->getBranch<float>(332, 23);
+  hipo::node<float>*   cal_m2w_node      = reader->getBranch<float>(332, 24);
+  hipo::node<float>*   cal_m3u_node      = reader->getBranch<float>(332, 25);
+  hipo::node<float>*   cal_m3v_node      = reader->getBranch<float>(332, 26);
+  hipo::node<float>*   cal_m3w_node      = reader->getBranch<float>(332, 27);
 
   hipo::node<int16_t>* chern_pindex_node   = reader->getBranch<int16_t>(333, 2);
   hipo::node<int8_t>*  chern_detector_node = reader->getBranch<int8_t>(333, 3);
@@ -110,8 +116,14 @@ int main(int argc, char** argv) {
   hipo::node<float>*   chern_nphe_node     = reader->getBranch<float>(333, 5);
   hipo::node<float>*   chern_time_node     = reader->getBranch<float>(333, 6);
   hipo::node<float>*   chern_path_node     = reader->getBranch<float>(333, 7);
+  hipo::node<float>*   chern_chi2_node     = reader->getBranch<float>(333, 8);
+  hipo::node<float>*   chern_x_node        = reader->getBranch<float>(333, 9);
+  hipo::node<float>*   chern_y_node        = reader->getBranch<float>(333, 10);
+  hipo::node<float>*   chern_z_node        = reader->getBranch<float>(333, 11);
   hipo::node<float>*   chern_theta_node    = reader->getBranch<float>(333, 12);
   hipo::node<float>*   chern_phi_node      = reader->getBranch<float>(333, 13);
+  hipo::node<float>*   chern_dtheta_node   = reader->getBranch<float>(333, 14);
+  hipo::node<float>*   chern_dphi_node     = reader->getBranch<float>(333, 15);
 
   hipo::node<int16_t>* fortag_pindex_node   = reader->getBranch<int16_t>(334, 2);
   hipo::node<int8_t>*  fortag_detector_node = reader->getBranch<int8_t>(334, 3);
@@ -134,24 +146,58 @@ int main(int argc, char** argv) {
   hipo::node<float>*   scint_energy_node    = reader->getBranch<float>(335, 7);
   hipo::node<float>*   scint_time_node      = reader->getBranch<float>(335, 8);
   hipo::node<float>*   scint_path_node      = reader->getBranch<float>(335, 9);
-  // hipo::node<float> *scint_chi2_node = reader->getBranch<float>(335, 10);
-  hipo::node<float>* scint_x_node  = reader->getBranch<float>(335, 11);
-  hipo::node<float>* scint_y_node  = reader->getBranch<float>(335, 12);
-  hipo::node<float>* scint_z_node  = reader->getBranch<float>(335, 13);
-  hipo::node<float>* scint_hx_node = reader->getBranch<float>(335, 14);
-  hipo::node<float>* scint_hy_node = reader->getBranch<float>(335, 15);
-  hipo::node<float>* scint_hz_node = reader->getBranch<float>(335, 16);
-  // hipo::node<int16_t> *scint_status_node = reader->getBranch<int16_t>(335, 17);
+  hipo::node<float>*   scint_x_node         = reader->getBranch<float>(335, 11);
+  hipo::node<float>*   scint_y_node         = reader->getBranch<float>(335, 12);
+  hipo::node<float>*   scint_z_node         = reader->getBranch<float>(335, 13);
+  hipo::node<float>*   scint_hx_node        = reader->getBranch<float>(335, 14);
+  hipo::node<float>*   scint_hy_node        = reader->getBranch<float>(335, 15);
+  hipo::node<float>*   scint_hz_node        = reader->getBranch<float>(335, 16);
 
-  hipo::node<int16_t>* track_pindex_node   = reader->getBranch<int16_t>(336, 2);
-  hipo::node<int8_t>*  track_detector_node = reader->getBranch<int8_t>(336, 3);
-  hipo::node<int8_t>*  track_sector_node   = reader->getBranch<int8_t>(336, 4);
-  hipo::node<float>*   track_px_nomm_node  = reader->getBranch<float>(336, 9);
-  hipo::node<float>*   track_py_nomm_node  = reader->getBranch<float>(336, 10);
-  hipo::node<float>*   track_pz_nomm_node  = reader->getBranch<float>(336, 11);
-  hipo::node<float>*   track_vx_nomm_node  = reader->getBranch<float>(336, 12);
-  hipo::node<float>*   track_vy_nomm_node  = reader->getBranch<float>(336, 13);
-  hipo::node<float>*   track_vz_nomm_node  = reader->getBranch<float>(336, 14);
+  hipo::node<int16_t>* track_pindex_node    = reader->getBranch<int16_t>(336, 2);
+  hipo::node<int8_t>*  track_detector_node  = reader->getBranch<int8_t>(336, 3);
+  hipo::node<int8_t>*  track_sector_node    = reader->getBranch<int8_t>(336, 4);
+  hipo::node<int8_t>*  track_q_node         = reader->getBranch<int8_t>(336, 6);
+  hipo::node<float>*   track_chi2_node      = reader->getBranch<float>(336, 7);
+  hipo::node<int16_t>* track_NDF_node       = reader->getBranch<int16_t>(336, 8);
+  hipo::node<float>*   track_px_nomm_node   = reader->getBranch<float>(336, 9);
+  hipo::node<float>*   track_py_nomm_node   = reader->getBranch<float>(336, 10);
+  hipo::node<float>*   track_pz_nomm_node   = reader->getBranch<float>(336, 11);
+  hipo::node<float>*   track_vx_nomm_node   = reader->getBranch<float>(336, 12);
+  hipo::node<float>*   track_vy_nomm_node   = reader->getBranch<float>(336, 13);
+  hipo::node<float>*   track_vz_nomm_node   = reader->getBranch<float>(336, 14);
+  hipo::node<float>*   track_chi2_nomm_node = reader->getBranch<float>(336, 15);
+  hipo::node<float>*   track_NDF_nomm_node  = reader->getBranch<float>(336, 16);
+
+  hipo::node<int16_t>* VertDoca_index1_node = reader->getBranch<int16_t>(339, 1);
+  hipo::node<int16_t>* VertDoca_index2_node = reader->getBranch<int16_t>(339, 2);
+  hipo::node<float>*   VertDoca_x_node      = reader->getBranch<float>(339, 3);
+  hipo::node<float>*   VertDoca_y_node      = reader->getBranch<float>(339, 4);
+  hipo::node<float>*   VertDoca_z_node      = reader->getBranch<float>(339, 5);
+  hipo::node<float>*   VertDoca_x1_node     = reader->getBranch<float>(339, 6);
+  hipo::node<float>*   VertDoca_y1_node     = reader->getBranch<float>(339, 7);
+  hipo::node<float>*   VertDoca_z1_node     = reader->getBranch<float>(339, 8);
+  hipo::node<float>*   VertDoca_cx1_node    = reader->getBranch<float>(339, 9);
+  hipo::node<float>*   VertDoca_cy1_node    = reader->getBranch<float>(339, 10);
+  hipo::node<float>*   VertDoca_cz1_node    = reader->getBranch<float>(339, 11);
+  hipo::node<float>*   VertDoca_x2_node     = reader->getBranch<float>(339, 12);
+  hipo::node<float>*   VertDoca_y2_node     = reader->getBranch<float>(339, 13);
+  hipo::node<float>*   VertDoca_z2_node     = reader->getBranch<float>(339, 14);
+  hipo::node<float>*   VertDoca_cx2_node    = reader->getBranch<float>(339, 15);
+  hipo::node<float>*   VertDoca_cy2_node    = reader->getBranch<float>(339, 16);
+  hipo::node<float>*   VertDoca_cz2_node    = reader->getBranch<float>(339, 17);
+  hipo::node<float>*   VertDoca_r_node      = reader->getBranch<float>(339, 18);
+
+  hipo::node<int16_t>* traj_pindex_node     = reader->getBranch<int16_t>(340, 1);
+  hipo::node<int16_t>* traj_index_node      = reader->getBranch<int16_t>(340, 2);
+  hipo::node<int16_t>* traj_detId_node      = reader->getBranch<int16_t>(340, 3);
+  hipo::node<int8_t>*  traj_q_node          = reader->getBranch<int8_t>(340, 4);
+  hipo::node<float>*   traj_x_node          = reader->getBranch<float>(340, 5);
+  hipo::node<float>*   traj_y_node          = reader->getBranch<float>(340, 6);
+  hipo::node<float>*   traj_z_node          = reader->getBranch<float>(340, 7);
+  hipo::node<float>*   traj_cx_node         = reader->getBranch<float>(340, 8);
+  hipo::node<float>*   traj_cy_node         = reader->getBranch<float>(340, 9);
+  hipo::node<float>*   traj_cz_node         = reader->getBranch<float>(340, 10);
+  hipo::node<float>*   traj_pathlength_node = reader->getBranch<float>(340, 11);
 
   hipo::node<float>*   MC_Header_helicity_node = reader->getBranch<float>(40, 4);
   hipo::node<int16_t>* MC_Event_npart_node     = reader->getBranch<int16_t>(41, 1);
@@ -191,305 +237,19 @@ int main(int argc, char** argv) {
   hipo::node<float>*   CovMat_C45_node    = reader->getBranch<float>(338, 16);
   hipo::node<float>*   CovMat_C55_node    = reader->getBranch<float>(338, 17);
 
-  hipo::node<int16_t>* CVT_pid_node         = reader->getBranch<int16_t>(20526, 1);
-  hipo::node<int8_t>*  CVT_q_node           = reader->getBranch<int8_t>(20526, 10);
-  hipo::node<float>*   CVT_p_node           = reader->getBranch<float>(20526, 11);
-  hipo::node<float>*   CVT_pt_node          = reader->getBranch<float>(20526, 12);
-  hipo::node<float>*   CVT_phi0_node        = reader->getBranch<float>(20526, 13);
-  hipo::node<float>*   CVT_tandip_node      = reader->getBranch<float>(20526, 14);
-  hipo::node<float>*   CVT_z0_node          = reader->getBranch<float>(20526, 15);
-  hipo::node<float>*   CVT_d0_node          = reader->getBranch<float>(20526, 16);
-  hipo::node<float>*   CVT_Cov_d02_node     = reader->getBranch<float>(20526, 17);
-  hipo::node<float>*   CVT_Cov_d0phi0_node  = reader->getBranch<float>(20526, 18);
-  hipo::node<float>*   CVT_Cov_d0rho_node   = reader->getBranch<float>(20526, 19);
-  hipo::node<float>*   CVT_Cov_phi02_node   = reader->getBranch<float>(20526, 20);
-  hipo::node<float>*   CVT_Cov_phi0rho_node = reader->getBranch<float>(20526, 21);
-  hipo::node<float>*   CVT_Cov_rho2_node    = reader->getBranch<float>(20526, 22);
-  hipo::node<float>*   CVT_Cov_z02_node     = reader->getBranch<float>(20526, 23);
-  hipo::node<float>*   CVT_Cov_tandip2_node = reader->getBranch<float>(20526, 24);
-
-  std::vector<int>   run;
-  std::vector<int>   event;
-  std::vector<float> torus;
-  std::vector<float> solenoid;
-  std::vector<int>   crate;
-  std::vector<int>   slot;
-  std::vector<int>   channel;
-  std::vector<int>   helicity;
-  std::vector<int>   quartet;
-  std::vector<int>   value;
-  std::vector<int>   NRUN;
-  std::vector<int>   NEVENT;
-  std::vector<float> EVNTime;
-  std::vector<int>   TYPE;
-  std::vector<int>   TRG;
-  std::vector<float> BCG;
-  std::vector<float> STTime;
-  std::vector<float> RFTime;
-  std::vector<int>   Helic;
-
-  std::vector<int>   pid;
-  std::vector<float> p;
-  std::vector<float> p2;
-  std::vector<float> px;
-  std::vector<float> py;
-  std::vector<float> pz;
-  std::vector<float> vx;
-  std::vector<float> vy;
-  std::vector<float> vz;
-  std::vector<int>   charge;
-  std::vector<float> beta;
-  std::vector<float> chi2pid;
-  std::vector<int>   status;
-
-  std::vector<int>   cal_pindex;
-  std::vector<int>   cal_detector;
-  std::vector<int>   cal_sector;
-  std::vector<int>   cal_layer;
-  std::vector<float> cal_energy;
-  std::vector<float> cal_time;
-  std::vector<float> cal_path;
-  std::vector<float> cal_x;
-  std::vector<float> cal_y;
-  std::vector<float> cal_z;
-  std::vector<float> cal_lu;
-  std::vector<float> cal_lv;
-  std::vector<float> cal_lw;
-
-  std::vector<int>   chern_pindex;
-  std::vector<int>   chern_detector;
-  std::vector<int>   chern_sector;
-  std::vector<float> chern_nphe;
-  std::vector<float> chern_time;
-  std::vector<float> chern_path;
-  std::vector<float> chern_theta;
-  std::vector<float> chern_phi;
-
-  std::vector<int>   fortag_pindex;
-  std::vector<int>   fortag_detector;
-  std::vector<float> fortag_energy;
-  std::vector<float> fortag_time;
-  std::vector<float> fortag_path;
-  std::vector<float> fortag_x;
-  std::vector<float> fortag_y;
-  std::vector<float> fortag_z;
-  std::vector<float> fortag_dx;
-  std::vector<float> fortag_dy;
-  std::vector<float> fortag_radius;
-  std::vector<int>   fortag_size;
-
-  std::vector<int>   dc_sec;
-  std::vector<float> dc_px;
-  std::vector<float> dc_py;
-  std::vector<float> dc_pz;
-  std::vector<float> dc_vx;
-  std::vector<float> dc_vy;
-  std::vector<float> dc_vz;
-
-  std::vector<float> cvt_px;
-  std::vector<float> cvt_py;
-  std::vector<float> cvt_pz;
-  std::vector<float> cvt_vx;
-  std::vector<float> cvt_vy;
-  std::vector<float> cvt_vz;
-
-  std::vector<float> ec_tot_energy;
-  std::vector<float> ec_pcal_energy;
-  std::vector<int>   ec_pcal_sec;
-  std::vector<float> ec_pcal_time;
-  std::vector<float> ec_pcal_path;
-  std::vector<float> ec_pcal_x;
-  std::vector<float> ec_pcal_y;
-  std::vector<float> ec_pcal_z;
-  std::vector<float> ec_pcal_lu;
-  std::vector<float> ec_pcal_lv;
-  std::vector<float> ec_pcal_lw;
-
-  std::vector<float> ec_ecin_energy;
-  std::vector<int>   ec_ecin_sec;
-  std::vector<float> ec_ecin_time;
-  std::vector<float> ec_ecin_path;
-  std::vector<float> ec_ecin_x;
-  std::vector<float> ec_ecin_y;
-  std::vector<float> ec_ecin_z;
-  std::vector<float> ec_ecin_lu;
-  std::vector<float> ec_ecin_lv;
-  std::vector<float> ec_ecin_lw;
-
-  std::vector<float> ec_ecout_energy;
-  std::vector<int>   ec_ecout_sec;
-  std::vector<float> ec_ecout_time;
-  std::vector<float> ec_ecout_path;
-  std::vector<float> ec_ecout_x;
-  std::vector<float> ec_ecout_y;
-  std::vector<float> ec_ecout_z;
-  std::vector<float> ec_ecout_lu;
-  std::vector<float> ec_ecout_lv;
-  std::vector<float> ec_ecout_lw;
-
-  std::vector<float> cc_nphe_tot;
-  std::vector<int>   cc_ltcc_sec;
-  std::vector<float> cc_ltcc_nphe;
-  std::vector<float> cc_ltcc_time;
-  std::vector<float> cc_ltcc_path;
-  std::vector<float> cc_ltcc_theta;
-  std::vector<float> cc_ltcc_phi;
-  std::vector<int>   cc_htcc_sec;
-  std::vector<float> cc_htcc_nphe;
-  std::vector<float> cc_htcc_time;
-  std::vector<float> cc_htcc_path;
-  std::vector<float> cc_htcc_theta;
-  std::vector<float> cc_htcc_phi;
-  std::vector<int>   cc_rich_sec;
-  std::vector<float> cc_rich_nphe;
-  std::vector<float> cc_rich_time;
-  std::vector<float> cc_rich_path;
-  std::vector<float> cc_rich_theta;
-  std::vector<float> cc_rich_phi;
-
-  std::vector<int>   sc_ftof_1a_sec;
-  std::vector<float> sc_ftof_1a_time;
-  std::vector<float> sc_ftof_1a_path;
-  std::vector<float> sc_ftof_1a_energy;
-  std::vector<int>   sc_ftof_1a_component;
-  std::vector<float> sc_ftof_1a_x;
-  std::vector<float> sc_ftof_1a_y;
-  std::vector<float> sc_ftof_1a_z;
-  std::vector<float> sc_ftof_1a_hx;
-  std::vector<float> sc_ftof_1a_hy;
-  std::vector<float> sc_ftof_1a_hz;
-
-  std::vector<int>   sc_ftof_1b_sec;
-  std::vector<float> sc_ftof_1b_time;
-  std::vector<float> sc_ftof_1b_path;
-  std::vector<float> sc_ftof_1b_energy;
-  std::vector<int>   sc_ftof_1b_component;
-  std::vector<float> sc_ftof_1b_x;
-  std::vector<float> sc_ftof_1b_y;
-  std::vector<float> sc_ftof_1b_z;
-  std::vector<float> sc_ftof_1b_hx;
-  std::vector<float> sc_ftof_1b_hy;
-  std::vector<float> sc_ftof_1b_hz;
-
-  std::vector<int>   sc_ftof_2_sec;
-  std::vector<float> sc_ftof_2_time;
-  std::vector<float> sc_ftof_2_path;
-  std::vector<float> sc_ftof_2_energy;
-  std::vector<int>   sc_ftof_2_component;
-  std::vector<float> sc_ftof_2_x;
-  std::vector<float> sc_ftof_2_y;
-  std::vector<float> sc_ftof_2_z;
-  std::vector<float> sc_ftof_2_hx;
-  std::vector<float> sc_ftof_2_hy;
-  std::vector<float> sc_ftof_2_hz;
-
-  std::vector<float> sc_ctof_time;
-  std::vector<float> sc_ctof_path;
-  std::vector<float> sc_ctof_energy;
-  std::vector<int>   sc_ctof_component;
-  std::vector<float> sc_ctof_x;
-  std::vector<float> sc_ctof_y;
-  std::vector<float> sc_ctof_z;
-  std::vector<float> sc_ctof_hx;
-  std::vector<float> sc_ctof_hy;
-  std::vector<float> sc_ctof_hz;
-
-  std::vector<float> sc_cnd_time;
-  std::vector<float> sc_cnd_path;
-  std::vector<float> sc_cnd_energy;
-  std::vector<int>   sc_cnd_component;
-  std::vector<float> sc_cnd_x;
-  std::vector<float> sc_cnd_y;
-  std::vector<float> sc_cnd_z;
-  std::vector<float> sc_cnd_hx;
-  std::vector<float> sc_cnd_hy;
-  std::vector<float> sc_cnd_hz;
-
-  std::vector<float> ft_cal_energy;
-  std::vector<float> ft_cal_time;
-  std::vector<float> ft_cal_path;
-  std::vector<float> ft_cal_x;
-  std::vector<float> ft_cal_y;
-  std::vector<float> ft_cal_z;
-  std::vector<float> ft_cal_dx;
-  std::vector<float> ft_cal_dy;
-  std::vector<float> ft_cal_radius;
-
-  std::vector<float> ft_hodo_energy;
-  std::vector<float> ft_hodo_time;
-  std::vector<float> ft_hodo_path;
-  std::vector<float> ft_hodo_x;
-  std::vector<float> ft_hodo_y;
-  std::vector<float> ft_hodo_z;
-  std::vector<float> ft_hodo_dx;
-  std::vector<float> ft_hodo_dy;
-  std::vector<float> ft_hodo_radius;
-
-  std::vector<int>   MC_pid;
-  std::vector<float> MC_helicity;
-  std::vector<float> MC_px;
-  std::vector<float> MC_py;
-  std::vector<float> MC_pz;
-  std::vector<float> MC_vx;
-  std::vector<float> MC_vy;
-  std::vector<float> MC_vz;
-  std::vector<float> MC_vt;
-
-  std::vector<int>   Lund_pid;
-  std::vector<float> Lund_px;
-  std::vector<float> Lund_py;
-  std::vector<float> Lund_pz;
-  std::vector<float> Lund_E;
-  std::vector<float> Lund_vx;
-  std::vector<float> Lund_vy;
-  std::vector<float> Lund_vz;
-  std::vector<float> Lund_ltime;
-
-  std::vector<float> CovMat_11;
-  std::vector<float> CovMat_12;
-  std::vector<float> CovMat_13;
-  std::vector<float> CovMat_14;
-  std::vector<float> CovMat_15;
-  std::vector<float> CovMat_22;
-  std::vector<float> CovMat_23;
-  std::vector<float> CovMat_24;
-  std::vector<float> CovMat_25;
-  std::vector<float> CovMat_33;
-  std::vector<float> CovMat_34;
-  std::vector<float> CovMat_35;
-  std::vector<float> CovMat_44;
-  std::vector<float> CovMat_45;
-  std::vector<float> CovMat_55;
-
-  std::vector<int>   cvt_pid;
-  std::vector<int>   cvt_q;
-  std::vector<float> cvt_p;
-  std::vector<float> cvt_pt;
-  std::vector<float> cvt_phi0;
-  std::vector<float> cvt_tandip;
-  std::vector<float> cvt_z0;
-  std::vector<float> cvt_d0;
-  std::vector<float> cvt_CovMat_d02;
-  std::vector<float> cvt_CovMat_d0phi0;
-  std::vector<float> cvt_CovMat_d0rho;
-  std::vector<float> cvt_CovMat_phi02;
-  std::vector<float> cvt_CovMat_phi0rho;
-  std::vector<float> cvt_CovMat_rho2;
-  std::vector<float> cvt_CovMat_z02;
-  std::vector<float> cvt_CovMat_tandip2;
-
-  clas12->Branch("run", &run);
-  clas12->Branch("event", &event);
-  clas12->Branch("torus", &torus);
-  clas12->Branch("solenoid", &solenoid);
-  clas12->Branch("crate", &crate);
-  clas12->Branch("slot", &slot);
-  clas12->Branch("channel", &channel);
-  clas12->Branch("helicity", &helicity);
-  clas12->Branch("quartet", &quartet);
-  clas12->Branch("value", &value);
+  clas12->Branch("NRUN", &NRUN);
+  clas12->Branch("NEVENT", &NEVENT);
+  clas12->Branch("EVNTime", &EVNTime);
+  clas12->Branch("TYPE", &TYPE);
+  clas12->Branch("TRG", &TRG);
+  clas12->Branch("BCG", &BCG);
   clas12->Branch("STTime", &STTime);
   clas12->Branch("RFTime", &RFTime);
+  clas12->Branch("Helic", &Helic);
+  clas12->Branch("EvCAT", &EvCAT);
+  clas12->Branch("NPGP", &NPGP);
+  clas12->Branch("LT", &LT);
+  clas12->Branch("PTIME", &PTIME);
 
   clas12->Branch("pid", &pid);
   clas12->Branch("p", &p);
@@ -526,40 +286,6 @@ int main(int argc, char** argv) {
     clas12->Branch("lund_ltime", &Lund_ltime);
   }
 
-  clas12->Branch("ec_tot_energy", &ec_tot_energy);
-  clas12->Branch("ec_pcal_energy", &ec_pcal_energy);
-  clas12->Branch("ec_pcal_sec", &ec_pcal_sec);
-  clas12->Branch("ec_pcal_time", &ec_pcal_time);
-  clas12->Branch("ec_pcal_path", &ec_pcal_path);
-  clas12->Branch("ec_pcal_x", &ec_pcal_x);
-  clas12->Branch("ec_pcal_y", &ec_pcal_y);
-  clas12->Branch("ec_pcal_z", &ec_pcal_z);
-  clas12->Branch("ec_pcal_lu", &ec_pcal_lu);
-  clas12->Branch("ec_pcal_lv", &ec_pcal_lv);
-  clas12->Branch("ec_pcal_lw", &ec_pcal_lw);
-
-  clas12->Branch("ec_ecin_energy", &ec_ecin_energy);
-  clas12->Branch("ec_ecin_sec", &ec_ecin_sec);
-  clas12->Branch("ec_ecin_time", &ec_ecin_time);
-  clas12->Branch("ec_ecin_path", &ec_ecin_path);
-  clas12->Branch("ec_ecin_x", &ec_ecin_x);
-  clas12->Branch("ec_ecin_y", &ec_ecin_y);
-  clas12->Branch("ec_ecin_z", &ec_ecin_z);
-  clas12->Branch("ec_ecin_lu", &ec_ecin_lu);
-  clas12->Branch("ec_ecin_lv", &ec_ecin_lv);
-  clas12->Branch("ec_ecin_lw", &ec_ecin_lw);
-
-  clas12->Branch("ec_ecout_energy", &ec_ecout_energy);
-  clas12->Branch("ec_ecout_sec", &ec_ecout_sec);
-  clas12->Branch("ec_ecout_time", &ec_ecout_time);
-  clas12->Branch("ec_ecout_path", &ec_ecout_path);
-  clas12->Branch("ec_ecout_x", &ec_ecout_x);
-  clas12->Branch("ec_ecout_y", &ec_ecout_y);
-  clas12->Branch("ec_ecout_z", &ec_ecout_z);
-  clas12->Branch("ec_ecout_lu", &ec_ecout_lu);
-  clas12->Branch("ec_ecout_lv", &ec_ecout_lv);
-  clas12->Branch("ec_ecout_lw", &ec_ecout_lw);
-
   clas12->Branch("dc_sec", &dc_sec);
   clas12->Branch("dc_px", &dc_px);
   clas12->Branch("dc_py", &dc_py);
@@ -575,6 +301,76 @@ int main(int argc, char** argv) {
   clas12->Branch("cvt_vy", &cvt_vy);
   clas12->Branch("cvt_vz", &cvt_vz);
 
+  clas12->Branch("ec_tot_energy", &ec_tot_energy);
+  clas12->Branch("ec_pcal_energy", &ec_pcal_energy);
+  clas12->Branch("ec_pcal_sec", &ec_pcal_sec);
+  clas12->Branch("ec_pcal_time", &ec_pcal_time);
+  clas12->Branch("ec_pcal_path", &ec_pcal_path);
+  clas12->Branch("ec_pcal_x", &ec_pcal_x);
+  clas12->Branch("ec_pcal_y", &ec_pcal_y);
+  clas12->Branch("ec_pcal_z", &ec_pcal_z);
+  clas12->Branch("ec_pcal_hx", &ec_pcal_hx);
+  clas12->Branch("ec_pcal_hy", &ec_pcal_hy);
+  clas12->Branch("ec_pcal_hz", &ec_pcal_hz);
+  clas12->Branch("ec_pcal_lu", &ec_pcal_lu);
+  clas12->Branch("ec_pcal_lv", &ec_pcal_lv);
+  clas12->Branch("ec_pcal_lw", &ec_pcal_lw);
+  clas12->Branch("ec_pcal_du", &ec_pcal_du);
+  clas12->Branch("ec_pcal_dv", &ec_pcal_dv);
+  clas12->Branch("ec_pcal_dw", &ec_pcal_dw);
+  clas12->Branch("ec_pcal_m2u", &ec_pcal_m2u);
+  clas12->Branch("ec_pcal_m2v", &ec_pcal_m2v);
+  clas12->Branch("ec_pcal_m2w", &ec_pcal_m2w);
+  clas12->Branch("ec_pcal_m3u", &ec_pcal_m3u);
+  clas12->Branch("ec_pcal_m3v", &ec_pcal_m3v);
+  clas12->Branch("ec_pcal_m3w", &ec_pcal_m3w);
+
+  clas12->Branch("ec_ecin_energy", &ec_ecin_energy);
+  clas12->Branch("ec_ecin_sec", &ec_ecin_sec);
+  clas12->Branch("ec_ecin_time", &ec_ecin_time);
+  clas12->Branch("ec_ecin_path", &ec_ecin_path);
+  clas12->Branch("ec_ecin_x", &ec_ecin_x);
+  clas12->Branch("ec_ecin_y", &ec_ecin_y);
+  clas12->Branch("ec_ecin_z", &ec_ecin_z);
+  clas12->Branch("ec_ecin_hx", &ec_pcal_hx);
+  clas12->Branch("ec_ecin_hy", &ec_pcal_hy);
+  clas12->Branch("ec_ecin_hz", &ec_pcal_hz);
+  clas12->Branch("ec_ecin_lu", &ec_pcal_lu);
+  clas12->Branch("ec_ecin_lv", &ec_pcal_lv);
+  clas12->Branch("ec_ecin_lw", &ec_pcal_lw);
+  clas12->Branch("ec_ecin_du", &ec_pcal_du);
+  clas12->Branch("ec_ecin_dv", &ec_pcal_dv);
+  clas12->Branch("ec_ecin_dw", &ec_pcal_dw);
+  clas12->Branch("ec_ecin_m2u", &ec_pcal_m2u);
+  clas12->Branch("ec_ecin_m2v", &ec_pcal_m2v);
+  clas12->Branch("ec_ecin_m2w", &ec_pcal_m2w);
+  clas12->Branch("ec_ecin_m3u", &ec_pcal_m3u);
+  clas12->Branch("ec_ecin_m3v", &ec_pcal_m3v);
+  clas12->Branch("ec_ecin_m3w", &ec_pcal_m3w);
+
+  clas12->Branch("ec_ecout_energy", &ec_ecout_energy);
+  clas12->Branch("ec_ecout_sec", &ec_ecout_sec);
+  clas12->Branch("ec_ecout_time", &ec_ecout_time);
+  clas12->Branch("ec_ecout_path", &ec_ecout_path);
+  clas12->Branch("ec_ecout_x", &ec_ecout_x);
+  clas12->Branch("ec_ecout_y", &ec_ecout_y);
+  clas12->Branch("ec_ecout_z", &ec_ecout_z);
+  clas12->Branch("ec_ecout_hx", &ec_pcal_hx);
+  clas12->Branch("ec_ecout_hy", &ec_pcal_hy);
+  clas12->Branch("ec_ecout_hz", &ec_pcal_hz);
+  clas12->Branch("ec_ecout_lu", &ec_pcal_lu);
+  clas12->Branch("ec_ecout_lv", &ec_pcal_lv);
+  clas12->Branch("ec_ecout_lw", &ec_pcal_lw);
+  clas12->Branch("ec_ecout_du", &ec_pcal_du);
+  clas12->Branch("ec_ecout_dv", &ec_pcal_dv);
+  clas12->Branch("ec_ecout_dw", &ec_pcal_dw);
+  clas12->Branch("ec_ecout_m2u", &ec_pcal_m2u);
+  clas12->Branch("ec_ecout_m2v", &ec_pcal_m2v);
+  clas12->Branch("ec_ecout_m2w", &ec_pcal_m2w);
+  clas12->Branch("ec_ecout_m3u", &ec_pcal_m3u);
+  clas12->Branch("ec_ecout_m3v", &ec_pcal_m3v);
+  clas12->Branch("ec_ecout_m3w", &ec_pcal_m3w);
+
   clas12->Branch("cc_nphe_tot", &cc_nphe_tot);
   clas12->Branch("cc_ltcc_sec", &cc_ltcc_sec);
   clas12->Branch("cc_ltcc_nphe", &cc_ltcc_nphe);
@@ -582,6 +378,9 @@ int main(int argc, char** argv) {
   clas12->Branch("cc_ltcc_path", &cc_ltcc_path);
   clas12->Branch("cc_ltcc_theta", &cc_ltcc_theta);
   clas12->Branch("cc_ltcc_phi", &cc_ltcc_phi);
+  clas12->Branch("cc_ltcc_x", &cc_ltcc_x);
+  clas12->Branch("cc_ltcc_y", &cc_ltcc_y);
+  clas12->Branch("cc_ltcc_z", &cc_ltcc_z);
 
   clas12->Branch("cc_htcc_sec", &cc_htcc_sec);
   clas12->Branch("cc_htcc_nphe", &cc_htcc_nphe);
@@ -589,6 +388,9 @@ int main(int argc, char** argv) {
   clas12->Branch("cc_htcc_path", &cc_htcc_path);
   clas12->Branch("cc_htcc_theta", &cc_htcc_theta);
   clas12->Branch("cc_htcc_phi", &cc_htcc_phi);
+  clas12->Branch("cc_htcc_x", &cc_htcc_x);
+  clas12->Branch("cc_htcc_y", &cc_htcc_y);
+  clas12->Branch("cc_htcc_z", &cc_htcc_z);
 
   clas12->Branch("cc_rich_sec", &cc_rich_sec);
   clas12->Branch("cc_rich_nphe", &cc_rich_nphe);
@@ -596,6 +398,9 @@ int main(int argc, char** argv) {
   clas12->Branch("cc_rich_path", &cc_rich_path);
   clas12->Branch("cc_rich_theta", &cc_rich_theta);
   clas12->Branch("cc_rich_phi", &cc_rich_phi);
+  clas12->Branch("cc_rich_x", &cc_rich_x);
+  clas12->Branch("cc_rich_y", &cc_rich_y);
+  clas12->Branch("cc_rich_z", &cc_rich_z);
 
   clas12->Branch("sc_ftof_1a_sec", &sc_ftof_1a_sec);
   clas12->Branch("sc_ftof_1a_time", &sc_ftof_1a_time);
@@ -692,32 +497,47 @@ int main(int argc, char** argv) {
     clas12->Branch("CovMat_45", &CovMat_45);
     clas12->Branch("CovMat_55", &CovMat_55);
   }
-  if (cvt) {
-    clas12->Branch("cvt_pid", &cvt_pid);
-    clas12->Branch("cvt_q", &cvt_q);
-    clas12->Branch("cvt_p", &cvt_p);
-    clas12->Branch("cvt_pt", &cvt_pt);
-    clas12->Branch("cvt_phi0", &cvt_phi0);
-    clas12->Branch("cvt_tandip", &cvt_tandip);
-    clas12->Branch("cvt_z0", &cvt_z0);
-    clas12->Branch("cvt_d0", &cvt_d0);
-    clas12->Branch("cvt_CovMat_d02", &cvt_CovMat_d02);
-    clas12->Branch("cvt_CovMat_d0rho", &cvt_CovMat_d0rho);
-    clas12->Branch("cvt_CovMat_phi02", &cvt_CovMat_phi02);
-    clas12->Branch("cvt_CovMat_phi0rho", &cvt_CovMat_phi0rho);
-    clas12->Branch("cvt_CovMat_rho2", &cvt_CovMat_rho2);
-    clas12->Branch("cvt_CovMat_z02", &cvt_CovMat_z02);
-    clas12->Branch("cvt_CovMat_tandip2", &cvt_CovMat_tandip2);
+  if (VertDoca) {
+    clas12->Branch("VertDoca_index1", &VertDoca_index1_vec);
+    clas12->Branch("VertDoca_index2", &VertDoca_index2_vec);
+    clas12->Branch("VertDoca_x", &VertDoca_x_vec);
+    clas12->Branch("VertDoca_y", &VertDoca_y_vec);
+    clas12->Branch("VertDoca_z", &VertDoca_z_vec);
+    clas12->Branch("VertDoca_x1", &VertDoca_x1_vec);
+    clas12->Branch("VertDoca_y1", &VertDoca_y1_vec);
+    clas12->Branch("VertDoca_z1", &VertDoca_z1_vec);
+    clas12->Branch("VertDoca_cx1", &VertDoca_cx1_vec);
+    clas12->Branch("VertDoca_cy1", &VertDoca_cy1_vec);
+    clas12->Branch("VertDoca_cz1", &VertDoca_cz1_vec);
+    clas12->Branch("VertDoca_x2", &VertDoca_x2_vec);
+    clas12->Branch("VertDoca_y2", &VertDoca_y2_vec);
+    clas12->Branch("VertDoca_z2", &VertDoca_z2_vec);
+    clas12->Branch("VertDoca_cx2", &VertDoca_cx2_vec);
+    clas12->Branch("VertDoca_cy2", &VertDoca_cy2_vec);
+    clas12->Branch("VertDoca_cz2", &VertDoca_cz2_vec);
+    clas12->Branch("VertDoca_r", &VertDoca_r_vec);
+  }
+  if (traj) {
+    clas12->Branch("traj_pindex", &traj_pindex_vec);
+    clas12->Branch("traj_index", &traj_index_vec);
+    clas12->Branch("traj_detId", &traj_detId_vec);
+    clas12->Branch("traj_q", &traj_q_vec);
+    clas12->Branch("traj_x", &traj_x_vec);
+    clas12->Branch("traj_y", &traj_y_vec);
+    clas12->Branch("traj_z", &traj_z_vec);
+    clas12->Branch("traj_cx", &traj_cx_vec);
+    clas12->Branch("traj_cy", &traj_cy_vec);
+    clas12->Branch("traj_cz", &traj_cz_vec);
+    clas12->Branch("traj_pathlength", &traj_pathlength_vec);
   }
 
-  int entry      = 0;
-  int l          = 0;
-  int len_pid    = 0;
-  int len_pindex = 0;
-
-  while (reader->next() == true) {
-
-    // entry++;
+  int  entry                = 0;
+  int  l                    = 0;
+  int  len_pid              = 0;
+  int  len_pindex           = 0;
+  int  tot_events_processed = 0;
+  auto start_full           = std::chrono::high_resolution_clock::now();
+  while (reader->next()) {
     if (!is_batch && (++entry % 1000) == 0)
       std::cout << "\t" << floor(100 * entry / tot_hipo_events) << "%\r\r" << std::flush;
 
@@ -726,43 +546,17 @@ int main(int argc, char** argv) {
     if (elec_first && pid_node->getValue(0) != 11)
       continue;
 
-    l = run_node->getLength();
-    run.resize(l);
-    event.resize(l);
-    torus.resize(l);
-    solenoid.resize(l);
-
-    for (int i = 0; i < l; i++) {
-      run[i]      = run_node->getValue(i);
-      event[i]    = event_node->getValue(i);
-      torus[i]    = torus_node->getValue(i);
-      solenoid[i] = solenoid_node->getValue(i);
-    }
-
-    l = crate_node->getLength();
-    crate.resize(l);
-    slot.resize(l);
-    channel.resize(l);
-    helicity.resize(l);
-    quartet.resize(l);
-    value.resize(l);
-
-    for (int i = 0; i < l; i++) {
-      crate[i]    = crate_node->getValue(i);
-      slot[i]     = slot_node->getValue(i);
-      channel[i]  = channel_node->getValue(i);
-      helicity[i] = helicity_node->getValue(i);
-      quartet[i]  = quartet_node->getValue(i);
-      value[i]    = value_node->getValue(i);
-    }
-
-    l = STTime_node->getLength();
-    STTime.resize(l);
-    RFTime.resize(l);
-
-    for (int i = 0; i < l; i++) {
-      STTime[i] = STTime_node->getValue(i);
-      RFTime[i] = RFTime_node->getValue(i);
+    tot_events_processed++;
+    if (NRUN_node->getLength() > 0) {
+      NRUN    = NRUN_node->getValue(0);
+      NEVENT  = NEVENT_node->getValue(0);
+      EVNTime = EVNTime_node->getValue(0);
+      TYPE    = TYPE_node->getValue(0);
+      TRG     = TRG_node->getValue(0);
+      BCG     = BCG_node->getValue(0);
+      STTime  = STTime_node->getValue(0);
+      RFTime  = RFTime_node->getValue(0);
+      Helic   = Helic_node->getValue(0);
     }
 
     l = pid_node->getLength();
@@ -852,9 +646,22 @@ int main(int argc, char** argv) {
     ec_pcal_x.resize(len_pid);
     ec_pcal_y.resize(len_pid);
     ec_pcal_z.resize(len_pid);
+    ec_pcal_hx.resize(len_pid);
+    ec_pcal_hy.resize(len_pid);
+    ec_pcal_hz.resize(len_pid);
     ec_pcal_lu.resize(len_pid);
     ec_pcal_lv.resize(len_pid);
     ec_pcal_lw.resize(len_pid);
+    ec_pcal_du.resize(len_pid);
+    ec_pcal_dv.resize(len_pid);
+    ec_pcal_dw.resize(len_pid);
+    ec_pcal_m2u.resize(len_pid);
+    ec_pcal_m2v.resize(len_pid);
+    ec_pcal_m2w.resize(len_pid);
+    ec_pcal_m3u.resize(len_pid);
+    ec_pcal_m3v.resize(len_pid);
+    ec_pcal_m3w.resize(len_pid);
+
     ec_ecin_energy.resize(len_pid);
     ec_ecin_sec.resize(len_pid);
     ec_ecin_time.resize(len_pid);
@@ -862,9 +669,22 @@ int main(int argc, char** argv) {
     ec_ecin_x.resize(len_pid);
     ec_ecin_y.resize(len_pid);
     ec_ecin_z.resize(len_pid);
+    ec_ecin_hx.resize(len_pid);
+    ec_ecin_hy.resize(len_pid);
+    ec_ecin_hz.resize(len_pid);
     ec_ecin_lu.resize(len_pid);
     ec_ecin_lv.resize(len_pid);
     ec_ecin_lw.resize(len_pid);
+    ec_ecin_du.resize(len_pid);
+    ec_ecin_dv.resize(len_pid);
+    ec_ecin_dw.resize(len_pid);
+    ec_ecin_m2u.resize(len_pid);
+    ec_ecin_m2v.resize(len_pid);
+    ec_ecin_m2w.resize(len_pid);
+    ec_ecin_m3u.resize(len_pid);
+    ec_ecin_m3v.resize(len_pid);
+    ec_ecin_m3w.resize(len_pid);
+
     ec_ecout_energy.resize(len_pid);
     ec_ecout_sec.resize(len_pid);
     ec_ecout_time.resize(len_pid);
@@ -872,32 +692,70 @@ int main(int argc, char** argv) {
     ec_ecout_x.resize(len_pid);
     ec_ecout_y.resize(len_pid);
     ec_ecout_z.resize(len_pid);
+    ec_ecout_hx.resize(len_pid);
+    ec_ecout_hy.resize(len_pid);
+    ec_ecout_hz.resize(len_pid);
     ec_ecout_lu.resize(len_pid);
     ec_ecout_lv.resize(len_pid);
     ec_ecout_lw.resize(len_pid);
+    ec_ecout_du.resize(len_pid);
+    ec_ecout_dv.resize(len_pid);
+    ec_ecout_dw.resize(len_pid);
+    ec_ecout_m2u.resize(len_pid);
+    ec_ecout_m2v.resize(len_pid);
+    ec_ecout_m2w.resize(len_pid);
+    ec_ecout_m3u.resize(len_pid);
+    ec_ecout_m3v.resize(len_pid);
+    ec_ecout_m3w.resize(len_pid);
 
     for (int i = 0; i < len_pid; i++) {
-      ec_tot_energy[i]   = NAN;
-      ec_pcal_energy[i]  = NAN;
-      ec_pcal_sec[i]     = -1;
-      ec_pcal_time[i]    = NAN;
-      ec_pcal_path[i]    = NAN;
-      ec_pcal_x[i]       = NAN;
-      ec_pcal_y[i]       = NAN;
-      ec_pcal_z[i]       = NAN;
-      ec_pcal_lu[i]      = NAN;
-      ec_pcal_lv[i]      = NAN;
-      ec_pcal_lw[i]      = NAN;
-      ec_ecin_energy[i]  = NAN;
-      ec_ecin_sec[i]     = -1;
-      ec_ecin_time[i]    = NAN;
-      ec_ecin_path[i]    = NAN;
-      ec_ecin_x[i]       = NAN;
-      ec_ecin_y[i]       = NAN;
-      ec_ecin_z[i]       = NAN;
-      ec_ecin_lu[i]      = NAN;
-      ec_ecin_lv[i]      = NAN;
-      ec_ecin_lw[i]      = NAN;
+      ec_tot_energy[i]  = NAN;
+      ec_pcal_energy[i] = NAN;
+      ec_pcal_sec[i]    = -1;
+      ec_pcal_time[i]   = NAN;
+      ec_pcal_path[i]   = NAN;
+      ec_pcal_x[i]      = NAN;
+      ec_pcal_y[i]      = NAN;
+      ec_pcal_z[i]      = NAN;
+      ec_pcal_hx[i]     = NAN;
+      ec_pcal_hy[i]     = NAN;
+      ec_pcal_hz[i]     = NAN;
+      ec_pcal_lu[i]     = NAN;
+      ec_pcal_lv[i]     = NAN;
+      ec_pcal_lw[i]     = NAN;
+      ec_pcal_du[i]     = NAN;
+      ec_pcal_dv[i]     = NAN;
+      ec_pcal_dw[i]     = NAN;
+      ec_pcal_m2u[i]    = NAN;
+      ec_pcal_m2v[i]    = NAN;
+      ec_pcal_m2w[i]    = NAN;
+      ec_pcal_m3u[i]    = NAN;
+      ec_pcal_m3v[i]    = NAN;
+      ec_pcal_m3w[i]    = NAN;
+
+      ec_ecin_energy[i] = NAN;
+      ec_ecin_sec[i]    = -1;
+      ec_ecin_time[i]   = NAN;
+      ec_ecin_path[i]   = NAN;
+      ec_ecin_x[i]      = NAN;
+      ec_ecin_y[i]      = NAN;
+      ec_ecin_z[i]      = NAN;
+      ec_ecin_hx[i]     = NAN;
+      ec_ecin_hy[i]     = NAN;
+      ec_ecin_hz[i]     = NAN;
+      ec_ecin_lu[i]     = NAN;
+      ec_ecin_lv[i]     = NAN;
+      ec_ecin_lw[i]     = NAN;
+      ec_ecin_du[i]     = NAN;
+      ec_ecin_dv[i]     = NAN;
+      ec_ecin_dw[i]     = NAN;
+      ec_ecin_m2u[i]    = NAN;
+      ec_ecin_m2v[i]    = NAN;
+      ec_ecin_m2w[i]    = NAN;
+      ec_ecin_m3u[i]    = NAN;
+      ec_ecin_m3v[i]    = NAN;
+      ec_ecin_m3w[i]    = NAN;
+
       ec_ecout_energy[i] = NAN;
       ec_ecout_sec[i]    = -1;
       ec_ecout_time[i]   = NAN;
@@ -905,9 +763,21 @@ int main(int argc, char** argv) {
       ec_ecout_x[i]      = NAN;
       ec_ecout_y[i]      = NAN;
       ec_ecout_z[i]      = NAN;
+      ec_ecout_hx[i]     = NAN;
+      ec_ecout_hy[i]     = NAN;
+      ec_ecout_hz[i]     = NAN;
       ec_ecout_lu[i]     = NAN;
       ec_ecout_lv[i]     = NAN;
       ec_ecout_lw[i]     = NAN;
+      ec_ecout_du[i]     = NAN;
+      ec_ecout_dv[i]     = NAN;
+      ec_ecout_dw[i]     = NAN;
+      ec_ecout_m2u[i]    = NAN;
+      ec_ecout_m2v[i]    = NAN;
+      ec_ecout_m2w[i]    = NAN;
+      ec_ecout_m3u[i]    = NAN;
+      ec_ecout_m3v[i]    = NAN;
+      ec_ecout_m3w[i]    = NAN;
     }
 
     float pcal   = 0.0;
@@ -932,9 +802,21 @@ int main(int argc, char** argv) {
             ec_pcal_x[i]    = cal_x_node->getValue(k);
             ec_pcal_y[i]    = cal_y_node->getValue(k);
             ec_pcal_z[i]    = cal_z_node->getValue(k);
+            ec_pcal_hx[i]   = cal_hx_node->getValue(k);
+            ec_pcal_hy[i]   = cal_hy_node->getValue(k);
+            ec_pcal_hz[i]   = cal_hz_node->getValue(k);
             ec_pcal_lu[i]   = cal_lu_node->getValue(k);
             ec_pcal_lv[i]   = cal_lv_node->getValue(k);
             ec_pcal_lw[i]   = cal_lw_node->getValue(k);
+            ec_pcal_du[i]   = cal_du_node->getValue(k);
+            ec_pcal_dv[i]   = cal_dv_node->getValue(k);
+            ec_pcal_dw[i]   = cal_dw_node->getValue(k);
+            ec_pcal_m2u[i]  = cal_m2u_node->getValue(k);
+            ec_pcal_m2v[i]  = cal_m2v_node->getValue(k);
+            ec_pcal_m2w[i]  = cal_m2w_node->getValue(k);
+            ec_pcal_m3u[i]  = cal_m3u_node->getValue(k);
+            ec_pcal_m3v[i]  = cal_m3v_node->getValue(k);
+            ec_pcal_m3w[i]  = cal_m3w_node->getValue(k);
           } else if (layer == EC_INNER) {
             einner += energy;
             ec_ecin_sec[i]  = cal_sector_node->getValue(k);
@@ -943,9 +825,21 @@ int main(int argc, char** argv) {
             ec_ecin_x[i]    = cal_x_node->getValue(k);
             ec_ecin_y[i]    = cal_y_node->getValue(k);
             ec_ecin_z[i]    = cal_z_node->getValue(k);
+            ec_ecin_hx[i]   = cal_hx_node->getValue(k);
+            ec_ecin_hy[i]   = cal_hy_node->getValue(k);
+            ec_ecin_hz[i]   = cal_hz_node->getValue(k);
             ec_ecin_lu[i]   = cal_lu_node->getValue(k);
             ec_ecin_lv[i]   = cal_lv_node->getValue(k);
             ec_ecin_lw[i]   = cal_lw_node->getValue(k);
+            ec_ecin_du[i]   = cal_du_node->getValue(k);
+            ec_ecin_dv[i]   = cal_dv_node->getValue(k);
+            ec_ecin_dw[i]   = cal_dw_node->getValue(k);
+            ec_ecin_m2u[i]  = cal_m2u_node->getValue(k);
+            ec_ecin_m2v[i]  = cal_m2v_node->getValue(k);
+            ec_ecin_m2w[i]  = cal_m2w_node->getValue(k);
+            ec_ecin_m3u[i]  = cal_m3u_node->getValue(k);
+            ec_ecin_m3v[i]  = cal_m3v_node->getValue(k);
+            ec_ecin_m3w[i]  = cal_m3w_node->getValue(k);
           } else if (layer == EC_OUTER) {
             eouter += energy;
             ec_ecout_sec[i]  = cal_sector_node->getValue(k);
@@ -954,9 +848,21 @@ int main(int argc, char** argv) {
             ec_ecout_x[i]    = cal_x_node->getValue(k);
             ec_ecout_y[i]    = cal_y_node->getValue(k);
             ec_ecout_z[i]    = cal_z_node->getValue(k);
+            ec_ecout_hx[i]   = cal_hx_node->getValue(k);
+            ec_ecout_hy[i]   = cal_hy_node->getValue(k);
+            ec_ecout_hz[i]   = cal_hz_node->getValue(k);
             ec_ecout_lu[i]   = cal_lu_node->getValue(k);
             ec_ecout_lv[i]   = cal_lv_node->getValue(k);
             ec_ecout_lw[i]   = cal_lw_node->getValue(k);
+            ec_ecout_du[i]   = cal_du_node->getValue(k);
+            ec_ecout_dv[i]   = cal_dv_node->getValue(k);
+            ec_ecout_dw[i]   = cal_dw_node->getValue(k);
+            ec_ecout_m2u[i]  = cal_m2u_node->getValue(k);
+            ec_ecout_m2v[i]  = cal_m2v_node->getValue(k);
+            ec_ecout_m2w[i]  = cal_m2w_node->getValue(k);
+            ec_ecout_m3u[i]  = cal_m3u_node->getValue(k);
+            ec_ecout_m3v[i]  = cal_m3v_node->getValue(k);
+            ec_ecout_m3w[i]  = cal_m3w_node->getValue(k);
           }
         }
       }
@@ -981,6 +887,9 @@ int main(int argc, char** argv) {
     cc_ltcc_path.resize(len_pid);
     cc_ltcc_theta.resize(len_pid);
     cc_ltcc_phi.resize(len_pid);
+    cc_ltcc_x.resize(len_pid);
+    cc_ltcc_y.resize(len_pid);
+    cc_ltcc_z.resize(len_pid);
 
     cc_htcc_sec.resize(len_pid);
     cc_htcc_nphe.resize(len_pid);
@@ -988,6 +897,9 @@ int main(int argc, char** argv) {
     cc_htcc_path.resize(len_pid);
     cc_htcc_theta.resize(len_pid);
     cc_htcc_phi.resize(len_pid);
+    cc_htcc_x.resize(len_pid);
+    cc_htcc_y.resize(len_pid);
+    cc_htcc_z.resize(len_pid);
 
     cc_rich_sec.resize(len_pid);
     cc_rich_nphe.resize(len_pid);
@@ -995,6 +907,9 @@ int main(int argc, char** argv) {
     cc_rich_path.resize(len_pid);
     cc_rich_theta.resize(len_pid);
     cc_rich_phi.resize(len_pid);
+    cc_rich_x.resize(len_pid);
+    cc_rich_y.resize(len_pid);
+    cc_rich_z.resize(len_pid);
 
     for (int i = 0; i < len_pid; i++) {
       cc_nphe_tot[i]   = NAN;
@@ -1004,18 +919,27 @@ int main(int argc, char** argv) {
       cc_ltcc_path[i]  = NAN;
       cc_ltcc_theta[i] = NAN;
       cc_ltcc_phi[i]   = NAN;
+      cc_ltcc_x[i]     = NAN;
+      cc_ltcc_y[i]     = NAN;
+      cc_ltcc_z[i]     = NAN;
       cc_htcc_sec[i]   = -1;
       cc_htcc_nphe[i]  = NAN;
       cc_htcc_time[i]  = NAN;
       cc_htcc_path[i]  = NAN;
       cc_htcc_theta[i] = NAN;
       cc_htcc_phi[i]   = NAN;
+      cc_htcc_x[i]     = NAN;
+      cc_htcc_y[i]     = NAN;
+      cc_htcc_z[i]     = NAN;
       cc_rich_sec[i]   = -1;
       cc_rich_nphe[i]  = NAN;
       cc_rich_time[i]  = NAN;
       cc_rich_path[i]  = NAN;
       cc_rich_theta[i] = NAN;
       cc_rich_phi[i]   = NAN;
+      cc_rich_x[i]     = NAN;
+      cc_rich_y[i]     = NAN;
+      cc_rich_z[i]     = NAN;
     }
 
     float nphe_tot = 0.0;
@@ -1035,6 +959,9 @@ int main(int argc, char** argv) {
           cc_htcc_path[i]  = chern_path_node->getValue(k);
           cc_htcc_theta[i] = chern_theta_node->getValue(k);
           cc_htcc_phi[i]   = chern_phi_node->getValue(k);
+          cc_htcc_x[i]     = chern_x_node->getValue(k);
+          cc_htcc_y[i]     = chern_y_node->getValue(k);
+          cc_htcc_z[i]     = chern_z_node->getValue(k);
         } else if (pindex == i && detector == LTCC) {
           cc_ltcc_nphe[i]  = chern_nphe_node->getValue(k);
           cc_ltcc_sec[i]   = chern_sector_node->getValue(k);
@@ -1042,6 +969,9 @@ int main(int argc, char** argv) {
           cc_ltcc_path[i]  = chern_path_node->getValue(k);
           cc_ltcc_theta[i] = chern_theta_node->getValue(k);
           cc_ltcc_phi[i]   = chern_phi_node->getValue(k);
+          cc_ltcc_x[i]     = chern_x_node->getValue(k);
+          cc_ltcc_y[i]     = chern_y_node->getValue(k);
+          cc_ltcc_z[i]     = chern_z_node->getValue(k);
         } else if (pindex == i && detector == RICH) {
           cc_rich_nphe[i]  = chern_nphe_node->getValue(k);
           cc_rich_sec[i]   = chern_sector_node->getValue(k);
@@ -1049,6 +979,9 @@ int main(int argc, char** argv) {
           cc_rich_path[i]  = chern_path_node->getValue(k);
           cc_rich_theta[i] = chern_theta_node->getValue(k);
           cc_rich_phi[i]   = chern_phi_node->getValue(k);
+          cc_rich_x[i]     = chern_x_node->getValue(k);
+          cc_rich_y[i]     = chern_y_node->getValue(k);
+          cc_rich_z[i]     = chern_z_node->getValue(k);
         }
       }
       if (cc_nphe_tot[i] != cc_nphe_tot[i])
@@ -1181,6 +1114,7 @@ int main(int argc, char** argv) {
         int pindex   = scint_pindex_node->getValue(k);
         int detector = scint_detector_node->getValue(k);
         int layer    = scint_layer_node->getValue(k);
+
         if (pindex == i && detector == FTOF && layer == FTOF_1A) {
           sc_ftof_1a_sec[i]       = scint_sector_node->getValue(k);
           sc_ftof_1a_time[i]      = scint_time_node->getValue(k);
@@ -1439,67 +1373,75 @@ int main(int argc, char** argv) {
       }
     }
 
-    if (cvt) {
-      len_pid = CVT_pid_node->getLength();
-      l       = CVT_pid_node->getLength();
+    if (VertDoca) {
+      l = VertDoca_index1_node->getLength();
+      VertDoca_index1_vec.resize(l);
+      VertDoca_index2_vec.resize(l);
+      VertDoca_x_vec.resize(l);
+      VertDoca_y_vec.resize(l);
+      VertDoca_z_vec.resize(l);
+      VertDoca_x1_vec.resize(l);
+      VertDoca_y1_vec.resize(l);
+      VertDoca_z1_vec.resize(l);
+      VertDoca_cx1_vec.resize(l);
+      VertDoca_cy1_vec.resize(l);
+      VertDoca_cz1_vec.resize(l);
+      VertDoca_x2_vec.resize(l);
+      VertDoca_y2_vec.resize(l);
+      VertDoca_z2_vec.resize(l);
+      VertDoca_cx2_vec.resize(l);
+      VertDoca_cy2_vec.resize(l);
+      VertDoca_cz2_vec.resize(l);
+      VertDoca_r_vec.resize(l);
 
-      cvt_pid.resize(len_pid);
-      cvt_q.resize(len_pid);
-      cvt_p.resize(len_pid);
-      cvt_pt.resize(len_pid);
-      cvt_phi0.resize(len_pid);
-      cvt_tandip.resize(len_pid);
-      cvt_z0.resize(len_pid);
-      cvt_d0.resize(len_pid);
-      cvt_CovMat_d02.resize(len_pid);
-      cvt_CovMat_d0phi0.resize(len_pid);
-      cvt_CovMat_d0rho.resize(len_pid);
-      cvt_CovMat_phi02.resize(len_pid);
-      cvt_CovMat_phi0rho.resize(len_pid);
-      cvt_CovMat_rho2.resize(len_pid);
-      cvt_CovMat_z02.resize(len_pid);
-      cvt_CovMat_tandip2.resize(len_pid);
-
-      for (int i = 0; i < len_pid; i++) {
-        cvt_pid[i]            = -1;
-        cvt_q[i]              = -1;
-        cvt_p[i]              = NAN;
-        cvt_pt[i]             = NAN;
-        cvt_phi0[i]           = NAN;
-        cvt_tandip[i]         = NAN;
-        cvt_z0[i]             = NAN;
-        cvt_d0[i]             = NAN;
-        cvt_CovMat_d02[i]     = NAN;
-        cvt_CovMat_d0phi0[i]  = NAN;
-        cvt_CovMat_d0rho[i]   = NAN;
-        cvt_CovMat_phi02[i]   = NAN;
-        cvt_CovMat_phi0rho[i] = NAN;
-        cvt_CovMat_rho2[i]    = NAN;
-        cvt_CovMat_z02[i]     = NAN;
-        cvt_CovMat_tandip2[i] = NAN;
+      for (int i = 0; i < l; i++) {
+        VertDoca_index1_vec[i] = VertDoca_index1_node->getValue(i);
+        VertDoca_index2_vec[i] = VertDoca_index2_node->getValue(i);
+        VertDoca_x_vec[i]      = VertDoca_x_node->getValue(i);
+        VertDoca_y_vec[i]      = VertDoca_y_node->getValue(i);
+        VertDoca_z_vec[i]      = VertDoca_z_node->getValue(i);
+        VertDoca_x1_vec[i]     = VertDoca_x1_node->getValue(i);
+        VertDoca_y1_vec[i]     = VertDoca_y1_node->getValue(i);
+        VertDoca_z1_vec[i]     = VertDoca_z1_node->getValue(i);
+        VertDoca_cx1_vec[i]    = VertDoca_cx1_node->getValue(i);
+        VertDoca_cy1_vec[i]    = VertDoca_cy1_node->getValue(i);
+        VertDoca_cz1_vec[i]    = VertDoca_cz1_node->getValue(i);
+        VertDoca_x2_vec[i]     = VertDoca_x2_node->getValue(i);
+        VertDoca_y2_vec[i]     = VertDoca_y2_node->getValue(i);
+        VertDoca_z2_vec[i]     = VertDoca_z2_node->getValue(i);
+        VertDoca_cx2_vec[i]    = VertDoca_cx2_node->getValue(i);
+        VertDoca_cy2_vec[i]    = VertDoca_cy2_node->getValue(i);
+        VertDoca_cz2_vec[i]    = VertDoca_cz2_node->getValue(i);
+        VertDoca_r_vec[i]      = VertDoca_r_node->getValue(i);
       }
+    }
 
-      for (int i = 0; i < len_pid; i++) {
-        for (int k = 0; k < len_pindex; ++k) {
-          int pindex = CovMat_pindex_node->getValue(k);
-          if (pindex == i) {
-            cvt_pid[i]            = CVT_pid_node->getValue(k);
-            cvt_q[i]              = CVT_q_node->getValue(k);
-            cvt_p[i]              = CVT_p_node->getValue(k);
-            cvt_phi0[i]           = CVT_phi0_node->getValue(k);
-            cvt_tandip[i]         = CVT_tandip_node->getValue(k);
-            cvt_z0[i]             = CVT_z0_node->getValue(k);
-            cvt_d0[i]             = CVT_d0_node->getValue(k);
-            cvt_CovMat_d02[i]     = CVT_Cov_d02_node->getValue(k);
-            cvt_CovMat_d0phi0[i]  = CVT_Cov_d0phi0_node->getValue(k);
-            cvt_CovMat_d0rho[i]   = CVT_Cov_d0rho_node->getValue(k);
-            cvt_CovMat_phi02[i]   = CVT_Cov_phi02_node->getValue(k);
-            cvt_CovMat_phi0rho[i] = CVT_Cov_phi0rho_node->getValue(k);
-            cvt_CovMat_rho2[i]    = CVT_Cov_rho2_node->getValue(k);
-            cvt_CovMat_z02[i]     = CVT_Cov_z02_node->getValue(k);
-            cvt_CovMat_tandip2[i] = CVT_Cov_tandip2_node->getValue(k);
-          }
-        }
+    if (traj) {
+      l = traj_pindex_node->getLength();
+      traj_pindex_vec.resize(l);
+      traj_index_vec.resize(l);
+      traj_detId_vec.resize(l);
+      traj_q_vec.resize(l);
+      traj_x_vec.resize(l);
+      traj_y_vec.resize(l);
+      traj_z_vec.resize(l);
+      traj_cx_vec.resize(l);
+      traj_cy_vec.resize(l);
+      traj_cz_vec.resize(l);
+      traj_pathlength_vec.resize(l);
+
+      for (int i = 0; i < l; i++) {
+        traj_pindex_vec[i]     = traj_pindex_node->getValue(i);
+        traj_index_vec[i]      = traj_index_node->getValue(i);
+        traj_detId_vec[i]      = traj_detId_node->getValue(i);
+        traj_q_vec[i]          = traj_q_node->getValue(i);
+        traj_x_vec[i]          = traj_x_node->getValue(i);
+        traj_y_vec[i]          = traj_y_node->getValue(i);
+        traj_z_vec[i]          = traj_z_node->getValue(i);
+        traj_cx_vec[i]         = traj_cx_node->getValue(i);
+        traj_cy_vec[i]         = traj_cy_node->getValue(i);
+        traj_cz_vec[i]         = traj_cz_node->getValue(i);
+        traj_pathlength_vec[i] = traj_pathlength_node->getValue(i);
       }
     }
 
@@ -1514,7 +1456,12 @@ int main(int argc, char** argv) {
     std::chrono::duration<double> elapsed_full =
         (std::chrono::high_resolution_clock::now() - start_full);
     std::cout << "Elapsed time: " << elapsed_full.count() << " s" << std::endl;
-    std::cout << "Events/Sec: " << entry / elapsed_full.count() << " Hz" << std::endl;
+    std::cout << "Events/Sec: " << tot_hipo_events / elapsed_full.count() << " Hz" << std::endl;
+    std::cout << "Total events in file: " << tot_hipo_events << std::endl;
+    std::cout << "Events converted: " << tot_events_processed << "\t ("
+              << 100.0 * tot_events_processed / tot_hipo_events << "%)" << std::endl;
+    std::cout << "Events converted/Sec: " << tot_events_processed / elapsed_full.count() << " Hz"
+              << std::endl;
   }
 
   return 0;

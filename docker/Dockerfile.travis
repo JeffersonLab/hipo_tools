@@ -26,3 +26,6 @@ RUN mkdir -p /tmp/hipo_tools/build && cd /tmp/hipo_tools/build \
     && make -j$(nproc) \
     && make install \
     && rm -rf /tmp/*
+
+WORKDIR /tmp
+#ENTRYPOINT ["bash"]

@@ -92,26 +92,26 @@ cdef class hipo4_reader:
   def __iter__(hipo4_reader self):
       return self
   def __str__(hipo4_reader self):
-    out = "["
+    cdef bytes out = b"["
     out += self.c_dict.getSchema(str_to_char("REC::ForwardTagger")).json()
-    out += ","
+    out += b","
     out += self.c_dict.getSchema(str_to_char("REC::VertDoca")).json()
-    out += ","
+    out += b","
     out += self.c_dict.getSchema(str_to_char("REC::Track")).json()
-    out += ","
+    out += b","
     out += self.c_dict.getSchema(str_to_char("REC::Cherenkov")).json()
-    out += ","
+    out += b","
     out += self.c_dict.getSchema(str_to_char("REC::Event")).json()
-    out += ","
+    out += b","
     out += self.c_dict.getSchema(str_to_char("REC::Particle")).json()
-    out += ","
+    out += b","
     out += self.c_dict.getSchema(str_to_char("REC::Scintillator")).json()
-    out += ","
+    out += b","
     out += self.c_dict.getSchema(str_to_char("REC::Calorimeter")).json()
-    out += ","
+    out += b","
     out += self.c_dict.getSchema(str_to_char("REC::CovMat")).json()
-    out += "]"
-    return out
+    out += b"]"
+    return str(out)
   def __next__(hipo4_reader self):
     if self.c_hiporeader.next():
       self.c_hiporeader.read(self.c_event[0])

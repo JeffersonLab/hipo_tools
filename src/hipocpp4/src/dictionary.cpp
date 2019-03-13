@@ -86,6 +86,8 @@ namespace hipo {
       out += "{";
       out += "\"name\" : \"";
       out += schemaEntries[i].name;
+      out += "\" , \"id\" : \"";
+      out += std::to_string(getEntryOrder(schemaEntries[i].name));
       out += "\" , \"type\" : \"";
       out += schemaEntries[i].type;
       out += (i == schemaEntries.size() - 1) ? ("\" }") : ("\" },");
@@ -104,7 +106,7 @@ namespace hipo {
     return getOffset(item, order, rows);
   }
 
-  int schema::getEntryOrder(const char* name) { return schemaEntriesMap[name]; }
+  int schema::getEntryOrder(std::string name) { return schemaEntriesMap[name]; }
   int schema::getSizeForRows(int rows) {
     int nentries = schemaEntries.size();
     int offset   = getOffset(nentries - 1, rows - 1, rows) + schemaEntries[nentries - 1].typeSize;
