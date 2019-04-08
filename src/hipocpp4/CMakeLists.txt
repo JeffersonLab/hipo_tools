@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS}")
 
 set(hipo4_srcs
   src/bank.cpp

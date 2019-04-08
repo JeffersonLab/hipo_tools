@@ -7,6 +7,10 @@
 #ifndef CONSTANTS_H_GUARD
 #define CONSTANTS_H_GUARD
 
+#define FORWARD_TAGGER 1
+#define FORWARD_DETECTOR 2
+#define CENTRAL_DETECTOR 4
+
 // Detector
 #define BMT 1
 #define BST 2

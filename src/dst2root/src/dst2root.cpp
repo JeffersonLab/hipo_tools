@@ -381,6 +381,8 @@ int main(int argc, char** argv) {
   int  tot_events_processed = 0;
   auto start_full           = std::chrono::high_resolution_clock::now();
   while (reader->next()) {
+    if (is_test && entry > 50000)
+      break;
     reader->read(*hipo_event);
     hipo_event->getStructure(*rec_Particle);
     hipo_event->getStructure(*rec_ForwardTagger);
@@ -399,14 +401,6 @@ int main(int argc, char** argv) {
     if (!is_batch && (++entry % 10000) == 0)
       std::cout << "\t" << floor(100 * entry / tot_hipo_events) << "%\r\r" << std::flush;
 
-    if (is_test && entry > 50000)
-      break;
-
-    if (good_rec && rec_Particle->getRows() == 0)
-      continue;
-    if (elec_first && rec_Particle->getInt(0, 0) != 11)
-      continue;
-
     tot_events_processed++;
     l = rec_Event->getRows();
     if (l != 0) {
@@ -423,39 +417,6 @@ int main(int argc, char** argv) {
       RFTime  = rec_Event->getFloat(10, 0);
       Helic   = rec_Event->getInt(11, 0);
       PTIME   = rec_Event->getFloat(12, 0);
-    }
-
-    l = rec_Particle->getRows();
-    pid.resize(l);
-    p.resize(l);
-    p2.resize(l);
-    px.resize(l);
-    py.resize(l);
-    pz.resize(l);
-    vx.resize(l);
-    vy.resize(l);
-    vz.resize(l);
-    charge.resize(l);
-    beta.resize(l);
-    chi2pid.resize(l);
-    status.resize(l);
-
-    for (int i = 0; i < l; i++) {
-      pid[i]     = rec_Particle->getInt(0, i);
-      p2[i]      = (rec_Particle->getFloat(1, i) * rec_Particle->getFloat(1, i) +
-               rec_Particle->getFloat(2, i) * rec_Particle->getFloat(2, i) +
-               rec_Particle->getFloat(3, i) * rec_Particle->getFloat(3, i));
-      p[i]       = sqrt(p2[i]);
-      px[i]      = rec_Particle->getFloat(1, i);
-      py[i]      = rec_Particle->getFloat(2, i);
-      pz[i]      = rec_Particle->getFloat(3, i);
-      vx[i]      = rec_Particle->getFloat(4, i);
-      vy[i]      = rec_Particle->getFloat(5, i);
-      vz[i]      = rec_Particle->getFloat(6, i);
-      charge[i]  = rec_Particle->getInt(7, i);
-      beta[i]    = ((rec_Particle->getFloat(8, i) != -9999) ? rec_Particle->getFloat(8, i) : NAN);
-      chi2pid[i] = rec_Particle->getFloat(9, i);
-      status[i]  = rec_Particle->getInt(10, i);
     }
 
     /*
@@ -502,6 +463,45 @@ int main(int argc, char** argv) {
           }
         }
     */
+
+    if (good_rec && rec_Particle->getRows() == 0)
+      continue;
+    if (elec_first && rec_Particle->getInt(0, 0) != 11)
+      continue;
+
+    l = rec_Particle->getRows();
+    pid.resize(l);
+    p.resize(l);
+    p2.resize(l);
+    px.resize(l);
+    py.resize(l);
+    pz.resize(l);
+    vx.resize(l);
+    vy.resize(l);
+    vz.resize(l);
+    charge.resize(l);
+    beta.resize(l);
+    chi2pid.resize(l);
+    status.resize(l);
+
+    for (int i = 0; i < l; i++) {
+      pid[i]     = rec_Particle->getInt(0, i);
+      p2[i]      = (rec_Particle->getFloat(1, i) * rec_Particle->getFloat(1, i) +
+               rec_Particle->getFloat(2, i) * rec_Particle->getFloat(2, i) +
+               rec_Particle->getFloat(3, i) * rec_Particle->getFloat(3, i));
+      p[i]       = sqrt(p2[i]);
+      px[i]      = rec_Particle->getFloat(1, i);
+      py[i]      = rec_Particle->getFloat(2, i);
+      pz[i]      = rec_Particle->getFloat(3, i);
+      vx[i]      = rec_Particle->getFloat(4, i);
+      vy[i]      = rec_Particle->getFloat(5, i);
+      vz[i]      = rec_Particle->getFloat(6, i);
+      charge[i]  = rec_Particle->getInt(7, i);
+      beta[i]    = ((rec_Particle->getFloat(8, i) != -9999) ? rec_Particle->getFloat(8, i) : NAN);
+      chi2pid[i] = rec_Particle->getFloat(9, i);
+      status[i]  = rec_Particle->getInt(10, i);
+    }
+
     len_pid    = rec_Particle->getRows();
     len_pindex = rec_Calorimeter->getRows();
     ec_tot_energy.resize(len_pid);
