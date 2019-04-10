@@ -1,5 +1,5 @@
-using v_int   = std::vector<int>;
-using v_float = std::vector<float>;
+using v_int   = std::vector<Int_t>;
+using v_float = std::vector<Float_t>;
 
 int    NRUN;
 int    NEVENT;

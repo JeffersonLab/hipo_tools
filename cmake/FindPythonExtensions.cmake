@@ -274,15 +274,24 @@ for candidate in candidates:
         result = candidate
         rel_result = rel_candidate
         break
-
-sys.stdout.write(\";\".join((
+if sys.version_info[0] < 3:
+  sys.stdout.write(\";\".join((
+    os.sep,
+    os.pathsep,
+    sys.prefix,
+    result,
+    rel_result,
+    sysconfig.get_config_var('SO')
+  )))
+else:
+  sys.stdout.write(\";\".join((
     os.sep,
     os.pathsep,
     sys.prefix,
     result,
     rel_result,
     sysconfig.get_config_var('EXT_SUFFIX')
-)))
+  )))
 ")
 
 execute_process(COMMAND "${PYTHON_EXECUTABLE}" -c "${_command}"
