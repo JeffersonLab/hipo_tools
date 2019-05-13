@@ -1,19 +1,30 @@
 using v_int   = std::vector<Int_t>;
 using v_float = std::vector<Float_t>;
 
-int    NRUN;
-int    NEVENT;
-float  EVNTime;
-int    TYPE;
-int    TRG;
-float  BCG;
-float  STTime;
-float  RFTime;
+// Old Event
+int   NRUN;
+int   NEVENT;
+float EVNTime;
+int   TYPE;
+int   TRG;
+float BCG;
+float STTime;
+// float  RFTime;
 int    Helic;
 int    EvCAT;
 int    NPGP;
 double LT;
 float  PTIME;
+
+int    category;
+int    topology;
+float  beamCharge;
+double liveTime;
+float  startTime;
+float  RFTime;
+int    helicity;
+int    helicityRaw;
+float  procTime;
 
 v_int   pid;
 v_float p;
@@ -284,6 +295,20 @@ v_float ft_hodo_z;
 v_float ft_hodo_dx;
 v_float ft_hodo_dy;
 v_float ft_hodo_radius;
+
+int   mc_run;
+int   mc_event;
+int   mc_type;
+float mc_helicity;
+
+v_int   mc_pid_vec;
+v_float mc_px_vec;
+v_float mc_py_vec;
+v_float mc_pz_vec;
+v_float mc_vx_vec;
+v_float mc_vy_vec;
+v_float mc_vz_vec;
+v_float mc_vt_vec;
 
 v_int   MC_pid;
 v_float MC_helicity;

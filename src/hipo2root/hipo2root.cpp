@@ -427,6 +427,7 @@ int main(int argc, char** argv) {
 
     if (!is_batch && (++entry % 10000) == 0)
       std::cout << "\t" << floor(100 * entry / tot_hipo_events) << "%\r\r" << std::flush;
+
     l = rec_Event->getRows();
     if (l != -1) {
       REC_Event_category_vec.resize(l);
