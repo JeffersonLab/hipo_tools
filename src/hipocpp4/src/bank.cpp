@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
+#include <cmath>
 #include "hipo4/bank.h"
 #include "hipo4/utils.h"
 
