@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(hipoio C CXX)
-#project(hipoio C CXX Fortran)
+project(hipoio C CXX Fortran)
 set(VERSION 1.0.0)
 
 option(BUILD_FPIC "Build with -fPIC" ON)
