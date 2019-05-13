@@ -100,7 +100,7 @@ namespace hipo {
              bankSchema.getEntryName(item).c_str(), type);
       break;
     }
-    return 0;
+    return -99;
   }
   int bank::getShort(int item, int index) {
     int type   = bankSchema.getEntryType(item);
@@ -115,7 +115,7 @@ namespace hipo {
              bankSchema.getEntryName(item).c_str(), type);
       break;
     }
-    return 0;
+    return -99;
   }
   int bank::getByte(int item, int index) {
     int type   = bankSchema.getEntryType(item);
@@ -128,21 +128,21 @@ namespace hipo {
              bankSchema.getEntryName(item).c_str(), type);
       break;
     }
-    return 0;
+    return -99;
   }
   float bank::getFloat(int item, int index) {
     if (bankSchema.getEntryType(item) == 4) {
       int offset = bankSchema.getOffset(item, index, bankRows);
       return getFloatAt(offset);
     }
-    return 0.0;
+    return std::nanf("-99");
   }
   double bank::getDouble(int item, int index) {
     if (bankSchema.getEntryType(item) == 5) {
       int offset = bankSchema.getOffset(item, index, bankRows);
       return getDoubleAt(offset);
     }
-    return 0.0;
+    return std::nanf("-99");
   }
 
   long bank::getLong(int item, int index) {
@@ -150,7 +150,7 @@ namespace hipo {
       int offset = bankSchema.getOffset(item, index, bankRows);
       return getLongAt(offset);
     }
-    return 0;
+    return -99;
   }
 
   int bank::getInt(const char* name, int index) {
@@ -168,7 +168,7 @@ namespace hipo {
       printf("---> error : requested INT for [%s] type = %d\n", name, type);
       break;
     }
-    return 0;
+    return -99;
   }
 
   int bank::getShort(const char* name, int index) {
@@ -185,7 +185,7 @@ namespace hipo {
              bankSchema.getEntryName(item).c_str(), type);
       break;
     }
-    return 0;
+    return -99;
   }
   int bank::getByte(const char* name, int index) {
     int item   = bankSchema.getEntryOrder(name);
@@ -199,7 +199,7 @@ namespace hipo {
              bankSchema.getEntryName(item).c_str(), type);
       break;
     }
-    return 0;
+    return -99;
   }
 
   float bank::getFloat(const char* name, int index) {
@@ -226,7 +226,7 @@ namespace hipo {
       int offset = bankSchema.getOffset(item, index, bankRows);
       return getLongAt(offset);
     }
-    return 0;
+    return -99;
   }
   void bank::show() {
     for (int i = 0; i < bankSchema.getEntries(); i++) {

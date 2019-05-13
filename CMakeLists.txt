@@ -42,7 +42,7 @@ if(Cython_FOUND)
 endif()
 
 # Build executables from their own folders
-add_subdirectory(src/recon2root)
+add_subdirectory(src/hipo2root)
 add_subdirectory(src/dst2root)
 
 # Build examples
