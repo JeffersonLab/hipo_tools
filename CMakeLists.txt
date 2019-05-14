@@ -4,7 +4,7 @@ set(VERSION 1.0.0)
 
 option(BUILD_FPIC "Build with -fPIC" ON)
 option(BUILD_HIPOPY "Build python" OFF)
-option(BUILD_EXAMPLES "Build examples programs" OFF)
+option(BUILD_EXAMPLES "Build examples programs" ON)
 
 if(BUILD_FPIC)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)

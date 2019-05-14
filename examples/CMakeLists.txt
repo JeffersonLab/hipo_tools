@@ -33,13 +33,13 @@ endforeach( exe ${EXAMPLES} )
 
 file(GLOB EXAMPLES hipo4/*.f90 )
 foreach(exe ${EXAMPLES} )
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -g")
     get_filename_component(exename ${exe} NAME)
     string( REPLACE ".f90" "" exename ${exename} )
     add_executable( ${exename} ${exe} )
     target_link_libraries(${exename}
       PRIVATE ${libname}
-      PUBLIC hipocpp4_static
-      PUBLIC ${ROOT_LIBRARIES})
+      PUBLIC hipocpp4_static)
     add_dependencies(${exename} hipocpp4_static)
     install(TARGETS ${exename}
       EXPORT ${PROJECT_NAME}Targets

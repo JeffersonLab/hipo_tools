@@ -12,8 +12,7 @@ extern "C" {
 void hipo_open_file_(int* nevents, const char* filename, int length) {
   char* buffer = (char*)malloc(length + 1);
   memcpy(buffer, filename, length);
-  buffer[length] = '\0';
-  printf("[FORTRAN] opening file : %s\n", buffer);
+  buffer[length]   = '\0';
   hipo_FORT_Reader = new hipo::reader(buffer);
   free(buffer);
 
@@ -31,6 +30,12 @@ int reader_next_() {
     }
     return 1;
   } else {
+    for (auto const& x : hipo_bank_map) {
+      delete x.second;
+    }
+    delete hipo_FORT_Reader;
+    delete hipo_FORT_dict;
+    delete hipo_FORT_event;
     return 0;
   }
 }
