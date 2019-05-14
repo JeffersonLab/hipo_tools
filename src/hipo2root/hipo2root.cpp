@@ -562,25 +562,20 @@ int main(int argc, char** argv) {
       REC_Cherenkov_status_vec.resize(l);
 
       for (int i = 0; i < l; i++) {
-        REC_Cherenkov_index_vec[i]  = rec_Cherenkov->getInt(0, l);
-        REC_Cherenkov_pindex_vec[i] = rec_Cherenkov->getInt(1, l);
-        /*
-        Think these are flopped
-                REC_Cherenkov_detector_vec[i] = rec_Cherenkov->getInt("detector", l);
-                REC_Cherenkov_sector_vec[i]   = rec_Cherenkov->getInt("sector", l);
-        */
-        REC_Cherenkov_detector_vec[i] = rec_Cherenkov->getInt(2, l);
-        REC_Cherenkov_sector_vec[i]   = rec_Cherenkov->getInt(3, l);
-        REC_Cherenkov_nphe_vec[i]     = rec_Cherenkov->getFloat(4, l);
-        REC_Cherenkov_time_vec[i]     = rec_Cherenkov->getFloat(5, l);
-        REC_Cherenkov_path_vec[i]     = rec_Cherenkov->getFloat(6, l);
-        REC_Cherenkov_chi2_vec[i]     = rec_Cherenkov->getFloat(7, l);
-        REC_Cherenkov_x_vec[i]        = rec_Cherenkov->getFloat(8, l);
-        REC_Cherenkov_y_vec[i]        = rec_Cherenkov->getFloat(9, l);
-        REC_Cherenkov_z_vec[i]        = rec_Cherenkov->getFloat(10, l);
-        REC_Cherenkov_dtheta_vec[i]   = rec_Cherenkov->getFloat(11, l);
-        REC_Cherenkov_dphi_vec[i]     = rec_Cherenkov->getFloat(12, l);
-        REC_Cherenkov_status_vec[i]   = rec_Cherenkov->getShort(13, l);
+        REC_Cherenkov_index_vec[i]    = rec_Cherenkov->getInt(0, i);
+        REC_Cherenkov_pindex_vec[i]   = rec_Cherenkov->getInt(1, i);
+        REC_Cherenkov_detector_vec[i] = rec_Cherenkov->getInt(2, i);
+        REC_Cherenkov_sector_vec[i]   = rec_Cherenkov->getInt(3, i);
+        REC_Cherenkov_nphe_vec[i]     = rec_Cherenkov->getFloat(4, i);
+        REC_Cherenkov_time_vec[i]     = rec_Cherenkov->getFloat(5, i);
+        REC_Cherenkov_path_vec[i]     = rec_Cherenkov->getFloat(6, i);
+        REC_Cherenkov_chi2_vec[i]     = rec_Cherenkov->getFloat(7, i);
+        REC_Cherenkov_x_vec[i]        = rec_Cherenkov->getFloat(8, i);
+        REC_Cherenkov_y_vec[i]        = rec_Cherenkov->getFloat(9, i);
+        REC_Cherenkov_z_vec[i]        = rec_Cherenkov->getFloat(10, i);
+        REC_Cherenkov_dtheta_vec[i]   = rec_Cherenkov->getFloat(11, i);
+        REC_Cherenkov_dphi_vec[i]     = rec_Cherenkov->getFloat(12, i);
+        REC_Cherenkov_status_vec[i]   = rec_Cherenkov->getShort(13, i);
       }
     }
     l = rec_Scintillator->getRows();
@@ -606,7 +601,7 @@ int main(int argc, char** argv) {
       for (int i = 0; i < l; i++) {
         REC_Scintillator_index_vec[i]  = rec_Scintillator->getInt(0, i);
         REC_Scintillator_pindex_vec[i] = rec_Scintillator->getInt(1, i);
-        /* These look weird as well
+        /* Looks weird
         REC_Scintillator_detector_vec[i]  = rec_Scintillator->getInt(2, i);
         REC_Scintillator_sector_vec[i]    = rec_Scintillator->getInt(3, i);
         REC_Scintillator_layer_vec[i]     = rec_Scintillator->getInt(4, i);
