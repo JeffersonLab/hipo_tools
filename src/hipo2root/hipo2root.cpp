@@ -62,6 +62,7 @@ int main(int argc, char** argv) {
 
   auto rec_ForwardTagger = std::make_shared<hipo::bank>(dict->getSchema("REC::ForwardTagger"));
   auto rec_Track         = std::make_shared<hipo::bank>(dict->getSchema("REC::Track"));
+  auto rec_Traj          = std::make_shared<hipo::bank>(dict->getSchema("REC::Traj"));
   auto rec_Cherenkov     = std::make_shared<hipo::bank>(dict->getSchema("REC::Cherenkov"));
   auto rec_Event         = std::make_shared<hipo::bank>(dict->getSchema("REC::Event"));
   auto rec_Particle      = std::make_shared<hipo::bank>(dict->getSchema("REC::Particle"));
@@ -211,7 +212,8 @@ int main(int argc, char** argv) {
   std::vector<float>  REC_VertDoca_r_vec;
   std::vector<int>    REC_Traj_pindex_vec;
   std::vector<int>    REC_Traj_index_vec;
-  std::vector<int>    REC_Traj_detId_vec;
+  std::vector<int>    REC_Traj_detector_vec;
+  std::vector<int>    REC_Traj_layer_vec;
   std::vector<int>    REC_Traj_q_vec;
   std::vector<float>  REC_Traj_x_vec;
   std::vector<float>  REC_Traj_y_vec;
@@ -219,7 +221,7 @@ int main(int argc, char** argv) {
   std::vector<float>  REC_Traj_cx_vec;
   std::vector<float>  REC_Traj_cy_vec;
   std::vector<float>  REC_Traj_cz_vec;
-  std::vector<float>  REC_Traj_pathlength_vec;
+  std::vector<float>  REC_Traj_path_vec;
   std::vector<int>    MC_Header_run_vec;
   std::vector<int>    MC_Header_event_vec;
   std::vector<int>    MC_Header_type_vec;
@@ -378,15 +380,15 @@ int main(int argc, char** argv) {
   if (traj) {
     clas12->Branch("REC_Traj_pindex", &REC_Traj_pindex_vec);
     clas12->Branch("REC_Traj_index", &REC_Traj_index_vec);
-    clas12->Branch("REC_Traj_detId", &REC_Traj_detId_vec);
-    clas12->Branch("REC_Traj_q", &REC_Traj_q_vec);
+    clas12->Branch("REC_Traj_detector_vec", &REC_Traj_detector_vec);
+    clas12->Branch("REC_Traj_layer_vec", &REC_Traj_layer_vec);
     clas12->Branch("REC_Traj_x", &REC_Traj_x_vec);
     clas12->Branch("REC_Traj_y", &REC_Traj_y_vec);
     clas12->Branch("REC_Traj_z", &REC_Traj_z_vec);
     clas12->Branch("REC_Traj_cx", &REC_Traj_cx_vec);
     clas12->Branch("REC_Traj_cy", &REC_Traj_cy_vec);
     clas12->Branch("REC_Traj_cz", &REC_Traj_cz_vec);
-    clas12->Branch("REC_Traj_pathlength", &REC_Traj_pathlength_vec);
+    clas12->Branch("REC_Traj_path", &REC_Traj_path_vec);
   }
   if (is_mc) {
     clas12->Branch("MC_Header_run", &MC_Header_run_vec);
@@ -420,6 +422,8 @@ int main(int argc, char** argv) {
     hipo_event->getStructure(*rec_Calorimeter);
     if (cov)
       hipo_event->getStructure(*rec_CovMat);
+    if (traj)
+      hipo_event->getStructure(*rec_Traj);
     if (is_mc) {
       hipo_event->getStructure(*mc_Header);
       hipo_event->getStructure(*mc_Particle);
@@ -789,18 +793,34 @@ int main(int argc, char** argv) {
     }
 
     if (traj) {
-      // pindex/S
-      // index/S
-      // detector/B
-      // layer/B
-      // x/F
-      // y/F
-      // z/F
-      // cx/F
-      // cy/F
-      // cz/F
-      // path/F
-      std::cerr << "traj Not implemented yet" << '\n';
+      l = rec_Traj->getRows();
+      if (l != -1) {
+        REC_Traj_pindex_vec.resize(l);
+        REC_Traj_index_vec.resize(l);
+        REC_Traj_detector_vec.resize(l);
+        REC_Traj_layer_vec.resize(l);
+        REC_Traj_x_vec.resize(l);
+        REC_Traj_y_vec.resize(l);
+        REC_Traj_z_vec.resize(l);
+        REC_Traj_cx_vec.resize(l);
+        REC_Traj_cy_vec.resize(l);
+        REC_Traj_cz_vec.resize(l);
+        REC_Traj_path_vec.resize(l);
+
+        for (int i = 0; i < l; i++) {
+          REC_Traj_index_vec[i]    = rec_Traj->getInt(0, i);
+          REC_Traj_pindex_vec[i]   = rec_Traj->getInt(1, i);
+          REC_Traj_detector_vec[i] = rec_Traj->getInt(2, i);
+          REC_Traj_layer_vec[i]    = rec_Traj->getInt(3, i);
+          REC_Traj_x_vec[i]        = rec_Traj->getFloat(4, i);
+          REC_Traj_y_vec[i]        = rec_Traj->getFloat(5, i);
+          REC_Traj_z_vec[i]        = rec_Traj->getFloat(6, i);
+          REC_Traj_cx_vec[i]       = rec_Traj->getFloat(7, i);
+          REC_Traj_cy_vec[i]       = rec_Traj->getFloat(8, i);
+          REC_Traj_cz_vec[i]       = rec_Traj->getFloat(9, i);
+          REC_Traj_path_vec[i]     = rec_Traj->getFloat(10, i);
+        }
+      }
     }
 
     clas12->Fill();
@@ -944,15 +964,15 @@ int main(int argc, char** argv) {
     REC_VertDoca_r_vec.clear();
     REC_Traj_pindex_vec.clear();
     REC_Traj_index_vec.clear();
-    REC_Traj_detId_vec.clear();
-    REC_Traj_q_vec.clear();
+    REC_Traj_detector_vec.clear();
+    REC_Traj_layer_vec.clear();
     REC_Traj_x_vec.clear();
     REC_Traj_y_vec.clear();
     REC_Traj_z_vec.clear();
     REC_Traj_cx_vec.clear();
     REC_Traj_cy_vec.clear();
     REC_Traj_cz_vec.clear();
-    REC_Traj_pathlength_vec.clear();
+    REC_Traj_path_vec.clear();
     MC_Header_run_vec.clear();
     MC_Header_event_vec.clear();
     MC_Header_type_vec.clear();
