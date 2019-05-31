@@ -50,9 +50,9 @@ int main(int argc, char** argv) {
     l = rec_Particle->getRows();
     if (l != -1) {
       for (int i = 0; i < l; i++) {
-        if (rec_Particle->getFloat("px", i) < 10 && rec_Particle->getFloat("px", i) > -1 &&
+        if (rec_Particle->getFloat("pz", i) < 10 && rec_Particle->getFloat("pz", i) > -1 &&
             rec_Particle->getInt("pid", i) == 11)
-          hist->Fill(rec_Particle->getFloat("px", i));
+          hist->Fill(rec_Particle->getFloat("pz", i));
       }
     }
   }
