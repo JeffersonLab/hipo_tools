@@ -47,13 +47,12 @@ int main(int argc, char** argv) {
 
     reader->read(*hipo_event);
     hipo_event->getStructure(*rec_Particle);
-
     l = rec_Particle->getRows();
     if (l != -1) {
       for (int i = 0; i < l; i++) {
-        if (rec_Particle->getFloat(3, i) < 10 && rec_Particle->getFloat(3, i) > -1 &&
-            rec_Particle->getInt(0, i) == 11)
-          hist->Fill(rec_Particle->getFloat(3, i));
+        if (rec_Particle->getFloat("px", i) < 10 && rec_Particle->getFloat("px", i) > -1 &&
+            rec_Particle->getInt("pid", i) == 11)
+          hist->Fill(rec_Particle->getFloat("px", i));
       }
     }
   }
