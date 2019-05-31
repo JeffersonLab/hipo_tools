@@ -54,6 +54,7 @@ ENDIF()
 # Build executables from their own folders
 add_subdirectory(src/hipo2root)
 add_subdirectory(src/dst2root)
+add_subdirectory(src/tests)
 
 # Build examples
 if(BUILD_EXAMPLES)
