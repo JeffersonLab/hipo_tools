@@ -79,20 +79,18 @@ int main(int argc, char** argv) {
   auto rec_Scintillator  = std::make_shared<hipo::bank>(dict->getSchema("REC::Scintillator"));
   auto rec_Calorimeter   = std::make_shared<hipo::bank>(dict->getSchema("REC::Calorimeter"));
   auto rec_CovMat        = std::make_shared<hipo::bank>(dict->getSchema("REC::CovMat"));
+  auto mc_Header         = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
+  auto mc_Particle       = std::make_shared<hipo::bank>(dict->getSchema("MC::Particle"));
 
-  clas12->Branch("NRUN", &NRUN);
-  clas12->Branch("NEVENT", &NEVENT);
-  clas12->Branch("EVNTime", &EVNTime);
-  clas12->Branch("TYPE", &TYPE);
-  clas12->Branch("TRG", &TRG);
-  clas12->Branch("BCG", &BCG);
-  clas12->Branch("STTime", &STTime);
+  clas12->Branch("category", &category);
+  clas12->Branch("topology", &topology);
+  clas12->Branch("beamCharge", &beamCharge);
+  clas12->Branch("liveTime", &liveTime);
+  clas12->Branch("startTime", &startTime);
   clas12->Branch("RFTime", &RFTime);
-  clas12->Branch("Helic", &Helic);
-  clas12->Branch("EvCAT", &EvCAT);
-  clas12->Branch("NPGP", &NPGP);
-  clas12->Branch("LT", &LT);
-  clas12->Branch("PTIME", &PTIME);
+  clas12->Branch("helicity", &helicity);
+  clas12->Branch("helicityRaw", &helicityRaw);
+  clas12->Branch("procTime", &procTime);
 
   clas12->Branch("pid", &pid);
   clas12->Branch("p", &p);
@@ -107,26 +105,20 @@ int main(int argc, char** argv) {
   clas12->Branch("beta", &beta);
   clas12->Branch("chi2pid", &chi2pid);
   clas12->Branch("status", &status);
-  if (is_mc) {
-    clas12->Branch("mc_pid", &MC_pid);
-    clas12->Branch("mc_px", &MC_px);
-    clas12->Branch("mc_py", &MC_py);
-    clas12->Branch("mc_pz", &MC_pz);
-    clas12->Branch("mc_vx", &MC_vx);
-    clas12->Branch("mc_vy", &MC_vy);
-    clas12->Branch("mc_vz", &MC_vz);
-    clas12->Branch("mc_vt", &MC_vt);
-    clas12->Branch("mc_helicity", &MC_helicity);
 
-    clas12->Branch("lund_pid", &Lund_pid);
-    clas12->Branch("lund_px", &Lund_px);
-    clas12->Branch("lund_py", &Lund_py);
-    clas12->Branch("lund_pz", &Lund_pz);
-    clas12->Branch("lund_E", &Lund_E);
-    clas12->Branch("lund_vx", &Lund_vx);
-    clas12->Branch("lund_vy", &Lund_vy);
-    clas12->Branch("lund_vz", &Lund_vz);
-    clas12->Branch("lund_ltime", &Lund_ltime);
+  if (is_mc) {
+    clas12->Branch("mc_run", &mc_run);
+    clas12->Branch("mc_event", &mc_event);
+    clas12->Branch("mc_type", &mc_type);
+    clas12->Branch("mc_helicity", &mc_helicity);
+    clas12->Branch("mc_pid_vec", &mc_pid_vec);
+    clas12->Branch("mc_px_vec", &mc_px_vec);
+    clas12->Branch("mc_py_vec", &mc_py_vec);
+    clas12->Branch("mc_pz_vec", &mc_pz_vec);
+    clas12->Branch("mc_vx_vec", &mc_vx_vec);
+    clas12->Branch("mc_vy_vec", &mc_vy_vec);
+    clas12->Branch("mc_vz_vec", &mc_vz_vec);
+    clas12->Branch("mc_vt_vec", &mc_vt_vec);
   }
 
   clas12->Branch("dc_sec", &dc_sec);
@@ -381,6 +373,8 @@ int main(int argc, char** argv) {
   int  tot_events_processed = 0;
   auto start_full           = std::chrono::high_resolution_clock::now();
   while (reader->next()) {
+    if (is_test && entry > 50000)
+      break;
     reader->read(*hipo_event);
     hipo_event->getStructure(*rec_Particle);
     hipo_event->getStructure(*rec_ForwardTagger);
@@ -395,37 +389,70 @@ int main(int argc, char** argv) {
       hipo_event->getStructure(*rec_VertDoca);
     if (cov)
       hipo_event->getStructure(*rec_CovMat);
+    if (is_mc) {
+      hipo_event->getStructure(*mc_Header);
+      hipo_event->getStructure(*mc_Particle);
+    }
 
     if (!is_batch && (++entry % 10000) == 0)
       std::cout << "\t" << floor(100 * entry / tot_hipo_events) << "%\r\r" << std::flush;
 
-    if (is_test && entry > 50000)
-      break;
+    tot_events_processed++;
 
-    if (good_rec && rec_Particle->getRows() == 0)
+    l = rec_Event->getRows();
+    if (l != -1) {
+      category    = rec_Event->getLong(0, 0);
+      topology    = rec_Event->getLong(1, 0);
+      beamCharge  = rec_Event->getFloat(2, 0);
+      liveTime    = rec_Event->getDouble(3, 0);
+      startTime   = ((rec_Event->getFloat(4, 0) != -1000) ? rec_Event->getFloat(4, 0) : NAN);
+      RFTime      = rec_Event->getFloat(5, 0);
+      helicity    = rec_Event->getByte(6, 0);
+      helicityRaw = rec_Event->getByte(7, 0);
+      procTime    = rec_Event->getFloat(8, 0);
+    }
+
+    if (is_mc) {
+      l = mc_Header->getRows();
+      if (l != -1) {
+        mc_run      = mc_Header->getInt(0, 0);
+        mc_event    = mc_Header->getInt(1, 0);
+        mc_type     = mc_Header->getInt(2, 0);
+        mc_helicity = mc_Header->getFloat(3, 0);
+      }
+
+      l = mc_Particle->getRows();
+      if (l != -1) {
+        mc_pid_vec.resize(l);
+        mc_px_vec.resize(l);
+        mc_py_vec.resize(l);
+        mc_pz_vec.resize(l);
+        mc_vx_vec.resize(l);
+        mc_vy_vec.resize(l);
+        mc_vz_vec.resize(l);
+        mc_vt_vec.resize(l);
+        for (int i = 0; i < l; i++) {
+          mc_pid_vec[i] = mc_Particle->getInt(0, i);
+          mc_px_vec[i]  = mc_Particle->getFloat(1, i);
+          mc_py_vec[i]  = mc_Particle->getFloat(2, i);
+          mc_pz_vec[i]  = mc_Particle->getFloat(3, i);
+          mc_vx_vec[i]  = mc_Particle->getFloat(4, i);
+          mc_vy_vec[i]  = mc_Particle->getFloat(5, i);
+          mc_vz_vec[i]  = mc_Particle->getFloat(6, i);
+          mc_vt_vec[i]  = mc_Particle->getFloat(7, i);
+        }
+      }
+    }
+
+    if (good_rec && rec_Particle->getRows() == -1)
       continue;
     if (elec_first && rec_Particle->getInt(0, 0) != 11)
       continue;
 
-    tot_events_processed++;
-    l = rec_Event->getRows();
-    if (l != 0) {
-      NRUN    = rec_Event->getInt(0, 0);
-      NEVENT  = rec_Event->getInt(1, 0);
-      EVNTime = rec_Event->getFloat(2, 0);
-      TYPE    = rec_Event->getInt(3, 0);
-      EvCAT   = rec_Event->getInt(4, 0);
-      NPGP    = rec_Event->getInt(5, 0);
-      TRG     = rec_Event->getLong(6, 0);
-      BCG     = rec_Event->getFloat(7, 0);
-      LT      = rec_Event->getDouble(8, 0);
-      STTime  = rec_Event->getFloat(9, 0);
-      RFTime  = rec_Event->getFloat(10, 0);
-      Helic   = rec_Event->getInt(11, 0);
-      PTIME   = rec_Event->getFloat(12, 0);
-    }
-
     l = rec_Particle->getRows();
+    if (l == -1) {
+      continue;
+    }
     pid.resize(l);
     p.resize(l);
     p2.resize(l);
@@ -458,50 +485,6 @@ int main(int argc, char** argv) {
       status[i]  = rec_Particle->getInt(10, i);
     }
 
-    /*
-        if (is_mc) {
-          l = MC_pid_node->getLength();
-          MC_helicity.resize(l);
-          MC_pid.resize(l);
-          MC_px.resize(l);
-          MC_py.resize(l);
-          MC_pz.resize(l);
-          MC_vx.resize(l);
-          MC_vy.resize(l);
-          MC_vz.resize(l);
-          MC_vt.resize(l);
-          Lund_pid.resize(l);
-          Lund_px.resize(l);
-          Lund_py.resize(l);
-          Lund_pz.resize(l);
-          Lund_E.resize(l);
-          Lund_vx.resize(l);
-          Lund_vy.resize(l);
-          Lund_vz.resize(l);
-          Lund_ltime.resize(l);
-          for (int i = 0; i < l; i++) {
-            MC_helicity[i] = MC_Header_helicity_node->getValue(i);
-            MC_pid[i] = MC_pid_node->getValue(i);
-            MC_px[i] = MC_px_node->getValue(i);
-            MC_py[i] = MC_py_node->getValue(i);
-            MC_pz[i] = MC_pz_node->getValue(i);
-            MC_vx[i] = MC_vx_node->getValue(i);
-            MC_vy[i] = MC_vy_node->getValue(i);
-            MC_vz[i] = MC_vz_node->getValue(i);
-            MC_vt[i] = MC_vt_node->getValue(i);
-
-            Lund_pid[i] = MC_Lund_pid_node->getValue(i);
-            Lund_px[i] = MC_Lund_px_node->getValue(i);
-            Lund_py[i] = MC_Lund_py_node->getValue(i);
-            Lund_pz[i] = MC_Lund_pz_node->getValue(i);
-            Lund_E[i] = MC_Lund_E_node->getValue(i);
-            Lund_vx[i] = MC_Lund_vx_node->getValue(i);
-            Lund_vy[i] = MC_Lund_vy_node->getValue(i);
-            Lund_vz[i] = MC_Lund_vz_node->getValue(i);
-            Lund_ltime[i] = MC_Lund_ltime_node->getValue(i);
-          }
-        }
-    */
     len_pid    = rec_Particle->getRows();
     len_pindex = rec_Calorimeter->getRows();
     ec_tot_energy.resize(len_pid);

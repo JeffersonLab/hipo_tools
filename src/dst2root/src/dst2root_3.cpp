@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
   std::string OutFileName = "";
   bool        is_mc       = false;
   bool        is_batch    = false;
+  bool        is_test     = false;
   bool        print_help  = false;
   bool        good_rec    = false;
   bool        elec_first  = false;
@@ -42,6 +43,7 @@ int main(int argc, char** argv) {
               clipp::option("-c", "--cov").set(cov) % "Save Covariant Matrix for kinematic fitting",
               clipp::option("-v", "--VertDoca").set(VertDoca) % "Save VertDoca information",
               clipp::option("-t", "--traj").set(traj) % "Save traj information",
+              clipp::option("-test", "--test").set(is_test) % "Testing",
               clipp::value("inputFile.hipo", InFileName),
               clipp::opt_value("outputFile.root", OutFileName));
 
@@ -264,6 +266,7 @@ int main(int argc, char** argv) {
   clas12->Branch("beta", &beta);
   clas12->Branch("chi2pid", &chi2pid);
   clas12->Branch("status", &status);
+
   if (is_mc) {
     clas12->Branch("mc_pid", &MC_pid);
     clas12->Branch("mc_px", &MC_px);
@@ -293,6 +296,15 @@ int main(int argc, char** argv) {
   clas12->Branch("dc_vx", &dc_vx);
   clas12->Branch("dc_vy", &dc_vy);
   clas12->Branch("dc_vz", &dc_vz);
+  clas12->Branch("dc_r1_x", &dc_r1_x);
+  clas12->Branch("dc_r1_y", &dc_r1_y);
+  clas12->Branch("dc_r1_z", &dc_r1_z);
+  clas12->Branch("dc_r2_x", &dc_r2_x);
+  clas12->Branch("dc_r2_y", &dc_r2_y);
+  clas12->Branch("dc_r2_z", &dc_r2_z);
+  clas12->Branch("dc_r3_x", &dc_r3_x);
+  clas12->Branch("dc_r3_y", &dc_r3_y);
+  clas12->Branch("dc_r3_z", &dc_r3_z);
 
   clas12->Branch("cvt_px", &cvt_px);
   clas12->Branch("cvt_py", &cvt_py);
@@ -300,6 +312,61 @@ int main(int argc, char** argv) {
   clas12->Branch("cvt_vx", &cvt_vx);
   clas12->Branch("cvt_vy", &cvt_vy);
   clas12->Branch("cvt_vz", &cvt_vz);
+  clas12->Branch("cvt_l1_x", &cvt_l1_x);
+  clas12->Branch("cvt_l1_y", &cvt_l1_y);
+  clas12->Branch("cvt_l1_z", &cvt_l1_z);
+  clas12->Branch("cvt_l2_x", &cvt_l2_x);
+  clas12->Branch("cvt_l2_y", &cvt_l2_y);
+  clas12->Branch("cvt_l2_z", &cvt_l2_z);
+  clas12->Branch("cvt_l3_x", &cvt_l3_x);
+  clas12->Branch("cvt_l3_y", &cvt_l3_y);
+  clas12->Branch("cvt_l3_z", &cvt_l3_z);
+  clas12->Branch("cvt_l4_x", &cvt_l4_x);
+  clas12->Branch("cvt_l4_y", &cvt_l4_y);
+  clas12->Branch("cvt_l4_z", &cvt_l4_z);
+  clas12->Branch("cvt_l5_x", &cvt_l5_x);
+  clas12->Branch("cvt_l5_y", &cvt_l5_y);
+  clas12->Branch("cvt_l5_z", &cvt_l5_z);
+  clas12->Branch("cvt_l6_x", &cvt_l6_x);
+  clas12->Branch("cvt_l6_y", &cvt_l6_y);
+  clas12->Branch("cvt_l6_z", &cvt_l6_z);
+  clas12->Branch("cvt_l7_x", &cvt_l7_x);
+  clas12->Branch("cvt_l7_y", &cvt_l7_y);
+  clas12->Branch("cvt_l7_z", &cvt_l7_z);
+  clas12->Branch("cvt_l8_x", &cvt_l8_x);
+  clas12->Branch("cvt_l8_y", &cvt_l8_y);
+  clas12->Branch("cvt_l8_z", &cvt_l8_z);
+  clas12->Branch("cvt_l9_x", &cvt_l9_x);
+  clas12->Branch("cvt_l9_y", &cvt_l9_y);
+  clas12->Branch("cvt_l9_z", &cvt_l9_z);
+  clas12->Branch("cvt_l10_x", &cvt_l10_x);
+  clas12->Branch("cvt_l10_y", &cvt_l10_y);
+  clas12->Branch("cvt_l10_z", &cvt_l10_z);
+  clas12->Branch("cvt_l11_x", &cvt_l11_x);
+  clas12->Branch("cvt_l11_y", &cvt_l11_y);
+  clas12->Branch("cvt_l11_z", &cvt_l11_z);
+  clas12->Branch("cvt_l12_x", &cvt_l12_x);
+  clas12->Branch("cvt_l12_y", &cvt_l12_y);
+  clas12->Branch("cvt_l12_z", &cvt_l12_z);
+
+  clas12->Branch("fmt_p1_x", &fmt_p1_x);
+  clas12->Branch("fmt_p1_y", &fmt_p1_y);
+  clas12->Branch("fmt_p1_z", &fmt_p1_z);
+  clas12->Branch("fmt_p2_x", &fmt_p2_x);
+  clas12->Branch("fmt_p2_y", &fmt_p2_y);
+  clas12->Branch("fmt_p2_z", &fmt_p2_z);
+  clas12->Branch("fmt_p3_x", &fmt_p3_x);
+  clas12->Branch("fmt_p3_y", &fmt_p3_y);
+  clas12->Branch("fmt_p3_z", &fmt_p3_z);
+  clas12->Branch("fmt_p4_x", &fmt_p4_x);
+  clas12->Branch("fmt_p4_y", &fmt_p4_y);
+  clas12->Branch("fmt_p4_z", &fmt_p4_z);
+  clas12->Branch("fmt_p5_x", &fmt_p5_x);
+  clas12->Branch("fmt_p5_y", &fmt_p5_y);
+  clas12->Branch("fmt_p5_z", &fmt_p5_z);
+  clas12->Branch("fmt_p6_x", &fmt_p6_x);
+  clas12->Branch("fmt_p6_y", &fmt_p6_y);
+  clas12->Branch("fmt_p6_z", &fmt_p6_z);
 
   clas12->Branch("ec_tot_energy", &ec_tot_energy);
   clas12->Branch("ec_pcal_energy", &ec_pcal_energy);
@@ -538,13 +605,11 @@ int main(int argc, char** argv) {
   int  tot_events_processed = 0;
   auto start_full           = std::chrono::high_resolution_clock::now();
   while (reader->next()) {
+    if (is_test && entry > 500)
+      break;
+
     if (!is_batch && (++entry % 1000) == 0)
       std::cout << "\t" << floor(100 * entry / tot_hipo_events) << "%\r\r" << std::flush;
-
-    if (good_rec && pid_node->getLength() == 0)
-      continue;
-    if (elec_first && pid_node->getValue(0) != 11)
-      continue;
 
     tot_events_processed++;
     if (NRUN_node->getLength() > 0) {
@@ -557,39 +622,6 @@ int main(int argc, char** argv) {
       STTime  = STTime_node->getValue(0);
       RFTime  = RFTime_node->getValue(0);
       Helic   = Helic_node->getValue(0);
-    }
-
-    l = pid_node->getLength();
-    pid.resize(l);
-    p.resize(l);
-    p2.resize(l);
-    px.resize(l);
-    py.resize(l);
-    pz.resize(l);
-    vx.resize(l);
-    vy.resize(l);
-    vz.resize(l);
-    charge.resize(l);
-    beta.resize(l);
-    chi2pid.resize(l);
-    status.resize(l);
-
-    for (int i = 0; i < l; i++) {
-      pid[i]     = pid_node->getValue(i);
-      p2[i]      = (px_node->getValue(i) * px_node->getValue(i) +
-               py_node->getValue(i) * py_node->getValue(i) +
-               pz_node->getValue(i) * pz_node->getValue(i));
-      p[i]       = sqrt(p2[i]);
-      px[i]      = px_node->getValue(i);
-      py[i]      = py_node->getValue(i);
-      pz[i]      = pz_node->getValue(i);
-      vx[i]      = vx_node->getValue(i);
-      vy[i]      = vy_node->getValue(i);
-      vz[i]      = vz_node->getValue(i);
-      charge[i]  = charge_node->getValue(i);
-      beta[i]    = ((beta_node->getValue(i) != -9999) ? beta_node->getValue(i) : NAN);
-      chi2pid[i] = chi2pid_node->getValue(i);
-      status[i]  = status_node->getValue(i);
     }
 
     if (is_mc) {
@@ -633,6 +665,44 @@ int main(int argc, char** argv) {
         Lund_vz[i]    = MC_Lund_vz_node->getValue(i);
         Lund_ltime[i] = MC_Lund_ltime_node->getValue(i);
       }
+    }
+
+    if (good_rec && pid_node->getLength() == 0)
+      continue;
+    if (elec_first && pid_node->getValue(0) != 11)
+      continue;
+
+    l = pid_node->getLength();
+    pid.resize(l);
+    p.resize(l);
+    p2.resize(l);
+    px.resize(l);
+    py.resize(l);
+    pz.resize(l);
+    vx.resize(l);
+    vy.resize(l);
+    vz.resize(l);
+    charge.resize(l);
+    beta.resize(l);
+    chi2pid.resize(l);
+    status.resize(l);
+
+    for (int i = 0; i < l; i++) {
+      pid[i]     = pid_node->getValue(i);
+      p2[i]      = (px_node->getValue(i) * px_node->getValue(i) +
+               py_node->getValue(i) * py_node->getValue(i) +
+               pz_node->getValue(i) * pz_node->getValue(i));
+      p[i]       = sqrt(p2[i]);
+      px[i]      = px_node->getValue(i);
+      py[i]      = py_node->getValue(i);
+      pz[i]      = pz_node->getValue(i);
+      vx[i]      = vx_node->getValue(i);
+      vy[i]      = vy_node->getValue(i);
+      vz[i]      = vz_node->getValue(i);
+      charge[i]  = charge_node->getValue(i);
+      beta[i]    = ((beta_node->getValue(i) != -9999) ? beta_node->getValue(i) : NAN);
+      chi2pid[i] = chi2pid_node->getValue(i);
+      status[i]  = status_node->getValue(i);
     }
 
     len_pid    = pid_node->getLength();
@@ -1233,6 +1303,261 @@ int main(int argc, char** argv) {
           dc_vx[i]  = track_vx_nomm_node->getValue(k);
           dc_vy[i]  = track_vy_nomm_node->getValue(k);
           dc_vz[i]  = track_vz_nomm_node->getValue(k);
+        }
+      }
+    }
+
+    len_pid    = pid_node->getLength();
+    len_pindex = traj_pindex_node->getLength();
+    dc_r1_x.resize(len_pid);
+    dc_r1_y.resize(len_pid);
+    dc_r1_z.resize(len_pid);
+    dc_r2_x.resize(len_pid);
+    dc_r2_y.resize(len_pid);
+    dc_r2_z.resize(len_pid);
+    dc_r3_x.resize(len_pid);
+    dc_r3_y.resize(len_pid);
+    dc_r3_z.resize(len_pid);
+
+    cvt_l1_x.resize(len_pid);
+    cvt_l1_y.resize(len_pid);
+    cvt_l1_z.resize(len_pid);
+    cvt_l2_x.resize(len_pid);
+    cvt_l2_y.resize(len_pid);
+    cvt_l2_z.resize(len_pid);
+    cvt_l3_x.resize(len_pid);
+    cvt_l3_y.resize(len_pid);
+    cvt_l3_z.resize(len_pid);
+    cvt_l4_x.resize(len_pid);
+    cvt_l4_y.resize(len_pid);
+    cvt_l4_z.resize(len_pid);
+    cvt_l5_x.resize(len_pid);
+    cvt_l5_y.resize(len_pid);
+    cvt_l5_z.resize(len_pid);
+    cvt_l6_x.resize(len_pid);
+    cvt_l6_y.resize(len_pid);
+    cvt_l6_z.resize(len_pid);
+    cvt_l7_x.resize(len_pid);
+    cvt_l7_y.resize(len_pid);
+    cvt_l7_z.resize(len_pid);
+    cvt_l8_x.resize(len_pid);
+    cvt_l8_y.resize(len_pid);
+    cvt_l8_z.resize(len_pid);
+    cvt_l9_x.resize(len_pid);
+    cvt_l9_y.resize(len_pid);
+    cvt_l9_z.resize(len_pid);
+    cvt_l10_x.resize(len_pid);
+    cvt_l10_y.resize(len_pid);
+    cvt_l10_z.resize(len_pid);
+    cvt_l11_x.resize(len_pid);
+    cvt_l11_y.resize(len_pid);
+    cvt_l11_z.resize(len_pid);
+    cvt_l12_x.resize(len_pid);
+    cvt_l12_y.resize(len_pid);
+    cvt_l12_z.resize(len_pid);
+
+    fmt_p1_x.resize(len_pid);
+    fmt_p1_y.resize(len_pid);
+    fmt_p1_z.resize(len_pid);
+    fmt_p2_x.resize(len_pid);
+    fmt_p2_y.resize(len_pid);
+    fmt_p2_z.resize(len_pid);
+    fmt_p3_x.resize(len_pid);
+    fmt_p3_y.resize(len_pid);
+    fmt_p3_z.resize(len_pid);
+    fmt_p4_x.resize(len_pid);
+    fmt_p4_y.resize(len_pid);
+    fmt_p4_z.resize(len_pid);
+    fmt_p5_x.resize(len_pid);
+    fmt_p5_y.resize(len_pid);
+    fmt_p5_z.resize(len_pid);
+    fmt_p6_x.resize(len_pid);
+    fmt_p6_y.resize(len_pid);
+    fmt_p6_z.resize(len_pid);
+
+    for (int i = 0; i < len_pid; i++) {
+      dc_r1_x[i] = NAN;
+      dc_r1_y[i] = NAN;
+      dc_r1_z[i] = NAN;
+      dc_r2_x[i] = NAN;
+      dc_r2_y[i] = NAN;
+      dc_r2_z[i] = NAN;
+      dc_r3_x[i] = NAN;
+      dc_r3_y[i] = NAN;
+      dc_r3_z[i] = NAN;
+
+      cvt_l1_x[i]  = NAN;
+      cvt_l1_y[i]  = NAN;
+      cvt_l1_z[i]  = NAN;
+      cvt_l2_x[i]  = NAN;
+      cvt_l2_y[i]  = NAN;
+      cvt_l2_z[i]  = NAN;
+      cvt_l3_x[i]  = NAN;
+      cvt_l3_y[i]  = NAN;
+      cvt_l3_z[i]  = NAN;
+      cvt_l4_x[i]  = NAN;
+      cvt_l4_y[i]  = NAN;
+      cvt_l4_z[i]  = NAN;
+      cvt_l5_x[i]  = NAN;
+      cvt_l5_y[i]  = NAN;
+      cvt_l5_z[i]  = NAN;
+      cvt_l6_x[i]  = NAN;
+      cvt_l6_y[i]  = NAN;
+      cvt_l6_z[i]  = NAN;
+      cvt_l7_x[i]  = NAN;
+      cvt_l7_y[i]  = NAN;
+      cvt_l7_z[i]  = NAN;
+      cvt_l8_x[i]  = NAN;
+      cvt_l8_y[i]  = NAN;
+      cvt_l8_z[i]  = NAN;
+      cvt_l9_x[i]  = NAN;
+      cvt_l9_y[i]  = NAN;
+      cvt_l9_z[i]  = NAN;
+      cvt_l10_x[i] = NAN;
+      cvt_l10_y[i] = NAN;
+      cvt_l10_z[i] = NAN;
+      cvt_l11_x[i] = NAN;
+      cvt_l11_y[i] = NAN;
+      cvt_l11_z[i] = NAN;
+      cvt_l12_x[i] = NAN;
+      cvt_l12_y[i] = NAN;
+      cvt_l12_z[i] = NAN;
+
+      fmt_p1_x[i] = NAN;
+      fmt_p1_y[i] = NAN;
+      fmt_p1_z[i] = NAN;
+      fmt_p2_x[i] = NAN;
+      fmt_p2_y[i] = NAN;
+      fmt_p2_z[i] = NAN;
+      fmt_p3_x[i] = NAN;
+      fmt_p3_y[i] = NAN;
+      fmt_p3_z[i] = NAN;
+      fmt_p4_x[i] = NAN;
+      fmt_p4_y[i] = NAN;
+      fmt_p4_z[i] = NAN;
+      fmt_p5_x[i] = NAN;
+      fmt_p5_y[i] = NAN;
+      fmt_p5_z[i] = NAN;
+      fmt_p6_x[i] = NAN;
+      fmt_p6_y[i] = NAN;
+      fmt_p6_z[i] = NAN;
+    }
+
+    for (int i = 0; i < len_pid; i++) {
+      int FvsC = status_node->getValue(i) / 1000;
+      for (int k = 0; k < len_pindex; k++) {
+        int pindex   = traj_pindex_node->getValue(k);
+        int detector = traj_detId_node->getValue(k);
+        if (FvsC == FORWARD_DETECTOR && pindex == i) {
+          if (detector > 0 && detector < 7) {
+            switch (detector) {
+            case 1:
+              fmt_p1_x[i] = traj_x_node->getValue(k);
+              fmt_p1_y[i] = traj_y_node->getValue(k);
+              fmt_p1_z[i] = traj_z_node->getValue(k);
+              break;
+            case 2:
+              fmt_p2_x[i] = traj_x_node->getValue(k);
+              fmt_p2_y[i] = traj_y_node->getValue(k);
+              fmt_p2_z[i] = traj_z_node->getValue(k);
+              break;
+            case 3:
+              fmt_p3_x[i] = traj_x_node->getValue(k);
+              fmt_p3_y[i] = traj_y_node->getValue(k);
+              fmt_p3_z[i] = traj_z_node->getValue(k);
+              break;
+            case 4:
+              fmt_p4_x[i] = traj_x_node->getValue(k);
+              fmt_p4_y[i] = traj_y_node->getValue(k);
+              fmt_p4_z[i] = traj_z_node->getValue(k);
+              break;
+            case 5:
+              fmt_p5_x[i] = traj_x_node->getValue(k);
+              fmt_p5_y[i] = traj_y_node->getValue(k);
+              fmt_p5_z[i] = traj_z_node->getValue(k);
+              break;
+            case 6:
+              fmt_p6_x[i] = traj_x_node->getValue(k);
+              fmt_p6_y[i] = traj_y_node->getValue(k);
+              fmt_p6_z[i] = traj_z_node->getValue(k);
+              break;
+            }
+          } else if (detector == 10) {
+            dc_r1_x[i] = traj_x_node->getValue(k);
+            dc_r1_y[i] = traj_y_node->getValue(k);
+            dc_r1_z[i] = traj_z_node->getValue(k);
+          } else if (detector == 22) {
+            dc_r2_x[i] = traj_x_node->getValue(k);
+            dc_r2_y[i] = traj_y_node->getValue(k);
+            dc_r2_z[i] = traj_z_node->getValue(k);
+          } else if (detector == 34) {
+            dc_r3_x[i] = traj_x_node->getValue(k);
+            dc_r3_y[i] = traj_y_node->getValue(k);
+            dc_r3_z[i] = traj_z_node->getValue(k);
+          }
+        } else if (FvsC == CENTRAL_DETECTOR && pindex == i) {
+          switch (detector) {
+          case 1:
+            cvt_l1_x[i] = traj_x_node->getValue(k);
+            cvt_l1_y[i] = traj_y_node->getValue(k);
+            cvt_l1_z[i] = traj_z_node->getValue(k);
+            break;
+          case 2:
+            cvt_l2_x[i] = traj_x_node->getValue(k);
+            cvt_l2_y[i] = traj_y_node->getValue(k);
+            cvt_l2_z[i] = traj_z_node->getValue(k);
+            break;
+          case 3:
+            cvt_l3_x[i] = traj_x_node->getValue(k);
+            cvt_l3_y[i] = traj_y_node->getValue(k);
+            cvt_l3_z[i] = traj_z_node->getValue(k);
+            break;
+          case 4:
+            cvt_l4_x[i] = traj_x_node->getValue(k);
+            cvt_l4_y[i] = traj_y_node->getValue(k);
+            cvt_l4_z[i] = traj_z_node->getValue(k);
+            break;
+          case 5:
+            cvt_l5_x[i] = traj_x_node->getValue(k);
+            cvt_l5_y[i] = traj_y_node->getValue(k);
+            cvt_l5_z[i] = traj_z_node->getValue(k);
+            break;
+          case 6:
+            cvt_l6_x[i] = traj_x_node->getValue(k);
+            cvt_l6_y[i] = traj_y_node->getValue(k);
+            cvt_l6_z[i] = traj_z_node->getValue(k);
+            break;
+          case 7:
+            cvt_l7_x[i] = traj_x_node->getValue(k);
+            cvt_l7_y[i] = traj_y_node->getValue(k);
+            cvt_l7_z[i] = traj_z_node->getValue(k);
+            break;
+          case 8:
+            cvt_l8_x[i] = traj_x_node->getValue(k);
+            cvt_l8_y[i] = traj_y_node->getValue(k);
+            cvt_l8_z[i] = traj_z_node->getValue(k);
+            break;
+          case 9:
+            cvt_l9_x[i] = traj_x_node->getValue(k);
+            cvt_l9_y[i] = traj_y_node->getValue(k);
+            cvt_l9_z[i] = traj_z_node->getValue(k);
+            break;
+          case 10:
+            cvt_l10_x[i] = traj_x_node->getValue(k);
+            cvt_l10_y[i] = traj_y_node->getValue(k);
+            cvt_l10_z[i] = traj_z_node->getValue(k);
+            break;
+          case 11:
+            cvt_l11_x[i] = traj_x_node->getValue(k);
+            cvt_l11_y[i] = traj_y_node->getValue(k);
+            cvt_l11_z[i] = traj_z_node->getValue(k);
+            break;
+          case 12:
+            cvt_l12_x[i] = traj_x_node->getValue(k);
+            cvt_l12_y[i] = traj_y_node->getValue(k);
+            cvt_l12_z[i] = traj_z_node->getValue(k);
+            break;
+          }
         }
       }
     }

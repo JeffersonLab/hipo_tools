@@ -15,267 +15,220 @@
 #include "TFile.h"
 #include "TTree.h"
 // Hipo libs
+#include "clipp.h"
 #include "hipo3/reader.h"
 
 int main(int argc, char** argv) {
+  std::string InFileName;
+  std::string OutFileName;
+  bool        is_mc      = false;
+  bool        is_batch   = false;
+  bool        is_test    = false;
+  bool        print_help = false;
+  bool        good_rec   = false;
+  bool        elec_first = false;
 
-  char InFileName[128];
-  char OutFileName[128];
+  auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
+              clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
+              clipp::option("-b", "--batch").set(is_batch) % "Don't show progress and statistics",
+              clipp::option("-r", "--rec").set(good_rec) %
+                  "Only save events where number of partilces in the event > 0",
+              clipp::option("-e", "--elec").set(elec_first) %
+                  "Only save events with good electron as first particle",
+              clipp::option("-test", "--test").set(is_test) %
+                  "Only convert first 50000 events for testing",
+              clipp::value("inputFile.hipo", InFileName),
+              clipp::opt_value("outputFile.root", OutFileName));
 
-  if (argc == 2) {
-    sprintf(InFileName, "%s", argv[1]);
-    sprintf(OutFileName, "%s.root", argv[1]);
-    std::cout << OutFileName << std::endl;
-  } else if (argc == 3) {
-    sprintf(InFileName, "%s", argv[1]);
-    sprintf(OutFileName, "%s", argv[2]);
-  } else {
-    std::cout << "Please provide a filename to read...." << std::endl;
+  clipp::parse(argc, argv, cli);
+  if (print_help || InFileName.empty()) {
+    std::cout << clipp::make_man_page(cli, argv[0]);
     exit(0);
   }
-  TFile* OutputFile = new TFile(OutFileName, "RECREATE");
-  OutputFile->SetCompressionSettings(9);
-  TTree*       clas12 = new TTree("clas12", "clas12");
-  hipo::reader reader;
-  reader.open(InFileName);
 
-  hipo::node<int32_t>* REC_Event_NRUN_node             = reader.getBranch<int32_t>(330, 1);
-  hipo::node<int32_t>* REC_Event_NEVENT_node           = reader.getBranch<int32_t>(330, 2);
-  hipo::node<float>*   REC_Event_EVNTime_node          = reader.getBranch<float>(330, 3);
-  hipo::node<int8_t>*  REC_Event_TYPE_node             = reader.getBranch<int8_t>(330, 4);
-  hipo::node<int16_t>* REC_Event_EvCAT_node            = reader.getBranch<int16_t>(330, 5);
-  hipo::node<int16_t>* REC_Event_NPGP_node             = reader.getBranch<int16_t>(330, 6);
-  hipo::node<int64_t>* REC_Event_TRG_node              = reader.getBranch<int64_t>(330, 7);
-  hipo::node<float>*   REC_Event_BCG_node              = reader.getBranch<float>(330, 8);
-  hipo::node<float>*   REC_Event_LT_node               = reader.getBranch<float>(330, 9);
-  hipo::node<float>*   REC_Event_STTime_node           = reader.getBranch<float>(330, 10);
-  hipo::node<float>*   REC_Event_RFTime_node           = reader.getBranch<float>(330, 11);
-  hipo::node<int8_t>*  REC_Event_Helic_node            = reader.getBranch<int8_t>(330, 12);
-  hipo::node<float>*   REC_Event_PTIME_node            = reader.getBranch<float>(330, 13);
-  hipo::node<int32_t>* REC_Particle_pid_node           = reader.getBranch<int32_t>(331, 1);
-  hipo::node<float>*   REC_Particle_px_node            = reader.getBranch<float>(331, 2);
-  hipo::node<float>*   REC_Particle_py_node            = reader.getBranch<float>(331, 3);
-  hipo::node<float>*   REC_Particle_pz_node            = reader.getBranch<float>(331, 4);
-  hipo::node<float>*   REC_Particle_vx_node            = reader.getBranch<float>(331, 5);
-  hipo::node<float>*   REC_Particle_vy_node            = reader.getBranch<float>(331, 6);
-  hipo::node<float>*   REC_Particle_vz_node            = reader.getBranch<float>(331, 7);
-  hipo::node<int8_t>*  REC_Particle_charge_node        = reader.getBranch<int8_t>(331, 8);
-  hipo::node<float>*   REC_Particle_beta_node          = reader.getBranch<float>(331, 9);
-  hipo::node<float>*   REC_Particle_chi2pid_node       = reader.getBranch<float>(331, 10);
-  hipo::node<int16_t>* REC_Particle_status_node        = reader.getBranch<int16_t>(331, 11);
-  hipo::node<int16_t>* REC_Calorimeter_index_node      = reader.getBranch<int16_t>(332, 1);
-  hipo::node<int16_t>* REC_Calorimeter_pindex_node     = reader.getBranch<int16_t>(332, 2);
-  hipo::node<int8_t>*  REC_Calorimeter_detector_node   = reader.getBranch<int8_t>(332, 3);
-  hipo::node<int8_t>*  REC_Calorimeter_sector_node     = reader.getBranch<int8_t>(332, 4);
-  hipo::node<int8_t>*  REC_Calorimeter_layer_node      = reader.getBranch<int8_t>(332, 5);
-  hipo::node<float>*   REC_Calorimeter_energy_node     = reader.getBranch<float>(332, 6);
-  hipo::node<float>*   REC_Calorimeter_time_node       = reader.getBranch<float>(332, 7);
-  hipo::node<float>*   REC_Calorimeter_path_node       = reader.getBranch<float>(332, 8);
-  hipo::node<float>*   REC_Calorimeter_chi2_node       = reader.getBranch<float>(332, 9);
-  hipo::node<float>*   REC_Calorimeter_x_node          = reader.getBranch<float>(332, 10);
-  hipo::node<float>*   REC_Calorimeter_y_node          = reader.getBranch<float>(332, 11);
-  hipo::node<float>*   REC_Calorimeter_z_node          = reader.getBranch<float>(332, 12);
-  hipo::node<float>*   REC_Calorimeter_hx_node         = reader.getBranch<float>(332, 13);
-  hipo::node<float>*   REC_Calorimeter_hy_node         = reader.getBranch<float>(332, 14);
-  hipo::node<float>*   REC_Calorimeter_hz_node         = reader.getBranch<float>(332, 15);
-  hipo::node<float>*   REC_Calorimeter_lu_node         = reader.getBranch<float>(332, 16);
-  hipo::node<float>*   REC_Calorimeter_lv_node         = reader.getBranch<float>(332, 17);
-  hipo::node<float>*   REC_Calorimeter_lw_node         = reader.getBranch<float>(332, 18);
-  hipo::node<float>*   REC_Calorimeter_du_node         = reader.getBranch<float>(332, 19);
-  hipo::node<float>*   REC_Calorimeter_dv_node         = reader.getBranch<float>(332, 20);
-  hipo::node<float>*   REC_Calorimeter_dw_node         = reader.getBranch<float>(332, 21);
-  hipo::node<float>*   REC_Calorimeter_m2u_node        = reader.getBranch<float>(332, 22);
-  hipo::node<float>*   REC_Calorimeter_m2v_node        = reader.getBranch<float>(332, 23);
-  hipo::node<float>*   REC_Calorimeter_m2w_node        = reader.getBranch<float>(332, 24);
-  hipo::node<float>*   REC_Calorimeter_m3u_node        = reader.getBranch<float>(332, 25);
-  hipo::node<float>*   REC_Calorimeter_m3v_node        = reader.getBranch<float>(332, 26);
-  hipo::node<float>*   REC_Calorimeter_m3w_node        = reader.getBranch<float>(332, 27);
-  hipo::node<int16_t>* REC_Calorimeter_status_node     = reader.getBranch<int16_t>(332, 28);
-  hipo::node<int16_t>* REC_Cherenkov_index_node        = reader.getBranch<int16_t>(333, 1);
-  hipo::node<int16_t>* REC_Cherenkov_pindex_node       = reader.getBranch<int16_t>(333, 2);
-  hipo::node<int8_t>*  REC_Cherenkov_detector_node     = reader.getBranch<int8_t>(333, 3);
-  hipo::node<int8_t>*  REC_Cherenkov_sector_node       = reader.getBranch<int8_t>(333, 4);
-  hipo::node<float>*   REC_Cherenkov_nphe_node         = reader.getBranch<float>(333, 5);
-  hipo::node<float>*   REC_Cherenkov_time_node         = reader.getBranch<float>(333, 6);
-  hipo::node<float>*   REC_Cherenkov_path_node         = reader.getBranch<float>(333, 7);
-  hipo::node<float>*   REC_Cherenkov_chi2_node         = reader.getBranch<float>(333, 8);
-  hipo::node<float>*   REC_Cherenkov_x_node            = reader.getBranch<float>(333, 9);
-  hipo::node<float>*   REC_Cherenkov_y_node            = reader.getBranch<float>(333, 10);
-  hipo::node<float>*   REC_Cherenkov_z_node            = reader.getBranch<float>(333, 11);
-  hipo::node<float>*   REC_Cherenkov_theta_node        = reader.getBranch<float>(333, 12);
-  hipo::node<float>*   REC_Cherenkov_phi_node          = reader.getBranch<float>(333, 13);
-  hipo::node<float>*   REC_Cherenkov_dtheta_node       = reader.getBranch<float>(333, 14);
-  hipo::node<float>*   REC_Cherenkov_dphi_node         = reader.getBranch<float>(333, 15);
-  hipo::node<int16_t>* REC_Cherenkov_status_node       = reader.getBranch<int16_t>(333, 16);
-  hipo::node<int16_t>* REC_ForwardTagger_index_node    = reader.getBranch<int16_t>(334, 1);
-  hipo::node<int16_t>* REC_ForwardTagger_pindex_node   = reader.getBranch<int16_t>(334, 2);
-  hipo::node<int8_t>*  REC_ForwardTagger_detector_node = reader.getBranch<int8_t>(334, 3);
-  hipo::node<float>*   REC_ForwardTagger_energy_node   = reader.getBranch<float>(334, 4);
-  hipo::node<float>*   REC_ForwardTagger_time_node     = reader.getBranch<float>(334, 5);
-  hipo::node<float>*   REC_ForwardTagger_path_node     = reader.getBranch<float>(334, 6);
-  hipo::node<float>*   REC_ForwardTagger_chi2_node     = reader.getBranch<float>(334, 7);
-  hipo::node<float>*   REC_ForwardTagger_x_node        = reader.getBranch<float>(334, 8);
-  hipo::node<float>*   REC_ForwardTagger_y_node        = reader.getBranch<float>(334, 9);
-  hipo::node<float>*   REC_ForwardTagger_z_node        = reader.getBranch<float>(334, 10);
-  hipo::node<float>*   REC_ForwardTagger_dx_node       = reader.getBranch<float>(334, 11);
-  hipo::node<float>*   REC_ForwardTagger_dy_node       = reader.getBranch<float>(334, 12);
-  hipo::node<float>*   REC_ForwardTagger_radius_node   = reader.getBranch<float>(334, 13);
-  hipo::node<int16_t>* REC_ForwardTagger_size_node     = reader.getBranch<int16_t>(334, 14);
-  hipo::node<int16_t>* REC_ForwardTagger_status_node   = reader.getBranch<int16_t>(334, 15);
-  hipo::node<int16_t>* REC_Scintillator_index_node     = reader.getBranch<int16_t>(335, 1);
-  hipo::node<int16_t>* REC_Scintillator_pindex_node    = reader.getBranch<int16_t>(335, 2);
-  hipo::node<int8_t>*  REC_Scintillator_detector_node  = reader.getBranch<int8_t>(335, 3);
-  hipo::node<int8_t>*  REC_Scintillator_sector_node    = reader.getBranch<int8_t>(335, 4);
-  hipo::node<int8_t>*  REC_Scintillator_layer_node     = reader.getBranch<int8_t>(335, 5);
-  hipo::node<int16_t>* REC_Scintillator_component_node = reader.getBranch<int16_t>(335, 6);
-  hipo::node<float>*   REC_Scintillator_energy_node    = reader.getBranch<float>(335, 7);
-  hipo::node<float>*   REC_Scintillator_time_node      = reader.getBranch<float>(335, 8);
-  hipo::node<float>*   REC_Scintillator_path_node      = reader.getBranch<float>(335, 9);
-  hipo::node<float>*   REC_Scintillator_chi2_node      = reader.getBranch<float>(335, 10);
-  hipo::node<float>*   REC_Scintillator_x_node         = reader.getBranch<float>(335, 11);
-  hipo::node<float>*   REC_Scintillator_y_node         = reader.getBranch<float>(335, 12);
-  hipo::node<float>*   REC_Scintillator_z_node         = reader.getBranch<float>(335, 13);
-  hipo::node<float>*   REC_Scintillator_hx_node        = reader.getBranch<float>(335, 14);
-  hipo::node<float>*   REC_Scintillator_hy_node        = reader.getBranch<float>(335, 15);
-  hipo::node<float>*   REC_Scintillator_hz_node        = reader.getBranch<float>(335, 16);
-  hipo::node<int16_t>* REC_Scintillator_status_node    = reader.getBranch<int16_t>(335, 17);
-  hipo::node<int16_t>* REC_Track_index_node            = reader.getBranch<int16_t>(336, 1);
-  hipo::node<int16_t>* REC_Track_pindex_node           = reader.getBranch<int16_t>(336, 2);
-  hipo::node<int8_t>*  REC_Track_detector_node         = reader.getBranch<int8_t>(336, 3);
-  hipo::node<int8_t>*  REC_Track_sector_node           = reader.getBranch<int8_t>(336, 4);
-  hipo::node<int16_t>* REC_Track_status_node           = reader.getBranch<int16_t>(336, 5);
-  hipo::node<int8_t>*  REC_Track_q_node                = reader.getBranch<int8_t>(336, 6);
-  hipo::node<float>*   REC_Track_chi2_node             = reader.getBranch<float>(336, 7);
-  hipo::node<int16_t>* REC_Track_NDF_node              = reader.getBranch<int16_t>(336, 8);
-  hipo::node<float>*   REC_Track_px_nomm_node          = reader.getBranch<float>(336, 9);
-  hipo::node<float>*   REC_Track_py_nomm_node          = reader.getBranch<float>(336, 10);
-  hipo::node<float>*   REC_Track_pz_nomm_node          = reader.getBranch<float>(336, 11);
-  hipo::node<float>*   REC_Track_vx_nomm_node          = reader.getBranch<float>(336, 12);
-  hipo::node<float>*   REC_Track_vy_nomm_node          = reader.getBranch<float>(336, 13);
-  hipo::node<float>*   REC_Track_vz_nomm_node          = reader.getBranch<float>(336, 14);
-  hipo::node<float>*   REC_Track_chi2_nomm_node        = reader.getBranch<float>(336, 15);
-  hipo::node<int16_t>* REC_Track_NDF_nomm_node         = reader.getBranch<int16_t>(336, 16);
-  hipo::node<int16_t>* REC_TrackCross_index_node       = reader.getBranch<int16_t>(337, 1);
-  hipo::node<int16_t>* REC_TrackCross_pindex_node      = reader.getBranch<int16_t>(337, 2);
-  hipo::node<int8_t>*  REC_TrackCross_detector_node    = reader.getBranch<int8_t>(337, 3);
-  hipo::node<int8_t>*  REC_TrackCross_sector_node      = reader.getBranch<int8_t>(337, 4);
-  hipo::node<int8_t>*  REC_TrackCross_layer_node       = reader.getBranch<int8_t>(337, 5);
-  hipo::node<float>*   REC_TrackCross_c_x_node         = reader.getBranch<float>(337, 6);
-  hipo::node<float>*   REC_TrackCross_c_y_node         = reader.getBranch<float>(337, 7);
-  hipo::node<float>*   REC_TrackCross_c_z_node         = reader.getBranch<float>(337, 8);
-  hipo::node<float>*   REC_TrackCross_c_ux_node        = reader.getBranch<float>(337, 9);
-  hipo::node<float>*   REC_TrackCross_c_uy_node        = reader.getBranch<float>(337, 10);
-  hipo::node<float>*   REC_TrackCross_c_uz_node        = reader.getBranch<float>(337, 11);
-  hipo::node<int16_t>* REC_TrackCross_status_node      = reader.getBranch<int16_t>(337, 12);
-  hipo::node<int16_t>* REC_CovMat_index_node           = reader.getBranch<int16_t>(338, 1);
-  hipo::node<int16_t>* REC_CovMat_pindex_node          = reader.getBranch<int16_t>(338, 2);
-  hipo::node<float>*   REC_CovMat_C11_node             = reader.getBranch<float>(338, 3);
-  hipo::node<float>*   REC_CovMat_C12_node             = reader.getBranch<float>(338, 4);
-  hipo::node<float>*   REC_CovMat_C13_node             = reader.getBranch<float>(338, 5);
-  hipo::node<float>*   REC_CovMat_C14_node             = reader.getBranch<float>(338, 6);
-  hipo::node<float>*   REC_CovMat_C15_node             = reader.getBranch<float>(338, 7);
-  hipo::node<float>*   REC_CovMat_C22_node             = reader.getBranch<float>(338, 8);
-  hipo::node<float>*   REC_CovMat_C23_node             = reader.getBranch<float>(338, 9);
-  hipo::node<float>*   REC_CovMat_C24_node             = reader.getBranch<float>(338, 10);
-  hipo::node<float>*   REC_CovMat_C25_node             = reader.getBranch<float>(338, 11);
-  hipo::node<float>*   REC_CovMat_C33_node             = reader.getBranch<float>(338, 12);
-  hipo::node<float>*   REC_CovMat_C34_node             = reader.getBranch<float>(338, 13);
-  hipo::node<float>*   REC_CovMat_C35_node             = reader.getBranch<float>(338, 14);
-  hipo::node<float>*   REC_CovMat_C44_node             = reader.getBranch<float>(338, 15);
-  hipo::node<float>*   REC_CovMat_C45_node             = reader.getBranch<float>(338, 16);
-  hipo::node<float>*   REC_CovMat_C55_node             = reader.getBranch<float>(338, 17);
-  hipo::node<int16_t>* REC_VertDoca_index1_node        = reader.getBranch<int16_t>(339, 1);
-  hipo::node<int16_t>* REC_VertDoca_index2_node        = reader.getBranch<int16_t>(339, 2);
-  hipo::node<float>*   REC_VertDoca_x_node             = reader.getBranch<float>(339, 3);
-  hipo::node<float>*   REC_VertDoca_y_node             = reader.getBranch<float>(339, 4);
-  hipo::node<float>*   REC_VertDoca_z_node             = reader.getBranch<float>(339, 5);
-  hipo::node<float>*   REC_VertDoca_x1_node            = reader.getBranch<float>(339, 6);
-  hipo::node<float>*   REC_VertDoca_y1_node            = reader.getBranch<float>(339, 7);
-  hipo::node<float>*   REC_VertDoca_z1_node            = reader.getBranch<float>(339, 8);
-  hipo::node<float>*   REC_VertDoca_cx1_node           = reader.getBranch<float>(339, 9);
-  hipo::node<float>*   REC_VertDoca_cy1_node           = reader.getBranch<float>(339, 10);
-  hipo::node<float>*   REC_VertDoca_cz1_node           = reader.getBranch<float>(339, 11);
-  hipo::node<float>*   REC_VertDoca_x2_node            = reader.getBranch<float>(339, 12);
-  hipo::node<float>*   REC_VertDoca_y2_node            = reader.getBranch<float>(339, 13);
-  hipo::node<float>*   REC_VertDoca_z2_node            = reader.getBranch<float>(339, 14);
-  hipo::node<float>*   REC_VertDoca_cx2_node           = reader.getBranch<float>(339, 15);
-  hipo::node<float>*   REC_VertDoca_cy2_node           = reader.getBranch<float>(339, 16);
-  hipo::node<float>*   REC_VertDoca_cz2_node           = reader.getBranch<float>(339, 17);
-  hipo::node<float>*   REC_VertDoca_r_node             = reader.getBranch<float>(339, 18);
-  hipo::node<int16_t>* REC_Traj_pindex_node            = reader.getBranch<int16_t>(340, 1);
-  hipo::node<int16_t>* REC_Traj_index_node             = reader.getBranch<int16_t>(340, 2);
-  hipo::node<int16_t>* REC_Traj_detId_node             = reader.getBranch<int16_t>(340, 3);
-  hipo::node<int8_t>*  REC_Traj_q_node                 = reader.getBranch<int8_t>(340, 4);
-  hipo::node<float>*   REC_Traj_x_node                 = reader.getBranch<float>(340, 5);
-  hipo::node<float>*   REC_Traj_y_node                 = reader.getBranch<float>(340, 6);
-  hipo::node<float>*   REC_Traj_z_node                 = reader.getBranch<float>(340, 7);
-  hipo::node<float>*   REC_Traj_cx_node                = reader.getBranch<float>(340, 8);
-  hipo::node<float>*   REC_Traj_cy_node                = reader.getBranch<float>(340, 9);
-  hipo::node<float>*   REC_Traj_cz_node                = reader.getBranch<float>(340, 10);
-  hipo::node<float>*   REC_Traj_pathlength_node        = reader.getBranch<float>(340, 11);
-  hipo::node<int32_t>* MC_Header_run_node              = reader.getBranch<int32_t>(40, 1);
-  hipo::node<int32_t>* MC_Header_event_node            = reader.getBranch<int32_t>(40, 2);
-  hipo::node<int8_t>*  MC_Header_type_node             = reader.getBranch<int8_t>(40, 3);
-  hipo::node<float>*   MC_Header_helicity_node         = reader.getBranch<float>(40, 4);
-  hipo::node<int16_t>* MC_Event_npart_node             = reader.getBranch<int16_t>(41, 1);
-  hipo::node<int16_t>* MC_Event_atarget_node           = reader.getBranch<int16_t>(41, 2);
-  hipo::node<int16_t>* MC_Event_ztarget_node           = reader.getBranch<int16_t>(41, 3);
-  hipo::node<float>*   MC_Event_ptarget_node           = reader.getBranch<float>(41, 4);
-  hipo::node<float>*   MC_Event_pbeam_node             = reader.getBranch<float>(41, 5);
-  hipo::node<int16_t>* MC_Event_btype_node             = reader.getBranch<int16_t>(41, 6);
-  hipo::node<float>*   MC_Event_ebeam_node             = reader.getBranch<float>(41, 7);
-  hipo::node<int16_t>* MC_Event_targetid_node          = reader.getBranch<int16_t>(41, 8);
-  hipo::node<int16_t>* MC_Event_processid_node         = reader.getBranch<int16_t>(41, 9);
-  hipo::node<float>*   MC_Event_weight_node            = reader.getBranch<float>(41, 10);
-  hipo::node<int32_t>* MC_Particle_pid_node            = reader.getBranch<int32_t>(42, 1);
-  hipo::node<float>*   MC_Particle_px_node             = reader.getBranch<float>(42, 2);
-  hipo::node<float>*   MC_Particle_py_node             = reader.getBranch<float>(42, 3);
-  hipo::node<float>*   MC_Particle_pz_node             = reader.getBranch<float>(42, 4);
-  hipo::node<float>*   MC_Particle_vx_node             = reader.getBranch<float>(42, 5);
-  hipo::node<float>*   MC_Particle_vy_node             = reader.getBranch<float>(42, 6);
-  hipo::node<float>*   MC_Particle_vz_node             = reader.getBranch<float>(42, 7);
-  hipo::node<float>*   MC_Particle_vt_node             = reader.getBranch<float>(42, 8);
-  hipo::node<int8_t>*  MC_Lund_index_node              = reader.getBranch<int8_t>(43, 1);
-  hipo::node<int8_t>*  MC_Lund_type_node               = reader.getBranch<int8_t>(43, 2);
-  hipo::node<int32_t>* MC_Lund_pid_node                = reader.getBranch<int32_t>(43, 3);
-  hipo::node<int8_t>*  MC_Lund_parent_node             = reader.getBranch<int8_t>(43, 4);
-  hipo::node<int8_t>*  MC_Lund_daughter_node           = reader.getBranch<int8_t>(43, 5);
-  hipo::node<float>*   MC_Lund_px_node                 = reader.getBranch<float>(43, 6);
-  hipo::node<float>*   MC_Lund_py_node                 = reader.getBranch<float>(43, 7);
-  hipo::node<float>*   MC_Lund_pz_node                 = reader.getBranch<float>(43, 8);
-  hipo::node<float>*   MC_Lund_E_node                  = reader.getBranch<float>(43, 9);
-  hipo::node<float>*   MC_Lund_mass_node               = reader.getBranch<float>(43, 10);
-  hipo::node<float>*   MC_Lund_vx_node                 = reader.getBranch<float>(43, 11);
-  hipo::node<float>*   MC_Lund_vy_node                 = reader.getBranch<float>(43, 12);
-  hipo::node<float>*   MC_Lund_vz_node                 = reader.getBranch<float>(43, 13);
-  hipo::node<float>*   MC_Lund_ltime_node              = reader.getBranch<float>(43, 14);
-  hipo::node<int8_t>*  MC_True_detector_node           = reader.getBranch<int8_t>(44, 1);
-  hipo::node<int32_t>* MC_True_pid_node                = reader.getBranch<int32_t>(44, 2);
-  hipo::node<int32_t>* MC_True_mpid_node               = reader.getBranch<int32_t>(44, 3);
-  hipo::node<int32_t>* MC_True_tid_node                = reader.getBranch<int32_t>(44, 4);
-  hipo::node<int32_t>* MC_True_mtid_node               = reader.getBranch<int32_t>(44, 5);
-  hipo::node<int32_t>* MC_True_otid_node               = reader.getBranch<int32_t>(44, 6);
-  hipo::node<float>*   MC_True_trackE_node             = reader.getBranch<float>(44, 7);
-  hipo::node<float>*   MC_True_totEdep_node            = reader.getBranch<float>(44, 8);
-  hipo::node<float>*   MC_True_avgX_node               = reader.getBranch<float>(44, 9);
-  hipo::node<float>*   MC_True_avgY_node               = reader.getBranch<float>(44, 10);
-  hipo::node<float>*   MC_True_avgZ_node               = reader.getBranch<float>(44, 11);
-  hipo::node<float>*   MC_True_avgLx_node              = reader.getBranch<float>(44, 12);
-  hipo::node<float>*   MC_True_avgLy_node              = reader.getBranch<float>(44, 13);
-  hipo::node<float>*   MC_True_avgLz_node              = reader.getBranch<float>(44, 14);
-  hipo::node<float>*   MC_True_px_node                 = reader.getBranch<float>(44, 15);
-  hipo::node<float>*   MC_True_py_node                 = reader.getBranch<float>(44, 16);
-  hipo::node<float>*   MC_True_pz_node                 = reader.getBranch<float>(44, 17);
-  hipo::node<float>*   MC_True_vx_node                 = reader.getBranch<float>(44, 18);
-  hipo::node<float>*   MC_True_vy_node                 = reader.getBranch<float>(44, 19);
-  hipo::node<float>*   MC_True_vz_node                 = reader.getBranch<float>(44, 20);
-  hipo::node<float>*   MC_True_mvx_node                = reader.getBranch<float>(44, 21);
-  hipo::node<float>*   MC_True_mvy_node                = reader.getBranch<float>(44, 22);
-  hipo::node<float>*   MC_True_mvz_node                = reader.getBranch<float>(44, 23);
-  hipo::node<float>*   MC_True_avgT_node               = reader.getBranch<float>(44, 24);
-  hipo::node<int32_t>* MC_True_nsteps_node             = reader.getBranch<int32_t>(44, 25);
-  hipo::node<int32_t>* MC_True_procID_node             = reader.getBranch<int32_t>(44, 26);
-  hipo::node<int32_t>* MC_True_hitn_node               = reader.getBranch<int32_t>(44, 27);
+  if (OutFileName.empty())
+    OutFileName = InFileName + ".root";
+
+  TFile* OutputFile = new TFile(OutFileName.c_str(), "RECREATE");
+  OutputFile->SetCompressionSettings(404); // kUseAnalysis
+  TTree*        clas12 = new TTree("clas12", "clas12");
+  hipo::reader* reader = new hipo::reader();
+  reader->open(InFileName.c_str());
+
+  hipo::node<int32_t>* REC_Event_NRUN_node             = reader->getBranch<int32_t>(330, 1);
+  hipo::node<int32_t>* REC_Event_NEVENT_node           = reader->getBranch<int32_t>(330, 2);
+  hipo::node<float>*   REC_Event_EVNTime_node          = reader->getBranch<float>(330, 3);
+  hipo::node<int8_t>*  REC_Event_TYPE_node             = reader->getBranch<int8_t>(330, 4);
+  hipo::node<int16_t>* REC_Event_EvCAT_node            = reader->getBranch<int16_t>(330, 5);
+  hipo::node<int16_t>* REC_Event_NPGP_node             = reader->getBranch<int16_t>(330, 6);
+  hipo::node<int64_t>* REC_Event_TRG_node              = reader->getBranch<int64_t>(330, 7);
+  hipo::node<float>*   REC_Event_BCG_node              = reader->getBranch<float>(330, 8);
+  hipo::node<float>*   REC_Event_LT_node               = reader->getBranch<float>(330, 9);
+  hipo::node<float>*   REC_Event_STTime_node           = reader->getBranch<float>(330, 10);
+  hipo::node<float>*   REC_Event_RFTime_node           = reader->getBranch<float>(330, 11);
+  hipo::node<int8_t>*  REC_Event_Helic_node            = reader->getBranch<int8_t>(330, 12);
+  hipo::node<float>*   REC_Event_PTIME_node            = reader->getBranch<float>(330, 13);
+  hipo::node<int32_t>* REC_Particle_pid_node           = reader->getBranch<int32_t>(331, 1);
+  hipo::node<float>*   REC_Particle_px_node            = reader->getBranch<float>(331, 2);
+  hipo::node<float>*   REC_Particle_py_node            = reader->getBranch<float>(331, 3);
+  hipo::node<float>*   REC_Particle_pz_node            = reader->getBranch<float>(331, 4);
+  hipo::node<float>*   REC_Particle_vx_node            = reader->getBranch<float>(331, 5);
+  hipo::node<float>*   REC_Particle_vy_node            = reader->getBranch<float>(331, 6);
+  hipo::node<float>*   REC_Particle_vz_node            = reader->getBranch<float>(331, 7);
+  hipo::node<int8_t>*  REC_Particle_charge_node        = reader->getBranch<int8_t>(331, 8);
+  hipo::node<float>*   REC_Particle_beta_node          = reader->getBranch<float>(331, 9);
+  hipo::node<float>*   REC_Particle_chi2pid_node       = reader->getBranch<float>(331, 10);
+  hipo::node<int16_t>* REC_Particle_status_node        = reader->getBranch<int16_t>(331, 11);
+  hipo::node<int16_t>* REC_Calorimeter_index_node      = reader->getBranch<int16_t>(332, 1);
+  hipo::node<int16_t>* REC_Calorimeter_pindex_node     = reader->getBranch<int16_t>(332, 2);
+  hipo::node<int8_t>*  REC_Calorimeter_detector_node   = reader->getBranch<int8_t>(332, 3);
+  hipo::node<int8_t>*  REC_Calorimeter_sector_node     = reader->getBranch<int8_t>(332, 4);
+  hipo::node<int8_t>*  REC_Calorimeter_layer_node      = reader->getBranch<int8_t>(332, 5);
+  hipo::node<float>*   REC_Calorimeter_energy_node     = reader->getBranch<float>(332, 6);
+  hipo::node<float>*   REC_Calorimeter_time_node       = reader->getBranch<float>(332, 7);
+  hipo::node<float>*   REC_Calorimeter_path_node       = reader->getBranch<float>(332, 8);
+  hipo::node<float>*   REC_Calorimeter_chi2_node       = reader->getBranch<float>(332, 9);
+  hipo::node<float>*   REC_Calorimeter_x_node          = reader->getBranch<float>(332, 10);
+  hipo::node<float>*   REC_Calorimeter_y_node          = reader->getBranch<float>(332, 11);
+  hipo::node<float>*   REC_Calorimeter_z_node          = reader->getBranch<float>(332, 12);
+  hipo::node<float>*   REC_Calorimeter_hx_node         = reader->getBranch<float>(332, 13);
+  hipo::node<float>*   REC_Calorimeter_hy_node         = reader->getBranch<float>(332, 14);
+  hipo::node<float>*   REC_Calorimeter_hz_node         = reader->getBranch<float>(332, 15);
+  hipo::node<float>*   REC_Calorimeter_lu_node         = reader->getBranch<float>(332, 16);
+  hipo::node<float>*   REC_Calorimeter_lv_node         = reader->getBranch<float>(332, 17);
+  hipo::node<float>*   REC_Calorimeter_lw_node         = reader->getBranch<float>(332, 18);
+  hipo::node<float>*   REC_Calorimeter_du_node         = reader->getBranch<float>(332, 19);
+  hipo::node<float>*   REC_Calorimeter_dv_node         = reader->getBranch<float>(332, 20);
+  hipo::node<float>*   REC_Calorimeter_dw_node         = reader->getBranch<float>(332, 21);
+  hipo::node<float>*   REC_Calorimeter_m2u_node        = reader->getBranch<float>(332, 22);
+  hipo::node<float>*   REC_Calorimeter_m2v_node        = reader->getBranch<float>(332, 23);
+  hipo::node<float>*   REC_Calorimeter_m2w_node        = reader->getBranch<float>(332, 24);
+  hipo::node<float>*   REC_Calorimeter_m3u_node        = reader->getBranch<float>(332, 25);
+  hipo::node<float>*   REC_Calorimeter_m3v_node        = reader->getBranch<float>(332, 26);
+  hipo::node<float>*   REC_Calorimeter_m3w_node        = reader->getBranch<float>(332, 27);
+  hipo::node<int16_t>* REC_Calorimeter_status_node     = reader->getBranch<int16_t>(332, 28);
+  hipo::node<int16_t>* REC_Cherenkov_index_node        = reader->getBranch<int16_t>(333, 1);
+  hipo::node<int16_t>* REC_Cherenkov_pindex_node       = reader->getBranch<int16_t>(333, 2);
+  hipo::node<int8_t>*  REC_Cherenkov_detector_node     = reader->getBranch<int8_t>(333, 3);
+  hipo::node<int8_t>*  REC_Cherenkov_sector_node       = reader->getBranch<int8_t>(333, 4);
+  hipo::node<float>*   REC_Cherenkov_nphe_node         = reader->getBranch<float>(333, 5);
+  hipo::node<float>*   REC_Cherenkov_time_node         = reader->getBranch<float>(333, 6);
+  hipo::node<float>*   REC_Cherenkov_path_node         = reader->getBranch<float>(333, 7);
+  hipo::node<float>*   REC_Cherenkov_chi2_node         = reader->getBranch<float>(333, 8);
+  hipo::node<float>*   REC_Cherenkov_x_node            = reader->getBranch<float>(333, 9);
+  hipo::node<float>*   REC_Cherenkov_y_node            = reader->getBranch<float>(333, 10);
+  hipo::node<float>*   REC_Cherenkov_z_node            = reader->getBranch<float>(333, 11);
+  hipo::node<float>*   REC_Cherenkov_theta_node        = reader->getBranch<float>(333, 12);
+  hipo::node<float>*   REC_Cherenkov_phi_node          = reader->getBranch<float>(333, 13);
+  hipo::node<float>*   REC_Cherenkov_dtheta_node       = reader->getBranch<float>(333, 14);
+  hipo::node<float>*   REC_Cherenkov_dphi_node         = reader->getBranch<float>(333, 15);
+  hipo::node<int16_t>* REC_Cherenkov_status_node       = reader->getBranch<int16_t>(333, 16);
+  hipo::node<int16_t>* REC_ForwardTagger_index_node    = reader->getBranch<int16_t>(334, 1);
+  hipo::node<int16_t>* REC_ForwardTagger_pindex_node   = reader->getBranch<int16_t>(334, 2);
+  hipo::node<int8_t>*  REC_ForwardTagger_detector_node = reader->getBranch<int8_t>(334, 3);
+  hipo::node<float>*   REC_ForwardTagger_energy_node   = reader->getBranch<float>(334, 4);
+  hipo::node<float>*   REC_ForwardTagger_time_node     = reader->getBranch<float>(334, 5);
+  hipo::node<float>*   REC_ForwardTagger_path_node     = reader->getBranch<float>(334, 6);
+  hipo::node<float>*   REC_ForwardTagger_chi2_node     = reader->getBranch<float>(334, 7);
+  hipo::node<float>*   REC_ForwardTagger_x_node        = reader->getBranch<float>(334, 8);
+  hipo::node<float>*   REC_ForwardTagger_y_node        = reader->getBranch<float>(334, 9);
+  hipo::node<float>*   REC_ForwardTagger_z_node        = reader->getBranch<float>(334, 10);
+  hipo::node<float>*   REC_ForwardTagger_dx_node       = reader->getBranch<float>(334, 11);
+  hipo::node<float>*   REC_ForwardTagger_dy_node       = reader->getBranch<float>(334, 12);
+  hipo::node<float>*   REC_ForwardTagger_radius_node   = reader->getBranch<float>(334, 13);
+  hipo::node<int16_t>* REC_ForwardTagger_size_node     = reader->getBranch<int16_t>(334, 14);
+  hipo::node<int16_t>* REC_ForwardTagger_status_node   = reader->getBranch<int16_t>(334, 15);
+  hipo::node<int16_t>* REC_Scintillator_index_node     = reader->getBranch<int16_t>(335, 1);
+  hipo::node<int16_t>* REC_Scintillator_pindex_node    = reader->getBranch<int16_t>(335, 2);
+  hipo::node<int8_t>*  REC_Scintillator_detector_node  = reader->getBranch<int8_t>(335, 3);
+  hipo::node<int8_t>*  REC_Scintillator_sector_node    = reader->getBranch<int8_t>(335, 4);
+  hipo::node<int8_t>*  REC_Scintillator_layer_node     = reader->getBranch<int8_t>(335, 5);
+  hipo::node<int16_t>* REC_Scintillator_component_node = reader->getBranch<int16_t>(335, 6);
+  hipo::node<float>*   REC_Scintillator_energy_node    = reader->getBranch<float>(335, 7);
+  hipo::node<float>*   REC_Scintillator_time_node      = reader->getBranch<float>(335, 8);
+  hipo::node<float>*   REC_Scintillator_path_node      = reader->getBranch<float>(335, 9);
+  hipo::node<float>*   REC_Scintillator_chi2_node      = reader->getBranch<float>(335, 10);
+  hipo::node<float>*   REC_Scintillator_x_node         = reader->getBranch<float>(335, 11);
+  hipo::node<float>*   REC_Scintillator_y_node         = reader->getBranch<float>(335, 12);
+  hipo::node<float>*   REC_Scintillator_z_node         = reader->getBranch<float>(335, 13);
+  hipo::node<float>*   REC_Scintillator_hx_node        = reader->getBranch<float>(335, 14);
+  hipo::node<float>*   REC_Scintillator_hy_node        = reader->getBranch<float>(335, 15);
+  hipo::node<float>*   REC_Scintillator_hz_node        = reader->getBranch<float>(335, 16);
+  hipo::node<int16_t>* REC_Scintillator_status_node    = reader->getBranch<int16_t>(335, 17);
+  hipo::node<int16_t>* REC_Track_index_node            = reader->getBranch<int16_t>(336, 1);
+  hipo::node<int16_t>* REC_Track_pindex_node           = reader->getBranch<int16_t>(336, 2);
+  hipo::node<int8_t>*  REC_Track_detector_node         = reader->getBranch<int8_t>(336, 3);
+  hipo::node<int8_t>*  REC_Track_sector_node           = reader->getBranch<int8_t>(336, 4);
+  hipo::node<int16_t>* REC_Track_status_node           = reader->getBranch<int16_t>(336, 5);
+  hipo::node<int8_t>*  REC_Track_q_node                = reader->getBranch<int8_t>(336, 6);
+  hipo::node<float>*   REC_Track_chi2_node             = reader->getBranch<float>(336, 7);
+  hipo::node<int16_t>* REC_Track_NDF_node              = reader->getBranch<int16_t>(336, 8);
+  hipo::node<float>*   REC_Track_px_nomm_node          = reader->getBranch<float>(336, 9);
+  hipo::node<float>*   REC_Track_py_nomm_node          = reader->getBranch<float>(336, 10);
+  hipo::node<float>*   REC_Track_pz_nomm_node          = reader->getBranch<float>(336, 11);
+  hipo::node<float>*   REC_Track_vx_nomm_node          = reader->getBranch<float>(336, 12);
+  hipo::node<float>*   REC_Track_vy_nomm_node          = reader->getBranch<float>(336, 13);
+  hipo::node<float>*   REC_Track_vz_nomm_node          = reader->getBranch<float>(336, 14);
+  hipo::node<float>*   REC_Track_chi2_nomm_node        = reader->getBranch<float>(336, 15);
+  hipo::node<int16_t>* REC_Track_NDF_nomm_node         = reader->getBranch<int16_t>(336, 16);
+  hipo::node<int16_t>* REC_TrackCross_index_node       = reader->getBranch<int16_t>(337, 1);
+  hipo::node<int16_t>* REC_TrackCross_pindex_node      = reader->getBranch<int16_t>(337, 2);
+  hipo::node<int8_t>*  REC_TrackCross_detector_node    = reader->getBranch<int8_t>(337, 3);
+  hipo::node<int8_t>*  REC_TrackCross_sector_node      = reader->getBranch<int8_t>(337, 4);
+  hipo::node<int8_t>*  REC_TrackCross_layer_node       = reader->getBranch<int8_t>(337, 5);
+  hipo::node<float>*   REC_TrackCross_c_x_node         = reader->getBranch<float>(337, 6);
+  hipo::node<float>*   REC_TrackCross_c_y_node         = reader->getBranch<float>(337, 7);
+  hipo::node<float>*   REC_TrackCross_c_z_node         = reader->getBranch<float>(337, 8);
+  hipo::node<float>*   REC_TrackCross_c_ux_node        = reader->getBranch<float>(337, 9);
+  hipo::node<float>*   REC_TrackCross_c_uy_node        = reader->getBranch<float>(337, 10);
+  hipo::node<float>*   REC_TrackCross_c_uz_node        = reader->getBranch<float>(337, 11);
+  hipo::node<int16_t>* REC_TrackCross_status_node      = reader->getBranch<int16_t>(337, 12);
+  hipo::node<int16_t>* REC_CovMat_index_node           = reader->getBranch<int16_t>(338, 1);
+  hipo::node<int16_t>* REC_CovMat_pindex_node          = reader->getBranch<int16_t>(338, 2);
+  hipo::node<float>*   REC_CovMat_C11_node             = reader->getBranch<float>(338, 3);
+  hipo::node<float>*   REC_CovMat_C12_node             = reader->getBranch<float>(338, 4);
+  hipo::node<float>*   REC_CovMat_C13_node             = reader->getBranch<float>(338, 5);
+  hipo::node<float>*   REC_CovMat_C14_node             = reader->getBranch<float>(338, 6);
+  hipo::node<float>*   REC_CovMat_C15_node             = reader->getBranch<float>(338, 7);
+  hipo::node<float>*   REC_CovMat_C22_node             = reader->getBranch<float>(338, 8);
+  hipo::node<float>*   REC_CovMat_C23_node             = reader->getBranch<float>(338, 9);
+  hipo::node<float>*   REC_CovMat_C24_node             = reader->getBranch<float>(338, 10);
+  hipo::node<float>*   REC_CovMat_C25_node             = reader->getBranch<float>(338, 11);
+  hipo::node<float>*   REC_CovMat_C33_node             = reader->getBranch<float>(338, 12);
+  hipo::node<float>*   REC_CovMat_C34_node             = reader->getBranch<float>(338, 13);
+  hipo::node<float>*   REC_CovMat_C35_node             = reader->getBranch<float>(338, 14);
+  hipo::node<float>*   REC_CovMat_C44_node             = reader->getBranch<float>(338, 15);
+  hipo::node<float>*   REC_CovMat_C45_node             = reader->getBranch<float>(338, 16);
+  hipo::node<float>*   REC_CovMat_C55_node             = reader->getBranch<float>(338, 17);
+  hipo::node<int16_t>* REC_VertDoca_index1_node        = reader->getBranch<int16_t>(339, 1);
+  hipo::node<int16_t>* REC_VertDoca_index2_node        = reader->getBranch<int16_t>(339, 2);
+  hipo::node<float>*   REC_VertDoca_x_node             = reader->getBranch<float>(339, 3);
+  hipo::node<float>*   REC_VertDoca_y_node             = reader->getBranch<float>(339, 4);
+  hipo::node<float>*   REC_VertDoca_z_node             = reader->getBranch<float>(339, 5);
+  hipo::node<float>*   REC_VertDoca_x1_node            = reader->getBranch<float>(339, 6);
+  hipo::node<float>*   REC_VertDoca_y1_node            = reader->getBranch<float>(339, 7);
+  hipo::node<float>*   REC_VertDoca_z1_node            = reader->getBranch<float>(339, 8);
+  hipo::node<float>*   REC_VertDoca_cx1_node           = reader->getBranch<float>(339, 9);
+  hipo::node<float>*   REC_VertDoca_cy1_node           = reader->getBranch<float>(339, 10);
+  hipo::node<float>*   REC_VertDoca_cz1_node           = reader->getBranch<float>(339, 11);
+  hipo::node<float>*   REC_VertDoca_x2_node            = reader->getBranch<float>(339, 12);
+  hipo::node<float>*   REC_VertDoca_y2_node            = reader->getBranch<float>(339, 13);
+  hipo::node<float>*   REC_VertDoca_z2_node            = reader->getBranch<float>(339, 14);
+  hipo::node<float>*   REC_VertDoca_cx2_node           = reader->getBranch<float>(339, 15);
+  hipo::node<float>*   REC_VertDoca_cy2_node           = reader->getBranch<float>(339, 16);
+  hipo::node<float>*   REC_VertDoca_cz2_node           = reader->getBranch<float>(339, 17);
+  hipo::node<float>*   REC_VertDoca_r_node             = reader->getBranch<float>(339, 18);
+  hipo::node<int16_t>* REC_Traj_pindex_node            = reader->getBranch<int16_t>(340, 1);
+  hipo::node<int16_t>* REC_Traj_index_node             = reader->getBranch<int16_t>(340, 2);
+  hipo::node<int16_t>* REC_Traj_detId_node             = reader->getBranch<int16_t>(340, 3);
+  hipo::node<int8_t>*  REC_Traj_q_node                 = reader->getBranch<int8_t>(340, 4);
+  hipo::node<float>*   REC_Traj_x_node                 = reader->getBranch<float>(340, 5);
+  hipo::node<float>*   REC_Traj_y_node                 = reader->getBranch<float>(340, 6);
+  hipo::node<float>*   REC_Traj_z_node                 = reader->getBranch<float>(340, 7);
+  hipo::node<float>*   REC_Traj_cx_node                = reader->getBranch<float>(340, 8);
+  hipo::node<float>*   REC_Traj_cy_node                = reader->getBranch<float>(340, 9);
+  hipo::node<float>*   REC_Traj_cz_node                = reader->getBranch<float>(340, 10);
+  hipo::node<float>*   REC_Traj_pathlength_node        = reader->getBranch<float>(340, 11);
 
   std::vector<int>   REC_Event_NRUN_vec;
   std::vector<int>   REC_Event_NEVENT_vec;
@@ -451,69 +404,6 @@ int main(int argc, char** argv) {
   std::vector<float> REC_Traj_cy_vec;
   std::vector<float> REC_Traj_cz_vec;
   std::vector<float> REC_Traj_pathlength_vec;
-  std::vector<int>   MC_Header_run_vec;
-  std::vector<int>   MC_Header_event_vec;
-  std::vector<int>   MC_Header_type_vec;
-  std::vector<float> MC_Header_helicity_vec;
-  std::vector<int>   MC_Event_npart_vec;
-  std::vector<int>   MC_Event_atarget_vec;
-  std::vector<int>   MC_Event_ztarget_vec;
-  std::vector<float> MC_Event_ptarget_vec;
-  std::vector<float> MC_Event_pbeam_vec;
-  std::vector<int>   MC_Event_btype_vec;
-  std::vector<float> MC_Event_ebeam_vec;
-  std::vector<int>   MC_Event_targetid_vec;
-  std::vector<int>   MC_Event_processid_vec;
-  std::vector<float> MC_Event_weight_vec;
-  std::vector<int>   MC_Particle_pid_vec;
-  std::vector<float> MC_Particle_px_vec;
-  std::vector<float> MC_Particle_py_vec;
-  std::vector<float> MC_Particle_pz_vec;
-  std::vector<float> MC_Particle_vx_vec;
-  std::vector<float> MC_Particle_vy_vec;
-  std::vector<float> MC_Particle_vz_vec;
-  std::vector<float> MC_Particle_vt_vec;
-  std::vector<int>   MC_Lund_index_vec;
-  std::vector<int>   MC_Lund_type_vec;
-  std::vector<int>   MC_Lund_pid_vec;
-  std::vector<int>   MC_Lund_parent_vec;
-  std::vector<int>   MC_Lund_daughter_vec;
-  std::vector<float> MC_Lund_px_vec;
-  std::vector<float> MC_Lund_py_vec;
-  std::vector<float> MC_Lund_pz_vec;
-  std::vector<float> MC_Lund_E_vec;
-  std::vector<float> MC_Lund_mass_vec;
-  std::vector<float> MC_Lund_vx_vec;
-  std::vector<float> MC_Lund_vy_vec;
-  std::vector<float> MC_Lund_vz_vec;
-  std::vector<float> MC_Lund_ltime_vec;
-  std::vector<int>   MC_True_detector_vec;
-  std::vector<int>   MC_True_pid_vec;
-  std::vector<int>   MC_True_mpid_vec;
-  std::vector<int>   MC_True_tid_vec;
-  std::vector<int>   MC_True_mtid_vec;
-  std::vector<int>   MC_True_otid_vec;
-  std::vector<float> MC_True_trackE_vec;
-  std::vector<float> MC_True_totEdep_vec;
-  std::vector<float> MC_True_avgX_vec;
-  std::vector<float> MC_True_avgY_vec;
-  std::vector<float> MC_True_avgZ_vec;
-  std::vector<float> MC_True_avgLx_vec;
-  std::vector<float> MC_True_avgLy_vec;
-  std::vector<float> MC_True_avgLz_vec;
-  std::vector<float> MC_True_px_vec;
-  std::vector<float> MC_True_py_vec;
-  std::vector<float> MC_True_pz_vec;
-  std::vector<float> MC_True_vx_vec;
-  std::vector<float> MC_True_vy_vec;
-  std::vector<float> MC_True_vz_vec;
-  std::vector<float> MC_True_mvx_vec;
-  std::vector<float> MC_True_mvy_vec;
-  std::vector<float> MC_True_mvz_vec;
-  std::vector<float> MC_True_avgT_vec;
-  std::vector<int>   MC_True_nsteps_vec;
-  std::vector<int>   MC_True_procID_vec;
-  std::vector<int>   MC_True_hitn_vec;
 
   clas12->Branch("REC_Event_NRUN", &REC_Event_NRUN_vec);
   clas12->Branch("REC_Event_NEVENT", &REC_Event_NEVENT_vec);
@@ -689,73 +579,10 @@ int main(int argc, char** argv) {
   clas12->Branch("REC_Traj_cy", &REC_Traj_cy_vec);
   clas12->Branch("REC_Traj_cz", &REC_Traj_cz_vec);
   clas12->Branch("REC_Traj_pathlength", &REC_Traj_pathlength_vec);
-  clas12->Branch("MC_Header_run", &MC_Header_run_vec);
-  clas12->Branch("MC_Header_event", &MC_Header_event_vec);
-  clas12->Branch("MC_Header_type", &MC_Header_type_vec);
-  clas12->Branch("MC_Header_helicity", &MC_Header_helicity_vec);
-  clas12->Branch("MC_Event_npart", &MC_Event_npart_vec);
-  clas12->Branch("MC_Event_atarget", &MC_Event_atarget_vec);
-  clas12->Branch("MC_Event_ztarget", &MC_Event_ztarget_vec);
-  clas12->Branch("MC_Event_ptarget", &MC_Event_ptarget_vec);
-  clas12->Branch("MC_Event_pbeam", &MC_Event_pbeam_vec);
-  clas12->Branch("MC_Event_btype", &MC_Event_btype_vec);
-  clas12->Branch("MC_Event_ebeam", &MC_Event_ebeam_vec);
-  clas12->Branch("MC_Event_targetid", &MC_Event_targetid_vec);
-  clas12->Branch("MC_Event_processid", &MC_Event_processid_vec);
-  clas12->Branch("MC_Event_weight", &MC_Event_weight_vec);
-  clas12->Branch("MC_Particle_pid", &MC_Particle_pid_vec);
-  clas12->Branch("MC_Particle_px", &MC_Particle_px_vec);
-  clas12->Branch("MC_Particle_py", &MC_Particle_py_vec);
-  clas12->Branch("MC_Particle_pz", &MC_Particle_pz_vec);
-  clas12->Branch("MC_Particle_vx", &MC_Particle_vx_vec);
-  clas12->Branch("MC_Particle_vy", &MC_Particle_vy_vec);
-  clas12->Branch("MC_Particle_vz", &MC_Particle_vz_vec);
-  clas12->Branch("MC_Particle_vt", &MC_Particle_vt_vec);
-  clas12->Branch("MC_Lund_index", &MC_Lund_index_vec);
-  clas12->Branch("MC_Lund_type", &MC_Lund_type_vec);
-  clas12->Branch("MC_Lund_pid", &MC_Lund_pid_vec);
-  clas12->Branch("MC_Lund_parent", &MC_Lund_parent_vec);
-  clas12->Branch("MC_Lund_daughter", &MC_Lund_daughter_vec);
-  clas12->Branch("MC_Lund_px", &MC_Lund_px_vec);
-  clas12->Branch("MC_Lund_py", &MC_Lund_py_vec);
-  clas12->Branch("MC_Lund_pz", &MC_Lund_pz_vec);
-  clas12->Branch("MC_Lund_E", &MC_Lund_E_vec);
-  clas12->Branch("MC_Lund_mass", &MC_Lund_mass_vec);
-  clas12->Branch("MC_Lund_vx", &MC_Lund_vx_vec);
-  clas12->Branch("MC_Lund_vy", &MC_Lund_vy_vec);
-  clas12->Branch("MC_Lund_vz", &MC_Lund_vz_vec);
-  clas12->Branch("MC_Lund_ltime", &MC_Lund_ltime_vec);
-  clas12->Branch("MC_True_detector", &MC_True_detector_vec);
-  clas12->Branch("MC_True_pid", &MC_True_pid_vec);
-  clas12->Branch("MC_True_mpid", &MC_True_mpid_vec);
-  clas12->Branch("MC_True_tid", &MC_True_tid_vec);
-  clas12->Branch("MC_True_mtid", &MC_True_mtid_vec);
-  clas12->Branch("MC_True_otid", &MC_True_otid_vec);
-  clas12->Branch("MC_True_trackE", &MC_True_trackE_vec);
-  clas12->Branch("MC_True_totEdep", &MC_True_totEdep_vec);
-  clas12->Branch("MC_True_avgX", &MC_True_avgX_vec);
-  clas12->Branch("MC_True_avgY", &MC_True_avgY_vec);
-  clas12->Branch("MC_True_avgZ", &MC_True_avgZ_vec);
-  clas12->Branch("MC_True_avgLx", &MC_True_avgLx_vec);
-  clas12->Branch("MC_True_avgLy", &MC_True_avgLy_vec);
-  clas12->Branch("MC_True_avgLz", &MC_True_avgLz_vec);
-  clas12->Branch("MC_True_px", &MC_True_px_vec);
-  clas12->Branch("MC_True_py", &MC_True_py_vec);
-  clas12->Branch("MC_True_pz", &MC_True_pz_vec);
-  clas12->Branch("MC_True_vx", &MC_True_vx_vec);
-  clas12->Branch("MC_True_vy", &MC_True_vy_vec);
-  clas12->Branch("MC_True_vz", &MC_True_vz_vec);
-  clas12->Branch("MC_True_mvx", &MC_True_mvx_vec);
-  clas12->Branch("MC_True_mvy", &MC_True_mvy_vec);
-  clas12->Branch("MC_True_mvz", &MC_True_mvz_vec);
-  clas12->Branch("MC_True_avgT", &MC_True_avgT_vec);
-  clas12->Branch("MC_True_nsteps", &MC_True_nsteps_vec);
-  clas12->Branch("MC_True_procID", &MC_True_procID_vec);
-  clas12->Branch("MC_True_hitn", &MC_True_hitn_vec);
 
   int entry = 0;
   int l     = 0;
-  while (reader.next() == true) {
+  while (reader->next() == true) {
     entry++;
     if ((entry % 1000) == 0)
       std::cerr << "\t" << entry << "\r\r" << std::flush;
@@ -1630,321 +1457,6 @@ int main(int argc, char** argv) {
     for (int i = 0; i < l; i++)
       REC_Traj_pathlength_vec.at(i) = REC_Traj_pathlength_node->getValue(i);
 
-    l = MC_Header_run_node->getLength();
-    MC_Header_run_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Header_run_vec.at(i) = MC_Header_run_node->getValue(i);
-
-    l = MC_Header_event_node->getLength();
-    MC_Header_event_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Header_event_vec.at(i) = MC_Header_event_node->getValue(i);
-
-    l = MC_Header_type_node->getLength();
-    MC_Header_type_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Header_type_vec.at(i) = MC_Header_type_node->getValue(i);
-
-    l = MC_Header_helicity_node->getLength();
-    MC_Header_helicity_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Header_helicity_vec.at(i) = MC_Header_helicity_node->getValue(i);
-
-    l = MC_Event_npart_node->getLength();
-    MC_Event_npart_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Event_npart_vec.at(i) = MC_Event_npart_node->getValue(i);
-
-    l = MC_Event_atarget_node->getLength();
-    MC_Event_atarget_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Event_atarget_vec.at(i) = MC_Event_atarget_node->getValue(i);
-
-    l = MC_Event_ztarget_node->getLength();
-    MC_Event_ztarget_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Event_ztarget_vec.at(i) = MC_Event_ztarget_node->getValue(i);
-
-    l = MC_Event_ptarget_node->getLength();
-    MC_Event_ptarget_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Event_ptarget_vec.at(i) = MC_Event_ptarget_node->getValue(i);
-
-    l = MC_Event_pbeam_node->getLength();
-    MC_Event_pbeam_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Event_pbeam_vec.at(i) = MC_Event_pbeam_node->getValue(i);
-
-    l = MC_Event_btype_node->getLength();
-    MC_Event_btype_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Event_btype_vec.at(i) = MC_Event_btype_node->getValue(i);
-
-    l = MC_Event_ebeam_node->getLength();
-    MC_Event_ebeam_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Event_ebeam_vec.at(i) = MC_Event_ebeam_node->getValue(i);
-
-    l = MC_Event_targetid_node->getLength();
-    MC_Event_targetid_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Event_targetid_vec.at(i) = MC_Event_targetid_node->getValue(i);
-
-    l = MC_Event_processid_node->getLength();
-    MC_Event_processid_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Event_processid_vec.at(i) = MC_Event_processid_node->getValue(i);
-
-    l = MC_Event_weight_node->getLength();
-    MC_Event_weight_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Event_weight_vec.at(i) = MC_Event_weight_node->getValue(i);
-
-    l = MC_Particle_pid_node->getLength();
-    MC_Particle_pid_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Particle_pid_vec.at(i) = MC_Particle_pid_node->getValue(i);
-
-    l = MC_Particle_px_node->getLength();
-    MC_Particle_px_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Particle_px_vec.at(i) = MC_Particle_px_node->getValue(i);
-
-    l = MC_Particle_py_node->getLength();
-    MC_Particle_py_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Particle_py_vec.at(i) = MC_Particle_py_node->getValue(i);
-
-    l = MC_Particle_pz_node->getLength();
-    MC_Particle_pz_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Particle_pz_vec.at(i) = MC_Particle_pz_node->getValue(i);
-
-    l = MC_Particle_vx_node->getLength();
-    MC_Particle_vx_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Particle_vx_vec.at(i) = MC_Particle_vx_node->getValue(i);
-
-    l = MC_Particle_vy_node->getLength();
-    MC_Particle_vy_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Particle_vy_vec.at(i) = MC_Particle_vy_node->getValue(i);
-
-    l = MC_Particle_vz_node->getLength();
-    MC_Particle_vz_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Particle_vz_vec.at(i) = MC_Particle_vz_node->getValue(i);
-
-    l = MC_Particle_vt_node->getLength();
-    MC_Particle_vt_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Particle_vt_vec.at(i) = MC_Particle_vt_node->getValue(i);
-
-    l = MC_Lund_index_node->getLength();
-    MC_Lund_index_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Lund_index_vec.at(i) = MC_Lund_index_node->getValue(i);
-
-    l = MC_Lund_type_node->getLength();
-    MC_Lund_type_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Lund_type_vec.at(i) = MC_Lund_type_node->getValue(i);
-
-    l = MC_Lund_pid_node->getLength();
-    MC_Lund_pid_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Lund_pid_vec.at(i) = MC_Lund_pid_node->getValue(i);
-
-    l = MC_Lund_parent_node->getLength();
-    MC_Lund_parent_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Lund_parent_vec.at(i) = MC_Lund_parent_node->getValue(i);
-
-    l = MC_Lund_daughter_node->getLength();
-    MC_Lund_daughter_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Lund_daughter_vec.at(i) = MC_Lund_daughter_node->getValue(i);
-
-    l = MC_Lund_px_node->getLength();
-    MC_Lund_px_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Lund_px_vec.at(i) = MC_Lund_px_node->getValue(i);
-
-    l = MC_Lund_py_node->getLength();
-    MC_Lund_py_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Lund_py_vec.at(i) = MC_Lund_py_node->getValue(i);
-
-    l = MC_Lund_pz_node->getLength();
-    MC_Lund_pz_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Lund_pz_vec.at(i) = MC_Lund_pz_node->getValue(i);
-
-    l = MC_Lund_E_node->getLength();
-    MC_Lund_E_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Lund_E_vec.at(i) = MC_Lund_E_node->getValue(i);
-
-    l = MC_Lund_mass_node->getLength();
-    MC_Lund_mass_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Lund_mass_vec.at(i) = MC_Lund_mass_node->getValue(i);
-
-    l = MC_Lund_vx_node->getLength();
-    MC_Lund_vx_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Lund_vx_vec.at(i) = MC_Lund_vx_node->getValue(i);
-
-    l = MC_Lund_vy_node->getLength();
-    MC_Lund_vy_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Lund_vy_vec.at(i) = MC_Lund_vy_node->getValue(i);
-
-    l = MC_Lund_vz_node->getLength();
-    MC_Lund_vz_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Lund_vz_vec.at(i) = MC_Lund_vz_node->getValue(i);
-
-    l = MC_Lund_ltime_node->getLength();
-    MC_Lund_ltime_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_Lund_ltime_vec.at(i) = MC_Lund_ltime_node->getValue(i);
-
-    l = MC_True_detector_node->getLength();
-    MC_True_detector_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_detector_vec.at(i) = MC_True_detector_node->getValue(i);
-
-    l = MC_True_pid_node->getLength();
-    MC_True_pid_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_pid_vec.at(i) = MC_True_pid_node->getValue(i);
-
-    l = MC_True_mpid_node->getLength();
-    MC_True_mpid_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_mpid_vec.at(i) = MC_True_mpid_node->getValue(i);
-
-    l = MC_True_tid_node->getLength();
-    MC_True_tid_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_tid_vec.at(i) = MC_True_tid_node->getValue(i);
-
-    l = MC_True_mtid_node->getLength();
-    MC_True_mtid_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_mtid_vec.at(i) = MC_True_mtid_node->getValue(i);
-
-    l = MC_True_otid_node->getLength();
-    MC_True_otid_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_otid_vec.at(i) = MC_True_otid_node->getValue(i);
-
-    l = MC_True_trackE_node->getLength();
-    MC_True_trackE_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_trackE_vec.at(i) = MC_True_trackE_node->getValue(i);
-
-    l = MC_True_totEdep_node->getLength();
-    MC_True_totEdep_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_totEdep_vec.at(i) = MC_True_totEdep_node->getValue(i);
-
-    l = MC_True_avgX_node->getLength();
-    MC_True_avgX_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_avgX_vec.at(i) = MC_True_avgX_node->getValue(i);
-
-    l = MC_True_avgY_node->getLength();
-    MC_True_avgY_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_avgY_vec.at(i) = MC_True_avgY_node->getValue(i);
-
-    l = MC_True_avgZ_node->getLength();
-    MC_True_avgZ_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_avgZ_vec.at(i) = MC_True_avgZ_node->getValue(i);
-
-    l = MC_True_avgLx_node->getLength();
-    MC_True_avgLx_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_avgLx_vec.at(i) = MC_True_avgLx_node->getValue(i);
-
-    l = MC_True_avgLy_node->getLength();
-    MC_True_avgLy_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_avgLy_vec.at(i) = MC_True_avgLy_node->getValue(i);
-
-    l = MC_True_avgLz_node->getLength();
-    MC_True_avgLz_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_avgLz_vec.at(i) = MC_True_avgLz_node->getValue(i);
-
-    l = MC_True_px_node->getLength();
-    MC_True_px_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_px_vec.at(i) = MC_True_px_node->getValue(i);
-
-    l = MC_True_py_node->getLength();
-    MC_True_py_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_py_vec.at(i) = MC_True_py_node->getValue(i);
-
-    l = MC_True_pz_node->getLength();
-    MC_True_pz_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_pz_vec.at(i) = MC_True_pz_node->getValue(i);
-
-    l = MC_True_vx_node->getLength();
-    MC_True_vx_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_vx_vec.at(i) = MC_True_vx_node->getValue(i);
-
-    l = MC_True_vy_node->getLength();
-    MC_True_vy_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_vy_vec.at(i) = MC_True_vy_node->getValue(i);
-
-    l = MC_True_vz_node->getLength();
-    MC_True_vz_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_vz_vec.at(i) = MC_True_vz_node->getValue(i);
-
-    l = MC_True_mvx_node->getLength();
-    MC_True_mvx_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_mvx_vec.at(i) = MC_True_mvx_node->getValue(i);
-
-    l = MC_True_mvy_node->getLength();
-    MC_True_mvy_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_mvy_vec.at(i) = MC_True_mvy_node->getValue(i);
-
-    l = MC_True_mvz_node->getLength();
-    MC_True_mvz_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_mvz_vec.at(i) = MC_True_mvz_node->getValue(i);
-
-    l = MC_True_avgT_node->getLength();
-    MC_True_avgT_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_avgT_vec.at(i) = MC_True_avgT_node->getValue(i);
-
-    l = MC_True_nsteps_node->getLength();
-    MC_True_nsteps_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_nsteps_vec.at(i) = MC_True_nsteps_node->getValue(i);
-
-    l = MC_True_procID_node->getLength();
-    MC_True_procID_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_procID_vec.at(i) = MC_True_procID_node->getValue(i);
-
-    l = MC_True_hitn_node->getLength();
-    MC_True_hitn_vec.resize(l);
-    for (int i = 0; i < l; i++)
-      MC_True_hitn_vec.at(i) = MC_True_hitn_node->getValue(i);
-
     clas12->Fill();
     REC_Event_NRUN_vec.clear();
     REC_Event_NEVENT_vec.clear();
@@ -2120,69 +1632,6 @@ int main(int argc, char** argv) {
     REC_Traj_cy_vec.clear();
     REC_Traj_cz_vec.clear();
     REC_Traj_pathlength_vec.clear();
-    MC_Header_run_vec.clear();
-    MC_Header_event_vec.clear();
-    MC_Header_type_vec.clear();
-    MC_Header_helicity_vec.clear();
-    MC_Event_npart_vec.clear();
-    MC_Event_atarget_vec.clear();
-    MC_Event_ztarget_vec.clear();
-    MC_Event_ptarget_vec.clear();
-    MC_Event_pbeam_vec.clear();
-    MC_Event_btype_vec.clear();
-    MC_Event_ebeam_vec.clear();
-    MC_Event_targetid_vec.clear();
-    MC_Event_processid_vec.clear();
-    MC_Event_weight_vec.clear();
-    MC_Particle_pid_vec.clear();
-    MC_Particle_px_vec.clear();
-    MC_Particle_py_vec.clear();
-    MC_Particle_pz_vec.clear();
-    MC_Particle_vx_vec.clear();
-    MC_Particle_vy_vec.clear();
-    MC_Particle_vz_vec.clear();
-    MC_Particle_vt_vec.clear();
-    MC_Lund_index_vec.clear();
-    MC_Lund_type_vec.clear();
-    MC_Lund_pid_vec.clear();
-    MC_Lund_parent_vec.clear();
-    MC_Lund_daughter_vec.clear();
-    MC_Lund_px_vec.clear();
-    MC_Lund_py_vec.clear();
-    MC_Lund_pz_vec.clear();
-    MC_Lund_E_vec.clear();
-    MC_Lund_mass_vec.clear();
-    MC_Lund_vx_vec.clear();
-    MC_Lund_vy_vec.clear();
-    MC_Lund_vz_vec.clear();
-    MC_Lund_ltime_vec.clear();
-    MC_True_detector_vec.clear();
-    MC_True_pid_vec.clear();
-    MC_True_mpid_vec.clear();
-    MC_True_tid_vec.clear();
-    MC_True_mtid_vec.clear();
-    MC_True_otid_vec.clear();
-    MC_True_trackE_vec.clear();
-    MC_True_totEdep_vec.clear();
-    MC_True_avgX_vec.clear();
-    MC_True_avgY_vec.clear();
-    MC_True_avgZ_vec.clear();
-    MC_True_avgLx_vec.clear();
-    MC_True_avgLy_vec.clear();
-    MC_True_avgLz_vec.clear();
-    MC_True_px_vec.clear();
-    MC_True_py_vec.clear();
-    MC_True_pz_vec.clear();
-    MC_True_vx_vec.clear();
-    MC_True_vy_vec.clear();
-    MC_True_vz_vec.clear();
-    MC_True_mvx_vec.clear();
-    MC_True_mvy_vec.clear();
-    MC_True_mvz_vec.clear();
-    MC_True_avgT_vec.clear();
-    MC_True_nsteps_vec.clear();
-    MC_True_procID_vec.clear();
-    MC_True_hitn_vec.clear();
   }
   OutputFile->cd();
   clas12->Write();

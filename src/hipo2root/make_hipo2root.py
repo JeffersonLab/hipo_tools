@@ -145,7 +145,7 @@ def make_hipo2root(files):
 
                     clear_vec.append("\t\t" + name + "_vec.clear();  \n")
 
-    with open("recon2root.cpp", 'w') as outfile:
+    with open("hipo2root.cpp", 'w') as outfile:
         def write(x): return outfile.write(x)
         write(begining)
         write("\n\n")

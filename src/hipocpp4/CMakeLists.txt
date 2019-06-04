@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_FLAGS "${ROOT_CXX_FLAGS}")
 
 set(hipo4_srcs
   src/bank.cpp
@@ -10,6 +9,7 @@ set(hipo4_srcs
   src/record.cpp
   src/recordbuilder.cpp
   src/utils.cpp
+  src/wrapper.cpp
   )
 
 add_library(hipo4_objlib OBJECT ${hipo4_srcs})

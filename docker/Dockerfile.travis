@@ -22,7 +22,7 @@ RUN curl https://cmake.org/files/v$CMAKE_MAJ_VER/cmake-$CMAKE_MAJ_VER.$CMAKE_MIN
 
 ADD . /tmp/hipo_tools/
 RUN mkdir -p /tmp/hipo_tools/build && cd /tmp/hipo_tools/build \
-    && cmake .. -DCMAKE_INSTALL_PREFIX=$HIPO_TOOLS\
+    && cmake .. -DBUILD_FPIC=ON -DBUILD_HIPOPY=ON -DBUILD_EXAMPLES=ON -DCMAKE_INSTALL_PREFIX=$HIPO_TOOLS\
     && make -j$(nproc) \
     && make install \
     && rm -rf /tmp/*
