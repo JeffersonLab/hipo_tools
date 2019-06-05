@@ -296,6 +296,10 @@ int main(int argc, char** argv) {
   clas12->Branch("dc_vx", &dc_vx);
   clas12->Branch("dc_vy", &dc_vy);
   clas12->Branch("dc_vz", &dc_vz);
+  clas12->Branch("dc_x", &dc_x);
+  clas12->Branch("dc_y", &dc_y);
+  clas12->Branch("dc_z", &dc_z);
+  /*
   clas12->Branch("dc_r1_x", &dc_r1_x);
   clas12->Branch("dc_r1_y", &dc_r1_y);
   clas12->Branch("dc_r1_z", &dc_r1_z);
@@ -305,13 +309,17 @@ int main(int argc, char** argv) {
   clas12->Branch("dc_r3_x", &dc_r3_x);
   clas12->Branch("dc_r3_y", &dc_r3_y);
   clas12->Branch("dc_r3_z", &dc_r3_z);
-
+  */
   clas12->Branch("cvt_px", &cvt_px);
   clas12->Branch("cvt_py", &cvt_py);
   clas12->Branch("cvt_pz", &cvt_pz);
   clas12->Branch("cvt_vx", &cvt_vx);
   clas12->Branch("cvt_vy", &cvt_vy);
   clas12->Branch("cvt_vz", &cvt_vz);
+  clas12->Branch("cvt_x", &cvt_x);
+  clas12->Branch("cvt_y", &cvt_y);
+  clas12->Branch("cvt_z", &cvt_z);
+  /*
   clas12->Branch("cvt_l1_x", &cvt_l1_x);
   clas12->Branch("cvt_l1_y", &cvt_l1_y);
   clas12->Branch("cvt_l1_z", &cvt_l1_z);
@@ -348,7 +356,11 @@ int main(int argc, char** argv) {
   clas12->Branch("cvt_l12_x", &cvt_l12_x);
   clas12->Branch("cvt_l12_y", &cvt_l12_y);
   clas12->Branch("cvt_l12_z", &cvt_l12_z);
-
+  */
+  clas12->Branch("fmt_x", &fmt_x);
+  clas12->Branch("fmt_y", &fmt_y);
+  clas12->Branch("fmt_z", &fmt_z);
+  /*
   clas12->Branch("fmt_p1_x", &fmt_p1_x);
   clas12->Branch("fmt_p1_y", &fmt_p1_y);
   clas12->Branch("fmt_p1_z", &fmt_p1_z);
@@ -367,7 +379,7 @@ int main(int argc, char** argv) {
   clas12->Branch("fmt_p6_x", &fmt_p6_x);
   clas12->Branch("fmt_p6_y", &fmt_p6_y);
   clas12->Branch("fmt_p6_z", &fmt_p6_z);
-
+  */
   clas12->Branch("ec_tot_energy", &ec_tot_energy);
   clas12->Branch("ec_pcal_energy", &ec_pcal_energy);
   clas12->Branch("ec_pcal_sec", &ec_pcal_sec);
