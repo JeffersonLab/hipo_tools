@@ -141,6 +141,10 @@ namespace hipo {
       currentEvent       = -1;
       currentRecordEvent = -1;
     }
+    void clear() {
+      recordEvents.clear();
+      recordPosition.clear();
+    }
     void reset() {
       currentRecord      = 0;
       currentEvent       = 0;

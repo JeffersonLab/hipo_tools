@@ -3,8 +3,8 @@
  * (c) 2017.
  */
 
-#include "hipo4/hipoexceptions.h"
 #include "hipo4/reader.h"
+#include "hipo4/hipoexceptions.h"
 #include "hipo4/record.h"
 
 #include <cstdlib>
@@ -101,7 +101,7 @@ namespace hipo {
     inputRecord.readHipoEvent(event, 0);
     hipo::structure base;
     event.getStructure(base, 32111, 1);
-
+    readerEventIndex.clear();
     int rows = base.getSize() / 32;
 
     for (int i = 0; i < rows; i++) {
@@ -115,6 +115,7 @@ namespace hipo {
       readerEventIndex.addSize(entries);
       readerEventIndex.addPosition(position);
     }
+
     readerEventIndex.rewind();
   }
 
