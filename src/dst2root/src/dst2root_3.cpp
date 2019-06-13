@@ -296,10 +296,6 @@ int main(int argc, char** argv) {
   clas12->Branch("dc_vx", &dc_vx);
   clas12->Branch("dc_vy", &dc_vy);
   clas12->Branch("dc_vz", &dc_vz);
-  clas12->Branch("dc_x", &dc_x);
-  clas12->Branch("dc_y", &dc_y);
-  clas12->Branch("dc_z", &dc_z);
-  /*
   clas12->Branch("dc_r1_x", &dc_r1_x);
   clas12->Branch("dc_r1_y", &dc_r1_y);
   clas12->Branch("dc_r1_z", &dc_r1_z);
@@ -309,7 +305,6 @@ int main(int argc, char** argv) {
   clas12->Branch("dc_r3_x", &dc_r3_x);
   clas12->Branch("dc_r3_y", &dc_r3_y);
   clas12->Branch("dc_r3_z", &dc_r3_z);
-  */
   clas12->Branch("cvt_px", &cvt_px);
   clas12->Branch("cvt_py", &cvt_py);
   clas12->Branch("cvt_pz", &cvt_pz);
