@@ -312,61 +312,13 @@ int main(int argc, char** argv) {
   clas12->Branch("cvt_vx", &cvt_vx);
   clas12->Branch("cvt_vy", &cvt_vy);
   clas12->Branch("cvt_vz", &cvt_vz);
-  clas12->Branch("cvt_l1_x", &cvt_l1_x);
-  clas12->Branch("cvt_l1_y", &cvt_l1_y);
-  clas12->Branch("cvt_l1_z", &cvt_l1_z);
-  clas12->Branch("cvt_l2_x", &cvt_l2_x);
-  clas12->Branch("cvt_l2_y", &cvt_l2_y);
-  clas12->Branch("cvt_l2_z", &cvt_l2_z);
-  clas12->Branch("cvt_l3_x", &cvt_l3_x);
-  clas12->Branch("cvt_l3_y", &cvt_l3_y);
-  clas12->Branch("cvt_l3_z", &cvt_l3_z);
-  clas12->Branch("cvt_l4_x", &cvt_l4_x);
-  clas12->Branch("cvt_l4_y", &cvt_l4_y);
-  clas12->Branch("cvt_l4_z", &cvt_l4_z);
-  clas12->Branch("cvt_l5_x", &cvt_l5_x);
-  clas12->Branch("cvt_l5_y", &cvt_l5_y);
-  clas12->Branch("cvt_l5_z", &cvt_l5_z);
-  clas12->Branch("cvt_l6_x", &cvt_l6_x);
-  clas12->Branch("cvt_l6_y", &cvt_l6_y);
-  clas12->Branch("cvt_l6_z", &cvt_l6_z);
-  clas12->Branch("cvt_l7_x", &cvt_l7_x);
-  clas12->Branch("cvt_l7_y", &cvt_l7_y);
-  clas12->Branch("cvt_l7_z", &cvt_l7_z);
-  clas12->Branch("cvt_l8_x", &cvt_l8_x);
-  clas12->Branch("cvt_l8_y", &cvt_l8_y);
-  clas12->Branch("cvt_l8_z", &cvt_l8_z);
-  clas12->Branch("cvt_l9_x", &cvt_l9_x);
-  clas12->Branch("cvt_l9_y", &cvt_l9_y);
-  clas12->Branch("cvt_l9_z", &cvt_l9_z);
-  clas12->Branch("cvt_l10_x", &cvt_l10_x);
-  clas12->Branch("cvt_l10_y", &cvt_l10_y);
-  clas12->Branch("cvt_l10_z", &cvt_l10_z);
-  clas12->Branch("cvt_l11_x", &cvt_l11_x);
-  clas12->Branch("cvt_l11_y", &cvt_l11_y);
-  clas12->Branch("cvt_l11_z", &cvt_l11_z);
-  clas12->Branch("cvt_l12_x", &cvt_l12_x);
-  clas12->Branch("cvt_l12_y", &cvt_l12_y);
-  clas12->Branch("cvt_l12_z", &cvt_l12_z);
+  clas12->Branch("cvt_x", &cvt_x);
+  clas12->Branch("cvt_y", &cvt_y);
+  clas12->Branch("cvt_z", &cvt_z);
 
-  clas12->Branch("fmt_p1_x", &fmt_p1_x);
-  clas12->Branch("fmt_p1_y", &fmt_p1_y);
-  clas12->Branch("fmt_p1_z", &fmt_p1_z);
-  clas12->Branch("fmt_p2_x", &fmt_p2_x);
-  clas12->Branch("fmt_p2_y", &fmt_p2_y);
-  clas12->Branch("fmt_p2_z", &fmt_p2_z);
-  clas12->Branch("fmt_p3_x", &fmt_p3_x);
-  clas12->Branch("fmt_p3_y", &fmt_p3_y);
-  clas12->Branch("fmt_p3_z", &fmt_p3_z);
-  clas12->Branch("fmt_p4_x", &fmt_p4_x);
-  clas12->Branch("fmt_p4_y", &fmt_p4_y);
-  clas12->Branch("fmt_p4_z", &fmt_p4_z);
-  clas12->Branch("fmt_p5_x", &fmt_p5_x);
-  clas12->Branch("fmt_p5_y", &fmt_p5_y);
-  clas12->Branch("fmt_p5_z", &fmt_p5_z);
-  clas12->Branch("fmt_p6_x", &fmt_p6_x);
-  clas12->Branch("fmt_p6_y", &fmt_p6_y);
-  clas12->Branch("fmt_p6_z", &fmt_p6_z);
+  clas12->Branch("fmt_x", &fmt_x);
+  clas12->Branch("fmt_y", &fmt_y);
+  clas12->Branch("fmt_z", &fmt_z);
 
   clas12->Branch("ec_tot_energy", &ec_tot_energy);
   clas12->Branch("ec_pcal_energy", &ec_pcal_energy);
@@ -1319,61 +1271,13 @@ int main(int argc, char** argv) {
     dc_r3_y.resize(len_pid);
     dc_r3_z.resize(len_pid);
 
-    cvt_l1_x.resize(len_pid);
-    cvt_l1_y.resize(len_pid);
-    cvt_l1_z.resize(len_pid);
-    cvt_l2_x.resize(len_pid);
-    cvt_l2_y.resize(len_pid);
-    cvt_l2_z.resize(len_pid);
-    cvt_l3_x.resize(len_pid);
-    cvt_l3_y.resize(len_pid);
-    cvt_l3_z.resize(len_pid);
-    cvt_l4_x.resize(len_pid);
-    cvt_l4_y.resize(len_pid);
-    cvt_l4_z.resize(len_pid);
-    cvt_l5_x.resize(len_pid);
-    cvt_l5_y.resize(len_pid);
-    cvt_l5_z.resize(len_pid);
-    cvt_l6_x.resize(len_pid);
-    cvt_l6_y.resize(len_pid);
-    cvt_l6_z.resize(len_pid);
-    cvt_l7_x.resize(len_pid);
-    cvt_l7_y.resize(len_pid);
-    cvt_l7_z.resize(len_pid);
-    cvt_l8_x.resize(len_pid);
-    cvt_l8_y.resize(len_pid);
-    cvt_l8_z.resize(len_pid);
-    cvt_l9_x.resize(len_pid);
-    cvt_l9_y.resize(len_pid);
-    cvt_l9_z.resize(len_pid);
-    cvt_l10_x.resize(len_pid);
-    cvt_l10_y.resize(len_pid);
-    cvt_l10_z.resize(len_pid);
-    cvt_l11_x.resize(len_pid);
-    cvt_l11_y.resize(len_pid);
-    cvt_l11_z.resize(len_pid);
-    cvt_l12_x.resize(len_pid);
-    cvt_l12_y.resize(len_pid);
-    cvt_l12_z.resize(len_pid);
+    cvt_x.resize(len_pid);
+    cvt_y.resize(len_pid);
+    cvt_z.resize(len_pid);
 
-    fmt_p1_x.resize(len_pid);
-    fmt_p1_y.resize(len_pid);
-    fmt_p1_z.resize(len_pid);
-    fmt_p2_x.resize(len_pid);
-    fmt_p2_y.resize(len_pid);
-    fmt_p2_z.resize(len_pid);
-    fmt_p3_x.resize(len_pid);
-    fmt_p3_y.resize(len_pid);
-    fmt_p3_z.resize(len_pid);
-    fmt_p4_x.resize(len_pid);
-    fmt_p4_y.resize(len_pid);
-    fmt_p4_z.resize(len_pid);
-    fmt_p5_x.resize(len_pid);
-    fmt_p5_y.resize(len_pid);
-    fmt_p5_z.resize(len_pid);
-    fmt_p6_x.resize(len_pid);
-    fmt_p6_y.resize(len_pid);
-    fmt_p6_z.resize(len_pid);
+    fmt_x.resize(len_pid);
+    fmt_y.resize(len_pid);
+    fmt_z.resize(len_pid);
 
     for (int i = 0; i < len_pid; i++) {
       dc_r1_x[i] = NAN;
@@ -1386,61 +1290,13 @@ int main(int argc, char** argv) {
       dc_r3_y[i] = NAN;
       dc_r3_z[i] = NAN;
 
-      cvt_l1_x[i]  = NAN;
-      cvt_l1_y[i]  = NAN;
-      cvt_l1_z[i]  = NAN;
-      cvt_l2_x[i]  = NAN;
-      cvt_l2_y[i]  = NAN;
-      cvt_l2_z[i]  = NAN;
-      cvt_l3_x[i]  = NAN;
-      cvt_l3_y[i]  = NAN;
-      cvt_l3_z[i]  = NAN;
-      cvt_l4_x[i]  = NAN;
-      cvt_l4_y[i]  = NAN;
-      cvt_l4_z[i]  = NAN;
-      cvt_l5_x[i]  = NAN;
-      cvt_l5_y[i]  = NAN;
-      cvt_l5_z[i]  = NAN;
-      cvt_l6_x[i]  = NAN;
-      cvt_l6_y[i]  = NAN;
-      cvt_l6_z[i]  = NAN;
-      cvt_l7_x[i]  = NAN;
-      cvt_l7_y[i]  = NAN;
-      cvt_l7_z[i]  = NAN;
-      cvt_l8_x[i]  = NAN;
-      cvt_l8_y[i]  = NAN;
-      cvt_l8_z[i]  = NAN;
-      cvt_l9_x[i]  = NAN;
-      cvt_l9_y[i]  = NAN;
-      cvt_l9_z[i]  = NAN;
-      cvt_l10_x[i] = NAN;
-      cvt_l10_y[i] = NAN;
-      cvt_l10_z[i] = NAN;
-      cvt_l11_x[i] = NAN;
-      cvt_l11_y[i] = NAN;
-      cvt_l11_z[i] = NAN;
-      cvt_l12_x[i] = NAN;
-      cvt_l12_y[i] = NAN;
-      cvt_l12_z[i] = NAN;
+      cvt_x[i] = NAN;
+      cvt_y[i] = NAN;
+      cvt_z[i] = NAN;
 
-      fmt_p1_x[i] = NAN;
-      fmt_p1_y[i] = NAN;
-      fmt_p1_z[i] = NAN;
-      fmt_p2_x[i] = NAN;
-      fmt_p2_y[i] = NAN;
-      fmt_p2_z[i] = NAN;
-      fmt_p3_x[i] = NAN;
-      fmt_p3_y[i] = NAN;
-      fmt_p3_z[i] = NAN;
-      fmt_p4_x[i] = NAN;
-      fmt_p4_y[i] = NAN;
-      fmt_p4_z[i] = NAN;
-      fmt_p5_x[i] = NAN;
-      fmt_p5_y[i] = NAN;
-      fmt_p5_z[i] = NAN;
-      fmt_p6_x[i] = NAN;
-      fmt_p6_y[i] = NAN;
-      fmt_p6_z[i] = NAN;
+      fmt_x[i] = NAN;
+      fmt_y[i] = NAN;
+      fmt_z[i] = NAN;
     }
 
     for (int i = 0; i < len_pid; i++) {
@@ -1452,34 +1308,9 @@ int main(int argc, char** argv) {
           if (detector > 0 && detector < 7) {
             switch (detector) {
             case 1:
-              fmt_p1_x[i] = traj_x_node->getValue(k);
-              fmt_p1_y[i] = traj_y_node->getValue(k);
-              fmt_p1_z[i] = traj_z_node->getValue(k);
-              break;
-            case 2:
-              fmt_p2_x[i] = traj_x_node->getValue(k);
-              fmt_p2_y[i] = traj_y_node->getValue(k);
-              fmt_p2_z[i] = traj_z_node->getValue(k);
-              break;
-            case 3:
-              fmt_p3_x[i] = traj_x_node->getValue(k);
-              fmt_p3_y[i] = traj_y_node->getValue(k);
-              fmt_p3_z[i] = traj_z_node->getValue(k);
-              break;
-            case 4:
-              fmt_p4_x[i] = traj_x_node->getValue(k);
-              fmt_p4_y[i] = traj_y_node->getValue(k);
-              fmt_p4_z[i] = traj_z_node->getValue(k);
-              break;
-            case 5:
-              fmt_p5_x[i] = traj_x_node->getValue(k);
-              fmt_p5_y[i] = traj_y_node->getValue(k);
-              fmt_p5_z[i] = traj_z_node->getValue(k);
-              break;
-            case 6:
-              fmt_p6_x[i] = traj_x_node->getValue(k);
-              fmt_p6_y[i] = traj_y_node->getValue(k);
-              fmt_p6_z[i] = traj_z_node->getValue(k);
+              fmt_x[i] = traj_x_node->getValue(k);
+              fmt_y[i] = traj_y_node->getValue(k);
+              fmt_z[i] = traj_z_node->getValue(k);
               break;
             }
           } else if (detector == 10) {
@@ -1498,64 +1329,9 @@ int main(int argc, char** argv) {
         } else if (FvsC == CENTRAL_DETECTOR && pindex == i) {
           switch (detector) {
           case 1:
-            cvt_l1_x[i] = traj_x_node->getValue(k);
-            cvt_l1_y[i] = traj_y_node->getValue(k);
-            cvt_l1_z[i] = traj_z_node->getValue(k);
-            break;
-          case 2:
-            cvt_l2_x[i] = traj_x_node->getValue(k);
-            cvt_l2_y[i] = traj_y_node->getValue(k);
-            cvt_l2_z[i] = traj_z_node->getValue(k);
-            break;
-          case 3:
-            cvt_l3_x[i] = traj_x_node->getValue(k);
-            cvt_l3_y[i] = traj_y_node->getValue(k);
-            cvt_l3_z[i] = traj_z_node->getValue(k);
-            break;
-          case 4:
-            cvt_l4_x[i] = traj_x_node->getValue(k);
-            cvt_l4_y[i] = traj_y_node->getValue(k);
-            cvt_l4_z[i] = traj_z_node->getValue(k);
-            break;
-          case 5:
-            cvt_l5_x[i] = traj_x_node->getValue(k);
-            cvt_l5_y[i] = traj_y_node->getValue(k);
-            cvt_l5_z[i] = traj_z_node->getValue(k);
-            break;
-          case 6:
-            cvt_l6_x[i] = traj_x_node->getValue(k);
-            cvt_l6_y[i] = traj_y_node->getValue(k);
-            cvt_l6_z[i] = traj_z_node->getValue(k);
-            break;
-          case 7:
-            cvt_l7_x[i] = traj_x_node->getValue(k);
-            cvt_l7_y[i] = traj_y_node->getValue(k);
-            cvt_l7_z[i] = traj_z_node->getValue(k);
-            break;
-          case 8:
-            cvt_l8_x[i] = traj_x_node->getValue(k);
-            cvt_l8_y[i] = traj_y_node->getValue(k);
-            cvt_l8_z[i] = traj_z_node->getValue(k);
-            break;
-          case 9:
-            cvt_l9_x[i] = traj_x_node->getValue(k);
-            cvt_l9_y[i] = traj_y_node->getValue(k);
-            cvt_l9_z[i] = traj_z_node->getValue(k);
-            break;
-          case 10:
-            cvt_l10_x[i] = traj_x_node->getValue(k);
-            cvt_l10_y[i] = traj_y_node->getValue(k);
-            cvt_l10_z[i] = traj_z_node->getValue(k);
-            break;
-          case 11:
-            cvt_l11_x[i] = traj_x_node->getValue(k);
-            cvt_l11_y[i] = traj_y_node->getValue(k);
-            cvt_l11_z[i] = traj_z_node->getValue(k);
-            break;
-          case 12:
-            cvt_l12_x[i] = traj_x_node->getValue(k);
-            cvt_l12_y[i] = traj_y_node->getValue(k);
-            cvt_l12_z[i] = traj_z_node->getValue(k);
+            cvt_x[i] = traj_x_node->getValue(k);
+            cvt_y[i] = traj_y_node->getValue(k);
+            cvt_z[i] = traj_z_node->getValue(k);
             break;
           }
         }

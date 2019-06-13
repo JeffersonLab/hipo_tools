@@ -8,9 +8,9 @@ target_link_libraries(hipo2root3
   PUBLIC ${ROOT_LIBRARIES}
   )
 
-add_dependencies(hipo2root3 hipocpp3)
+add_dependencies(hipo2root_3 hipocpp3)
 
-install(TARGETS hipo2root3
+install(TARGETS hipo2root_3
   EXPORT ${PROJECT_NAME}Targets
   RUNTIME DESTINATION bin)
 
