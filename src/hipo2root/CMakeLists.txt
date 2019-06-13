@@ -8,7 +8,7 @@ target_link_libraries(hipo2root_3
   PUBLIC ${ROOT_LIBRARIES}
   )
 
-add_dependencies(hipo2root_3 hipocpp3_static)
+add_dependencies(hipo2root_3 hipocpp3)
 
 install(TARGETS hipo2root_3
   EXPORT ${PROJECT_NAME}Targets

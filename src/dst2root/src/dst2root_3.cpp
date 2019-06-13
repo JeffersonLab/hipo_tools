@@ -314,67 +314,11 @@ int main(int argc, char** argv) {
   clas12->Branch("cvt_x", &cvt_x);
   clas12->Branch("cvt_y", &cvt_y);
   clas12->Branch("cvt_z", &cvt_z);
-  /*
-  clas12->Branch("cvt_l1_x", &cvt_l1_x);
-  clas12->Branch("cvt_l1_y", &cvt_l1_y);
-  clas12->Branch("cvt_l1_z", &cvt_l1_z);
-  clas12->Branch("cvt_l2_x", &cvt_l2_x);
-  clas12->Branch("cvt_l2_y", &cvt_l2_y);
-  clas12->Branch("cvt_l2_z", &cvt_l2_z);
-  clas12->Branch("cvt_l3_x", &cvt_l3_x);
-  clas12->Branch("cvt_l3_y", &cvt_l3_y);
-  clas12->Branch("cvt_l3_z", &cvt_l3_z);
-  clas12->Branch("cvt_l4_x", &cvt_l4_x);
-  clas12->Branch("cvt_l4_y", &cvt_l4_y);
-  clas12->Branch("cvt_l4_z", &cvt_l4_z);
-  clas12->Branch("cvt_l5_x", &cvt_l5_x);
-  clas12->Branch("cvt_l5_y", &cvt_l5_y);
-  clas12->Branch("cvt_l5_z", &cvt_l5_z);
-  clas12->Branch("cvt_l6_x", &cvt_l6_x);
-  clas12->Branch("cvt_l6_y", &cvt_l6_y);
-  clas12->Branch("cvt_l6_z", &cvt_l6_z);
-  clas12->Branch("cvt_l7_x", &cvt_l7_x);
-  clas12->Branch("cvt_l7_y", &cvt_l7_y);
-  clas12->Branch("cvt_l7_z", &cvt_l7_z);
-  clas12->Branch("cvt_l8_x", &cvt_l8_x);
-  clas12->Branch("cvt_l8_y", &cvt_l8_y);
-  clas12->Branch("cvt_l8_z", &cvt_l8_z);
-  clas12->Branch("cvt_l9_x", &cvt_l9_x);
-  clas12->Branch("cvt_l9_y", &cvt_l9_y);
-  clas12->Branch("cvt_l9_z", &cvt_l9_z);
-  clas12->Branch("cvt_l10_x", &cvt_l10_x);
-  clas12->Branch("cvt_l10_y", &cvt_l10_y);
-  clas12->Branch("cvt_l10_z", &cvt_l10_z);
-  clas12->Branch("cvt_l11_x", &cvt_l11_x);
-  clas12->Branch("cvt_l11_y", &cvt_l11_y);
-  clas12->Branch("cvt_l11_z", &cvt_l11_z);
-  clas12->Branch("cvt_l12_x", &cvt_l12_x);
-  clas12->Branch("cvt_l12_y", &cvt_l12_y);
-  clas12->Branch("cvt_l12_z", &cvt_l12_z);
-  */
+
   clas12->Branch("fmt_x", &fmt_x);
   clas12->Branch("fmt_y", &fmt_y);
   clas12->Branch("fmt_z", &fmt_z);
-  /*
-  clas12->Branch("fmt_p1_x", &fmt_p1_x);
-  clas12->Branch("fmt_p1_y", &fmt_p1_y);
-  clas12->Branch("fmt_p1_z", &fmt_p1_z);
-  clas12->Branch("fmt_p2_x", &fmt_p2_x);
-  clas12->Branch("fmt_p2_y", &fmt_p2_y);
-  clas12->Branch("fmt_p2_z", &fmt_p2_z);
-  clas12->Branch("fmt_p3_x", &fmt_p3_x);
-  clas12->Branch("fmt_p3_y", &fmt_p3_y);
-  clas12->Branch("fmt_p3_z", &fmt_p3_z);
-  clas12->Branch("fmt_p4_x", &fmt_p4_x);
-  clas12->Branch("fmt_p4_y", &fmt_p4_y);
-  clas12->Branch("fmt_p4_z", &fmt_p4_z);
-  clas12->Branch("fmt_p5_x", &fmt_p5_x);
-  clas12->Branch("fmt_p5_y", &fmt_p5_y);
-  clas12->Branch("fmt_p5_z", &fmt_p5_z);
-  clas12->Branch("fmt_p6_x", &fmt_p6_x);
-  clas12->Branch("fmt_p6_y", &fmt_p6_y);
-  clas12->Branch("fmt_p6_z", &fmt_p6_z);
-  */
+
   clas12->Branch("ec_tot_energy", &ec_tot_energy);
   clas12->Branch("ec_pcal_energy", &ec_pcal_energy);
   clas12->Branch("ec_pcal_sec", &ec_pcal_sec);
@@ -1363,9 +1307,9 @@ int main(int argc, char** argv) {
           if (detector > 0 && detector < 7) {
             switch (detector) {
             case 1:
-              fmt_p1_x[i] = traj_x_node->getValue(k);
-              fmt_p1_y[i] = traj_y_node->getValue(k);
-              fmt_p1_z[i] = traj_z_node->getValue(k);
+              fmt_x[i] = traj_x_node->getValue(k);
+              fmt_y[i] = traj_y_node->getValue(k);
+              fmt_z[i] = traj_z_node->getValue(k);
               break;
             }
           } else if (detector == 10) {
