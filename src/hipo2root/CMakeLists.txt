@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 
-add_executable(hipo2root3 hipo2root3.cpp)
+add_executable(hipo2root_3 hipo2root3.cpp)
 
-target_link_libraries(hipo2root3
+target_link_libraries(hipo2root_3
   PRIVATE ${libname}
   PUBLIC hipocpp3
   PUBLIC ${ROOT_LIBRARIES}
