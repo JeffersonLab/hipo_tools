@@ -19,6 +19,7 @@ set(CMAKE_MODULE_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 find_package(ROOT REQUIRED COMPONENTS RIO Net)
 include(${ROOT_USE_FILE})
+set(CMAKE_C_FLAGS "-Ofast")
 set(CMAKE_CXX_FLAGS "-Ofast ${ROOT_CXX_FLAGS}")
 
 # Find the lz4 package
