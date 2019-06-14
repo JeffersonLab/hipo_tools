@@ -802,8 +802,8 @@ int main(int argc, char** argv) {
           nphe_tot += rec_Cherenkov->getFloat(4, k);
 
         if (pindex == i && detector == HTCC) {
-          cc_htcc_nphe[i]  = rec_Cherenkov->getFloat(4, k);
           cc_htcc_sec[i]   = rec_Cherenkov->getInt(3, k);
+          cc_htcc_nphe[i]  = rec_Cherenkov->getFloat(4, k);
           cc_htcc_time[i]  = rec_Cherenkov->getFloat(5, k);
           cc_htcc_path[i]  = rec_Cherenkov->getFloat(6, k);
           cc_htcc_theta[i] = rec_Cherenkov->getFloat(11, k);
@@ -812,8 +812,8 @@ int main(int argc, char** argv) {
           cc_htcc_y[i]     = rec_Cherenkov->getFloat(8, k);
           cc_htcc_z[i]     = rec_Cherenkov->getFloat(9, k);
         } else if (pindex == i && detector == LTCC) {
-          cc_ltcc_nphe[i]  = rec_Cherenkov->getFloat(4, k);
           cc_ltcc_sec[i]   = rec_Cherenkov->getInt(3, k);
+          cc_ltcc_nphe[i]  = rec_Cherenkov->getFloat(4, k);
           cc_ltcc_time[i]  = rec_Cherenkov->getFloat(5, k);
           cc_ltcc_path[i]  = rec_Cherenkov->getFloat(6, k);
           cc_ltcc_theta[i] = rec_Cherenkov->getFloat(11, k);
@@ -822,8 +822,8 @@ int main(int argc, char** argv) {
           cc_ltcc_y[i]     = rec_Cherenkov->getFloat(8, k);
           cc_ltcc_z[i]     = rec_Cherenkov->getFloat(9, k);
         } else if (pindex == i && detector == RICH) {
-          cc_rich_nphe[i]  = rec_Cherenkov->getFloat(4, k);
           cc_rich_sec[i]   = rec_Cherenkov->getInt(3, k);
+          cc_rich_nphe[i]  = rec_Cherenkov->getFloat(4, k);
           cc_rich_time[i]  = rec_Cherenkov->getFloat(5, k);
           cc_rich_path[i]  = rec_Cherenkov->getFloat(6, k);
           cc_rich_theta[i] = rec_Cherenkov->getFloat(11, k);
@@ -965,10 +965,10 @@ int main(int argc, char** argv) {
         int layer    = rec_Scintillator->getInt(4, k);
         if (pindex == i && detector == FTOF && layer == FTOF_1A) {
           sc_ftof_1a_sec[i]       = rec_Scintillator->getInt(3, k);
+          sc_ftof_1a_component[i] = rec_Scintillator->getInt(5, k);
+          sc_ftof_1a_energy[i]    = rec_Scintillator->getFloat(6, k);
           sc_ftof_1a_time[i]      = rec_Scintillator->getFloat(7, k);
           sc_ftof_1a_path[i]      = rec_Scintillator->getFloat(8, k);
-          sc_ftof_1a_energy[i]    = rec_Scintillator->getFloat(6, k);
-          sc_ftof_1a_component[i] = rec_Scintillator->getInt(5, k);
           sc_ftof_1a_x[i]         = rec_Scintillator->getFloat(10, k);
           sc_ftof_1a_y[i]         = rec_Scintillator->getFloat(11, k);
           sc_ftof_1a_z[i]         = rec_Scintillator->getFloat(12, k);
@@ -977,10 +977,10 @@ int main(int argc, char** argv) {
           sc_ftof_1a_hz[i]        = rec_Scintillator->getFloat(15, k);
         } else if (pindex == i && detector == FTOF && layer == FTOF_1B) {
           sc_ftof_1b_sec[i]       = rec_Scintillator->getInt(3, k);
+          sc_ftof_1b_component[i] = rec_Scintillator->getInt(5, k);
+          sc_ftof_1b_energy[i]    = rec_Scintillator->getFloat(6, k);
           sc_ftof_1b_time[i]      = rec_Scintillator->getFloat(7, k);
           sc_ftof_1b_path[i]      = rec_Scintillator->getFloat(8, k);
-          sc_ftof_1b_energy[i]    = rec_Scintillator->getFloat(6, k);
-          sc_ftof_1b_component[i] = rec_Scintillator->getInt(5, k);
           sc_ftof_1b_x[i]         = rec_Scintillator->getFloat(10, k);
           sc_ftof_1b_y[i]         = rec_Scintillator->getFloat(11, k);
           sc_ftof_1b_z[i]         = rec_Scintillator->getFloat(12, k);
@@ -989,10 +989,10 @@ int main(int argc, char** argv) {
           sc_ftof_1b_hz[i]        = rec_Scintillator->getFloat(15, k);
         } else if (pindex == i && detector == FTOF && layer == FTOF_2) {
           sc_ftof_2_sec[i]       = rec_Scintillator->getInt(3, k);
+          sc_ftof_2_component[i] = rec_Scintillator->getInt(5, k);
+          sc_ftof_2_energy[i]    = rec_Scintillator->getFloat(6, k);
           sc_ftof_2_time[i]      = rec_Scintillator->getFloat(7, k);
           sc_ftof_2_path[i]      = rec_Scintillator->getFloat(8, k);
-          sc_ftof_2_energy[i]    = rec_Scintillator->getFloat(6, k);
-          sc_ftof_2_component[i] = rec_Scintillator->getInt(5, k);
           sc_ftof_2_x[i]         = rec_Scintillator->getFloat(10, k);
           sc_ftof_2_y[i]         = rec_Scintillator->getFloat(11, k);
           sc_ftof_2_z[i]         = rec_Scintillator->getFloat(12, k);
@@ -1000,10 +1000,10 @@ int main(int argc, char** argv) {
           sc_ftof_2_hy[i]        = rec_Scintillator->getFloat(14, k);
           sc_ftof_2_hz[i]        = rec_Scintillator->getFloat(15, k);
         } else if (pindex == i && detector == CTOF) {
+          sc_ctof_component[i] = rec_Scintillator->getInt(5, k);
+          sc_ctof_energy[i]    = rec_Scintillator->getFloat(6, k);
           sc_ctof_time[i]      = rec_Scintillator->getFloat(7, k);
           sc_ctof_path[i]      = rec_Scintillator->getFloat(8, k);
-          sc_ctof_energy[i]    = rec_Scintillator->getFloat(6, k);
-          sc_ctof_component[i] = rec_Scintillator->getInt(5, k);
           sc_ctof_x[i]         = rec_Scintillator->getFloat(10, k);
           sc_ctof_y[i]         = rec_Scintillator->getFloat(11, k);
           sc_ctof_z[i]         = rec_Scintillator->getFloat(12, k);
@@ -1011,10 +1011,10 @@ int main(int argc, char** argv) {
           sc_ctof_hy[i]        = rec_Scintillator->getFloat(14, k);
           sc_ctof_hz[i]        = rec_Scintillator->getFloat(15, k);
         } else if (pindex == i && detector == CND) {
+          sc_cnd_component[i] = rec_Scintillator->getInt(5, k);
+          sc_cnd_energy[i]    = rec_Scintillator->getFloat(6, k);
           sc_cnd_time[i]      = rec_Scintillator->getFloat(7, k);
           sc_cnd_path[i]      = rec_Scintillator->getFloat(8, k);
-          sc_cnd_energy[i]    = rec_Scintillator->getFloat(6, k);
-          sc_cnd_component[i] = rec_Scintillator->getInt(5, k);
           sc_cnd_x[i]         = rec_Scintillator->getFloat(10, k);
           sc_cnd_y[i]         = rec_Scintillator->getFloat(11, k);
           sc_cnd_z[i]         = rec_Scintillator->getFloat(12, k);
