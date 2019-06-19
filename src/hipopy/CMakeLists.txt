@@ -33,3 +33,14 @@ python_extension_module(clas12)
 target_link_libraries(clas12 hipocpp4_static ${LZ4_LIBRARY} ${PYTHON_LIBRARIES} ${ROOT_LIBRARIES})
 install(TARGETS clas12
         LIBRARY DESTINATION lib)
+
+
+add_cython_target(physics physics.pyx CXX PY3 OUTPUT_VAR _physics)
+include_directories(${PYTHON_INCLUDE_DIRS} ${NumPy_INCLUDE_DIR})
+set(EXTRA_FLAGS "-D__LZ4__ -pthread -m64")
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${EXTRA_FLAGS}" )
+add_library(physics MODULE ${_physics})
+python_extension_module(physics)
+target_link_libraries(physics ${PYTHON_LIBRARIES} ${ROOT_LIBRARIES})
+install(TARGETS physics
+        LIBRARY DESTINATION lib)
