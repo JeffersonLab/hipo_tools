@@ -107,18 +107,25 @@ int main(int argc, char** argv) {
   clas12->Branch("status", &status);
 
   if (is_mc) {
-    clas12->Branch("mc_run", &mc_run);
-    clas12->Branch("mc_event", &mc_event);
-    clas12->Branch("mc_type", &mc_type);
-    clas12->Branch("mc_helicity", &mc_helicity);
-    clas12->Branch("mc_pid_vec", &mc_pid_vec);
-    clas12->Branch("mc_px_vec", &mc_px_vec);
-    clas12->Branch("mc_py_vec", &mc_py_vec);
-    clas12->Branch("mc_pz_vec", &mc_pz_vec);
-    clas12->Branch("mc_vx_vec", &mc_vx_vec);
-    clas12->Branch("mc_vy_vec", &mc_vy_vec);
-    clas12->Branch("mc_vz_vec", &mc_vz_vec);
-    clas12->Branch("mc_vt_vec", &mc_vt_vec);
+    clas12->Branch("mc_pid", &MC_pid);
+    clas12->Branch("mc_px", &MC_px);
+    clas12->Branch("mc_py", &MC_py);
+    clas12->Branch("mc_pz", &MC_pz);
+    clas12->Branch("mc_vx", &MC_vx);
+    clas12->Branch("mc_vy", &MC_vy);
+    clas12->Branch("mc_vz", &MC_vz);
+    clas12->Branch("mc_vt", &MC_vt);
+    clas12->Branch("mc_helicity", &MC_helicity);
+
+    clas12->Branch("lund_pid", &Lund_pid);
+    clas12->Branch("lund_px", &Lund_px);
+    clas12->Branch("lund_py", &Lund_py);
+    clas12->Branch("lund_pz", &Lund_pz);
+    clas12->Branch("lund_E", &Lund_E);
+    clas12->Branch("lund_vx", &Lund_vx);
+    clas12->Branch("lund_vy", &Lund_vy);
+    clas12->Branch("lund_vz", &Lund_vz);
+    clas12->Branch("lund_ltime", &Lund_ltime);
   }
 
   clas12->Branch("dc_sec", &dc_sec);
@@ -128,13 +135,28 @@ int main(int argc, char** argv) {
   clas12->Branch("dc_vx", &dc_vx);
   clas12->Branch("dc_vy", &dc_vy);
   clas12->Branch("dc_vz", &dc_vz);
-
+  clas12->Branch("dc_r1_x", &dc_r1_x);
+  clas12->Branch("dc_r1_y", &dc_r1_y);
+  clas12->Branch("dc_r1_z", &dc_r1_z);
+  clas12->Branch("dc_r2_x", &dc_r2_x);
+  clas12->Branch("dc_r2_y", &dc_r2_y);
+  clas12->Branch("dc_r2_z", &dc_r2_z);
+  clas12->Branch("dc_r3_x", &dc_r3_x);
+  clas12->Branch("dc_r3_y", &dc_r3_y);
+  clas12->Branch("dc_r3_z", &dc_r3_z);
   clas12->Branch("cvt_px", &cvt_px);
   clas12->Branch("cvt_py", &cvt_py);
   clas12->Branch("cvt_pz", &cvt_pz);
   clas12->Branch("cvt_vx", &cvt_vx);
   clas12->Branch("cvt_vy", &cvt_vy);
   clas12->Branch("cvt_vz", &cvt_vz);
+  clas12->Branch("cvt_x", &cvt_x);
+  clas12->Branch("cvt_y", &cvt_y);
+  clas12->Branch("cvt_z", &cvt_z);
+
+  clas12->Branch("fmt_x", &fmt_x);
+  clas12->Branch("fmt_y", &fmt_y);
+  clas12->Branch("fmt_z", &fmt_z);
 
   clas12->Branch("ec_tot_energy", &ec_tot_energy);
   clas12->Branch("ec_pcal_energy", &ec_pcal_energy);
@@ -383,8 +405,7 @@ int main(int argc, char** argv) {
     hipo_event->getStructure(*rec_Event);
     hipo_event->getStructure(*rec_Scintillator);
     hipo_event->getStructure(*rec_Calorimeter);
-    if (traj)
-      hipo_event->getStructure(*rec_Traj);
+    hipo_event->getStructure(*rec_Traj);
     if (VertDoca)
       hipo_event->getStructure(*rec_VertDoca);
     if (cov)
@@ -1081,6 +1102,87 @@ int main(int argc, char** argv) {
           dc_vx[i]  = rec_Track->getFloat(11, k);
           dc_vy[i]  = rec_Track->getFloat(12, k);
           dc_vz[i]  = rec_Track->getFloat(13, k);
+        }
+      }
+    }
+
+    len_pid    = rec_Particle->getRows();
+    len_pindex = rec_Traj->getRows();
+
+    dc_r1_x.resize(len_pid);
+    dc_r1_y.resize(len_pid);
+    dc_r1_z.resize(len_pid);
+    dc_r2_x.resize(len_pid);
+    dc_r2_y.resize(len_pid);
+    dc_r2_z.resize(len_pid);
+    dc_r3_x.resize(len_pid);
+    dc_r3_y.resize(len_pid);
+    dc_r3_z.resize(len_pid);
+
+    cvt_x.resize(len_pid);
+    cvt_y.resize(len_pid);
+    cvt_z.resize(len_pid);
+
+    fmt_x.resize(len_pid);
+    fmt_y.resize(len_pid);
+    fmt_z.resize(len_pid);
+
+    for (int i = 0; i < len_pid; i++) {
+      dc_r1_x[i] = NAN;
+      dc_r1_y[i] = NAN;
+      dc_r1_z[i] = NAN;
+      dc_r2_x[i] = NAN;
+      dc_r2_y[i] = NAN;
+      dc_r2_z[i] = NAN;
+      dc_r3_x[i] = NAN;
+      dc_r3_y[i] = NAN;
+      dc_r3_z[i] = NAN;
+
+      cvt_x[i] = NAN;
+      cvt_y[i] = NAN;
+      cvt_z[i] = NAN;
+
+      fmt_x[i] = NAN;
+      fmt_y[i] = NAN;
+      fmt_z[i] = NAN;
+    }
+
+    for (int i = 0; i < len_pid; i++) {
+      int FvsC = rec_Particle->getInt(10, i) / 1000;
+      for (int k = 0; k < len_pindex; k++) {
+        int pindex   = rec_Traj->getShort("pindex", k);
+        int detector = rec_Traj->getByte("detector", k);
+        int layer    = rec_Traj->getByte("layer", k);
+        if (FvsC == FORWARD_DETECTOR && pindex == i) {
+          if (detector == FMT && layer == 1) {
+            fmt_x[i] = rec_Traj->getFloat("x", k);
+            fmt_y[i] = rec_Traj->getFloat("y", k);
+            fmt_z[i] = rec_Traj->getFloat("z", k);
+          }
+          if (detector == DC) {
+            // Layers 6 12 18 24 30 36 are saved
+            // Choose every other one starting at 6, 18, 30
+            // Assuiming they are in r1,r2,r3
+            if (layer == 6) {
+              dc_r1_x[i] = rec_Traj->getFloat("x", k);
+              dc_r1_y[i] = rec_Traj->getFloat("y", k);
+              dc_r1_z[i] = rec_Traj->getFloat("z", k);
+            } else if (layer == 18) {
+              dc_r2_x[i] = rec_Traj->getFloat("x", k);
+              dc_r2_y[i] = rec_Traj->getFloat("y", k);
+              dc_r2_z[i] = rec_Traj->getFloat("z", k);
+            } else if (layer == 30) {
+              dc_r3_x[i] = rec_Traj->getFloat("x", k);
+              dc_r3_y[i] = rec_Traj->getFloat("y", k);
+              dc_r3_z[i] = rec_Traj->getFloat("z", k);
+            }
+          }
+        } else if (FvsC == CENTRAL_DETECTOR && pindex == i) {
+          if (detector == CVT && layer == 1) {
+            cvt_x[i] = rec_Traj->getFloat("x", k);
+            cvt_y[i] = rec_Traj->getFloat("y", k);
+            cvt_z[i] = rec_Traj->getFloat("z", k);
+          }
         }
       }
     }
