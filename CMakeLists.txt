@@ -19,8 +19,8 @@ set(CMAKE_MODULE_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 find_package(ROOT REQUIRED COMPONENTS RIO Net)
 include(${ROOT_USE_FILE})
-set(CMAKE_C_FLAGS "-Ofast")
-set(CMAKE_CXX_FLAGS "-Ofast ${ROOT_CXX_FLAGS}")
+set(CMAKE_C_FLAGS "-O3")
+set(CMAKE_CXX_FLAGS "-O3 ${ROOT_CXX_FLAGS}")
 
 # Find the lz4 package
 # Hopefully in the future if not found download and build
@@ -35,6 +35,8 @@ ELSE()
   include_directories(${LZ4_INCLUDE_DIR})
   add_definitions(-D__LZ4__)
 ENDIF()
+
+add_subdirectory(src/split_clas12_root)
 
 # Add directory for hipo3 library
 include_directories(src/hipocpp3/include)

@@ -21,67 +21,7 @@
 #include "clipp.h"
 #include "constants.h"
 
-int main(int argc, char** argv) {
-  std::string InFileName;
-  std::string OutFileName;
-  bool        is_mc      = false;
-  bool        is_batch   = false;
-  bool        is_test    = false;
-  bool        print_help = false;
-  bool        good_rec   = false;
-  bool        elec_first = false;
-  bool        cov        = false;
-  bool        VertDoca   = false;
-  bool        traj       = false;
-
-  auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
-              clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
-              clipp::option("-b", "--batch").set(is_batch) % "Don't show progress and statistics",
-              clipp::option("-r", "--rec").set(good_rec) %
-                  "Only save events where number of partilces in the event > 0",
-              clipp::option("-e", "--elec").set(elec_first) %
-                  "Only save events with good electron as first particle",
-              clipp::option("-c", "--cov").set(cov) % "Save Covariant Matrix for kinematic fitting",
-              clipp::option("-v", "--VertDoca").set(VertDoca) % "Save VertDoca information",
-              clipp::option("-t", "--traj").set(traj) % "Save traj information",
-              clipp::option("-test", "--test").set(is_test) % "Testing",
-              clipp::value("inputFile.hipo", InFileName),
-              clipp::opt_value("outputFile.root", OutFileName));
-
-  clipp::parse(argc, argv, cli);
-  if (print_help || InFileName.empty()) {
-    std::cout << clipp::make_man_page(cli, argv[0]);
-    exit(0);
-  }
-
-  if (OutFileName.empty())
-    OutFileName = InFileName + ".root";
-
-  TFile*           OutputFile = new TFile(OutFileName.c_str(), "RECREATE");
-  TFileCacheWrite* fileCache  = new TFileCacheWrite(OutputFile, 10000000);
-  OutputFile->SetCompressionSettings(404); // kUseAnalysis
-  TTree* clas12 = new TTree("clas12", "clas12");
-
-  auto   reader          = std::make_shared<hipo::reader>(InFileName);
-  size_t tot_hipo_events = reader->numEvents();
-
-  auto dict = std::make_shared<hipo::dictionary>();
-  reader->readDictionary(*dict);
-  auto hipo_event = std::make_shared<hipo::event>();
-
-  auto rec_ForwardTagger = std::make_shared<hipo::bank>(dict->getSchema("REC::ForwardTagger"));
-  auto rec_VertDoca      = std::make_shared<hipo::bank>(dict->getSchema("REC::VertDoca"));
-  auto rec_Track         = std::make_shared<hipo::bank>(dict->getSchema("REC::Track"));
-  auto rec_Traj          = std::make_shared<hipo::bank>(dict->getSchema("REC::Traj"));
-  auto rec_Cherenkov     = std::make_shared<hipo::bank>(dict->getSchema("REC::Cherenkov"));
-  auto rec_Event         = std::make_shared<hipo::bank>(dict->getSchema("REC::Event"));
-  auto rec_Particle      = std::make_shared<hipo::bank>(dict->getSchema("REC::Particle"));
-  auto rec_Scintillator  = std::make_shared<hipo::bank>(dict->getSchema("REC::Scintillator"));
-  auto rec_Calorimeter   = std::make_shared<hipo::bank>(dict->getSchema("REC::Calorimeter"));
-  auto rec_CovMat        = std::make_shared<hipo::bank>(dict->getSchema("REC::CovMat"));
-  auto mc_Header         = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
-  auto mc_Particle       = std::make_shared<hipo::bank>(dict->getSchema("MC::Particle"));
-
+void init(const std::unique_ptr<TTree>& clas12, bool is_mc, bool cov, bool VertDoca, bool traj) {
   clas12->Branch("category", &category);
   clas12->Branch("topology", &topology);
   clas12->Branch("beamCharge", &beamCharge);
@@ -387,6 +327,85 @@ int main(int argc, char** argv) {
     clas12->Branch("traj_cz", &traj_cz_vec);
     clas12->Branch("traj_pathlength", &traj_pathlength_vec);
   }
+}
+
+int main(int argc, char** argv) {
+  std::string InFileName;
+  std::string OutFileName;
+  bool        is_mc      = false;
+  bool        is_batch   = false;
+  bool        is_test    = false;
+  bool        print_help = false;
+  bool        good_rec   = false;
+  bool        elec_first = false;
+  bool        cov        = false;
+  bool        VertDoca   = false;
+  bool        traj       = false;
+  int         n_files    = 1;
+
+  auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
+              clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
+              clipp::option("-b", "--batch").set(is_batch) % "Don't show progress and statistics",
+              clipp::option("-r", "--rec").set(good_rec) %
+                  "Only save events where number of partilces in the event > 0",
+              clipp::option("-e", "--elec").set(elec_first) %
+                  "Only save events with good electron as first particle",
+              clipp::option("-c", "--cov").set(cov) % "Save Covariant Matrix for kinematic fitting",
+              clipp::option("-v", "--VertDoca").set(VertDoca) % "Save VertDoca information",
+              clipp::option("-t", "--traj").set(traj) % "Save traj information",
+              clipp::option("-test", "--test").set(is_test) % "Testing",
+              clipp::option("-n", "--num_files") & clipp::value("n_files", n_files),
+              clipp::value("inputFile.hipo", InFileName),
+              clipp::opt_value("outputFile.root", OutFileName));
+
+  clipp::parse(argc, argv, cli);
+  if (print_help || InFileName.empty()) {
+    std::cout << clipp::make_man_page(cli, argv[0]);
+    exit(0);
+  }
+
+  std::vector<std::unique_ptr<TFile>> OutputFile(n_files);
+  std::vector<std::unique_ptr<TTree>> clas12(n_files);
+
+  if (OutFileName.empty())
+    OutFileName = InFileName + ".root";
+
+  auto base = OutFileName.substr(0, OutFileName.find(".root"));
+  if (n_files > 1) {
+    for (size_t n = 0; n < n_files; n++) {
+      auto name     = base + "_" + std::to_string(n) + ".root";
+      OutputFile[n] = std::make_unique<TFile>(name.c_str(), "RECREATE");
+      OutputFile[n]->SetCompressionSettings(404); // kUseAnalysis
+      clas12[n] = std::make_unique<TTree>("clas12", "clas12");
+    }
+  } else {
+    OutputFile[0] = std::make_unique<TFile>(OutFileName.c_str(), "RECREATE");
+    OutputFile[0]->SetCompressionSettings(404); // kUseAnalysis
+    clas12[0] = std::make_unique<TTree>("clas12", "clas12");
+  }
+
+  auto   reader          = std::make_shared<hipo::reader>(InFileName);
+  size_t tot_hipo_events = reader->numEvents();
+
+  auto dict = std::make_shared<hipo::dictionary>();
+  reader->readDictionary(*dict);
+  auto hipo_event = std::make_shared<hipo::event>();
+
+  auto rec_ForwardTagger = std::make_shared<hipo::bank>(dict->getSchema("REC::ForwardTagger"));
+  auto rec_VertDoca      = std::make_shared<hipo::bank>(dict->getSchema("REC::VertDoca"));
+  auto rec_Track         = std::make_shared<hipo::bank>(dict->getSchema("REC::Track"));
+  auto rec_Traj          = std::make_shared<hipo::bank>(dict->getSchema("REC::Traj"));
+  auto rec_Cherenkov     = std::make_shared<hipo::bank>(dict->getSchema("REC::Cherenkov"));
+  auto rec_Event         = std::make_shared<hipo::bank>(dict->getSchema("REC::Event"));
+  auto rec_Particle      = std::make_shared<hipo::bank>(dict->getSchema("REC::Particle"));
+  auto rec_Scintillator  = std::make_shared<hipo::bank>(dict->getSchema("REC::Scintillator"));
+  auto rec_Calorimeter   = std::make_shared<hipo::bank>(dict->getSchema("REC::Calorimeter"));
+  auto rec_CovMat        = std::make_shared<hipo::bank>(dict->getSchema("REC::CovMat"));
+  auto mc_Header         = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
+  auto mc_Particle       = std::make_shared<hipo::bank>(dict->getSchema("MC::Particle"));
+
+  for (auto& c12 : clas12)
+    init(c12, is_mc, cov, VertDoca, traj);
 
   int  entry                = 0;
   int  l                    = 0;
@@ -1394,24 +1413,25 @@ int main(int argc, char** argv) {
         traj_pathlength_vec[i] = rec_Traj->getFloat(11, i);
       }
     }
-    clas12->Fill();
+    clas12[entry % n_files]->Fill();
   }
 
-  OutputFile->cd();
-  clas12->Write();
-  OutputFile->Close();
+  for (int n = 0; n < n_files; n++) {
+    OutputFile[n]->cd();
+    clas12[n]->Write();
+  }
 
+  std::chrono::duration<double> elapsed_full =
+      (std::chrono::high_resolution_clock::now() - start_full);
+  std::cout << "Elapsed time: " << elapsed_full.count() << " s" << std::endl;
   if (!is_batch) {
-    std::chrono::duration<double> elapsed_full =
-        (std::chrono::high_resolution_clock::now() - start_full);
-    std::cout << "Elapsed time: " << elapsed_full.count() << " s" << std::endl;
     std::cout << "Events/Sec: " << tot_hipo_events / elapsed_full.count() << " Hz" << std::endl;
-    std::cout << "Total events in file: " << tot_hipo_events << std::endl;
     std::cout << "Events converted: " << tot_events_processed << "\t ("
               << 100.0 * tot_events_processed / tot_hipo_events << "%)" << std::endl;
-    std::cout << "Events converted/Sec: " << tot_events_processed / elapsed_full.count() << " Hz"
-              << std::endl;
   }
+  std::cout << "Total events in file: " << tot_hipo_events << std::endl;
+  std::cout << "Events converted/Sec: " << tot_events_processed / elapsed_full.count() << " Hz"
+            << std::endl;
 
   return 0;
 }
