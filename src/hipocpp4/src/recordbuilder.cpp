@@ -5,7 +5,6 @@
  */
 
 #include "hipo4/recordbuilder.h"
-//#include "hipoexceptions.h"
 
 #ifdef __LZ4__
 #include <lz4.h>
@@ -110,10 +109,6 @@ namespace hipo {
     hipo::utils::writeInt(&bufferRecord[0], 36, compressionWord);
     hipo::utils::writeLong(&bufferRecord[0], 40, 0);
     hipo::utils::writeLong(&bufferRecord[0], 48, 0);
-    printf("record::build uncompressed size = %8d, compressed size = %8d, rounding = %4d , record "
-           "size = %6d, version = %X, size = %5X\n",
-           uncompressedSize, compressedSize, rounding, compressedSizeToWrite, versionWord,
-           compressionWord);
   }
 
   int recordbuilder::compressRecord(int src_size) {
@@ -125,10 +120,6 @@ namespace hipo {
     // int   result = LZ4_decompress_safe(data,output,dataLength,dataLengthUncompressed);
     // int   result = LZ4_decompress_fast(data,output,dataLengthUncompressed);
     return result;
-// printf(" FIRST (%d) = %x %x %x %x\n",result);//,destUnCompressed[0],destUnCompressed[1],
-// destUnCompressed[2],destUnCompressed[3]);
-// LZ4_decompress_fast(buffer,destUnCompressed,decompressedLength);
-// LZ4_uncompress(buffer,destUnCompressed,decompressedLength);
 #endif
 
 #ifndef __LZ4__

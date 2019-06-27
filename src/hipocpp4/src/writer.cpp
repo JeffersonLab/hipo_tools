@@ -7,12 +7,10 @@
 #include <cstdlib>
 
 namespace hipo {
+  writer::writer(const char* filename) { writer::open(filename); }
+  writer::writer(const std::string& filename) { writer::open(filename.c_str()); }
 
-  /**
-   * Open a File for writing, it includes the dictionary
-   * in the file.
-   */
-  void writer::open(std::string filename) { writer::open(filename.c_str()); }
+  void writer::open(const std::string& filename) { writer::open(filename.c_str()); }
   void writer::open(const char* filename) {
     outputStream.open(filename);
 
@@ -26,8 +24,6 @@ namespace hipo {
           writerDictionary.getSchema(schemaList[i].c_str()).getSchemaString();
       std::string schemaStringJson =
           writerDictionary.getSchema(schemaList[i].c_str()).getSchemaStringJson();
-      printf("STR  : %s\n", schemaString.c_str());
-      printf("JSON : %s\n", schemaStringJson.c_str());
       schemaEvent.reset();
       structure schemaNode(120, 2, schemaString);
       structure schemaNodeJson(120, 1, schemaStringJson);
@@ -37,10 +33,7 @@ namespace hipo {
       builder.addEvent(schemaEvent);
     }
 
-    printf(" RECORD SIZE BEFORE BUILD = %d\n", builder.getRecordSize());
     builder.build();
-    printf(" RECORD SIZE AFTER  BUILD = %d, NENTRIES = %d\n", builder.getRecordSize(),
-           builder.getEntries());
 
     int dictionarySize = builder.getRecordSize();
 
@@ -62,10 +55,8 @@ namespace hipo {
     outputStream.write(reinterpret_cast<char*>(&header), sizeof(header));
     long position = outputStream.tellp();
 
-    printf("writing     header:: position = %ld\n", position);
     outputStream.write(reinterpret_cast<char*>(&builder.getRecordBuffer()[0]), dictionarySize);
     position = outputStream.tellp();
-    printf("writing dictionary:: position = %ld\n", position);
   }
 
   void writer::addEvent(hipo::event& hevent) {
@@ -88,12 +79,6 @@ namespace hipo {
       outputStream.write(reinterpret_cast<char*>(&builder.getRecordBuffer()[0]),
                          recordInfo.recordLength);
       writerRecordInfo.push_back(recordInfo);
-      printf("%6ld : writing::record : size = %8d, entries = %8d, position = %12ld word = %12ld "
-             "%12ld\n",
-             writerRecordInfo.size(), recordInfo.recordLength, recordInfo.recordEntries,
-             recordInfo.recordPosition, recordInfo.userWordOne, recordInfo.userWordTwo);
-    } else {
-      printf(" write::record : empty record will not be written.....");
     }
     builder.reset();
   }
@@ -111,10 +96,8 @@ namespace hipo {
   void writer::writeIndexTable() {
     hipo::schema indexSchema("file::index", 32111, 1);
     indexSchema.parse("position/L,length/I,entries/I,userWordOne/L,userWordTwo/L");
-    int  nEntries      = writerRecordInfo.size();
-    long indexPosition = outputStream.tellp();
-    printf("\n\n-----> writing file index : entries = %d, position = %ld\n", nEntries,
-           indexPosition);
+    int        nEntries      = writerRecordInfo.size();
+    long       indexPosition = outputStream.tellp();
     hipo::bank indexBank(indexSchema, nEntries);
     for (int i = 0; i < nEntries; i++) {
       recordInfo_t recordInfo = writerRecordInfo[i];
