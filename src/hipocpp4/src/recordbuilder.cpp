@@ -121,7 +121,7 @@ namespace hipo {
 #ifdef __LZ4__
     //(const char* src, char* dst, int srcSize, int dstCapacity, int acceleration);
     int result =
-        LZ4_compress_fast(&bufferData[0], &bufferRecord[56], src_size, bufferRecord.size(), 2);
+        LZ4_compress_fast(&bufferData[0], &bufferRecord[56], src_size, bufferRecord.size(), 3);
     // int   result = LZ4_decompress_safe(data,output,dataLength,dataLengthUncompressed);
     // int   result = LZ4_decompress_fast(data,output,dataLengthUncompressed);
     return result;
