@@ -70,6 +70,8 @@ namespace hipo {
 
     virtual ~schema() {}
 
+    std::string getSchemaString();
+    std::string getSchemaStringJson();
     void        parse(std::string schString);
     std::string getName() { return schemaName; }
     std::string json();

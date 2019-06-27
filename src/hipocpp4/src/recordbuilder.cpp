@@ -58,6 +58,23 @@ namespace hipo {
     int nbytes = 4 * nwords;
     return (bufferSize - nbytes);
   }
+  /**
+   * Returns number of events in the record.
+   */
+  int recordbuilder::getEntries() {
+    int nentries = *reinterpret_cast<int*>(&bufferRecord[12]);
+    return nentries;
+  }
+
+  long recordbuilder::getUserWordOne() {
+    long wOne = *reinterpret_cast<long*>(&bufferRecord[40]);
+    return wOne;
+  }
+
+  long recordbuilder::getUserWordTwo() {
+    long wTwo = *reinterpret_cast<long*>(&bufferRecord[48]);
+    return wTwo;
+  }
 
   int recordbuilder::getRecordSize() {
     int size = *reinterpret_cast<int*>(&bufferRecord[0]);
