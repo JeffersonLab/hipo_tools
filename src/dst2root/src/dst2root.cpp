@@ -341,7 +341,7 @@ int main(int argc, char** argv) {
   bool        cov        = false;
   bool        VertDoca   = false;
   bool        traj       = false;
-  int         n_files    = 1;
+  short       max_size   = 150;
 
   auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
               clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
@@ -354,7 +354,8 @@ int main(int argc, char** argv) {
               clipp::option("-v", "--VertDoca").set(VertDoca) % "Save VertDoca information",
               clipp::option("-t", "--traj").set(traj) % "Save traj information",
               clipp::option("-test", "--test").set(is_test) % "Testing",
-              clipp::option("-n", "--num_files") & clipp::value("n_files", n_files),
+              clipp::option("-m", "--max_file_size") &
+                  clipp::value("Max file size in GB (150GB default)", max_size),
               clipp::value("inputFile.hipo", InFileName),
               clipp::opt_value("outputFile.root", OutFileName));
 
@@ -364,25 +365,17 @@ int main(int argc, char** argv) {
     exit(0);
   }
 
-  std::vector<std::unique_ptr<TFile>> OutputFile(n_files);
-  std::vector<std::unique_ptr<TTree>> clas12(n_files);
+  std::unique_ptr<TFile> OutputFile;
+  std::unique_ptr<TTree> clas12;
 
   if (OutFileName.empty())
     OutFileName = InFileName + ".root";
 
-  auto base = OutFileName.substr(0, OutFileName.find(".root"));
-  if (n_files > 1) {
-    for (size_t n = 0; n < n_files; n++) {
-      auto name     = base + "_" + std::to_string(n) + ".root";
-      OutputFile[n] = std::make_unique<TFile>(name.c_str(), "RECREATE");
-      OutputFile[n]->SetCompressionSettings(404); // kUseAnalysis
-      clas12[n] = std::make_unique<TTree>("clas12", "clas12");
-    }
-  } else {
-    OutputFile[0] = std::make_unique<TFile>(OutFileName.c_str(), "RECREATE");
-    OutputFile[0]->SetCompressionSettings(404); // kUseAnalysis
-    clas12[0] = std::make_unique<TTree>("clas12", "clas12");
-  }
+  OutputFile = std::make_unique<TFile>(OutFileName.c_str(), "RECREATE");
+  OutputFile->SetCompressionSettings(404); // kUseAnalysis
+  clas12                  = std::make_unique<TTree>("clas12", "clas12");
+  long long max_tree_size = 1000000000LL * max_size;
+  clas12->SetMaxTreeSize(max_tree_size);
 
   auto   reader          = std::make_shared<hipo::reader>(InFileName);
   size_t tot_hipo_events = reader->numEvents();
@@ -404,8 +397,7 @@ int main(int argc, char** argv) {
   auto mc_Header         = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
   auto mc_Particle       = std::make_shared<hipo::bank>(dict->getSchema("MC::Particle"));
 
-  for (auto& c12 : clas12)
-    init(c12, is_mc, cov, VertDoca, traj);
+  init(clas12, is_mc, cov, VertDoca, traj);
 
   int  entry                = 0;
   int  l                    = 0;
@@ -1413,13 +1405,10 @@ int main(int argc, char** argv) {
         traj_pathlength_vec[i] = rec_Traj->getFloat(11, i);
       }
     }
-    clas12[entry % n_files]->Fill();
+    clas12->Fill();
   }
 
-  for (int n = 0; n < n_files; n++) {
-    OutputFile[n]->cd();
-    clas12[n]->Write();
-  }
+  clas12->Write();
 
   std::chrono::duration<double> elapsed_full =
       (std::chrono::high_resolution_clock::now() - start_full);
