@@ -123,11 +123,13 @@ namespace hipo {
 
   public:
     writer(){};
-    virtual ~writer(){};
+    writer(const char* filename);
+    writer(const std::string& filename);
+    virtual ~writer() { writer::close(); };
 
     void              addEvent(hipo::event& hevent);
     void              writeRecord(recordbuilder& builder);
-    void              open(std::string filename);
+    void              open(const std::string& filename);
     void              open(const char* filename);
     void              close();
     void              showSummary();

@@ -37,8 +37,6 @@ ELSE()
   add_definitions(-D__LZ4__)
 ENDIF()
 
-add_subdirectory(src/split_clas12_root)
-
 # Add directory for hipo3 library
 include_directories(src/hipocpp3/include)
 add_subdirectory(src/hipocpp3)
