@@ -10,6 +10,7 @@ set(hipo4_srcs
   src/recordbuilder.cpp
   src/utils.cpp
   src/wrapper.cpp
+  src/writer.cpp
   )
 
 add_library(hipo4_objlib OBJECT ${hipo4_srcs})

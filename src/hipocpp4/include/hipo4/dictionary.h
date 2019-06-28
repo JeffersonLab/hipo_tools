@@ -17,7 +17,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
-#include <map>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -70,6 +69,8 @@ namespace hipo {
 
     virtual ~schema() {}
 
+    std::string getSchemaString();
+    std::string getSchemaStringJson();
     void        parse(std::string schString);
     std::string getName() { return schemaName; }
     std::string json();
@@ -96,7 +97,7 @@ namespace hipo {
 
   class dictionary {
   private:
-    std::map<std::string, schema> factory;
+    std::unordered_map<std::string, schema> factory;
 
   public:
     dictionary(){};
@@ -106,7 +107,7 @@ namespace hipo {
     void                     addSchema(schema sc) { factory[sc.getName()] = sc; }
     bool                     hasSchema(const char* name) { return (factory.count(name) != 0); }
     schema&                  getSchema(const char* name) { return factory[name]; }
-    schema                   getSchema(std::string name) { return factory[name.c_str()]; }
+    schema&                  getSchema(std::string name) { return factory[name.c_str()]; }
     bool                     parse(const char* schemaString);
     void                     show();
   };

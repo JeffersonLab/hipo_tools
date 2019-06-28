@@ -20,12 +20,12 @@ PROGRAM READ_HIPO4_FILE
      len_rec_Particle = GET_ROWS(rec_particle)
      !CALL GET_INT_NODE(rec_particle, 0, PID)
      !CALL GET_FLOAT_NODE(rec_particle, 1, PX)
-     !ALL GET_FLOAT_NODE(rec_particle, 2, PY)
+     !CALL GET_FLOAT_NODE(rec_particle, 2, PY)
      !CALL GET_FLOAT_NODE(rec_particle, 3, PZ)
      !DO i=1, len_rec_Particle
      !    WRITE(*,*) i, PID(i), PX(i), PY(i), PZ(i)
-     ! ENDDO
-     ! len_rec_Particle = GET_ROWS(rec_Calorimeter)
+     !ENDDO
+     !len_rec_Particle = GET_ROWS(rec_Calorimeter)
      !CALL GET_INT_NODE(rec_Calorimeter, 0, INDEX)
      !CALL GET_INT_NODE(rec_Calorimeter, 1, pindex)
      !CALL GET_INT_NODE(rec_Calorimeter, 2, detector)

@@ -12,7 +12,7 @@ foreach(exe ${EXAMPLES} )
     add_dependencies(${exename} hipocpp3_static)
     install(TARGETS ${exename}
       EXPORT ${PROJECT_NAME}Targets
-      RUNTIME DESTINATION bin/hipo3_examples)
+      RUNTIME DESTINATION bin/examples)
 endforeach( exe ${EXAMPLES} )
 
 
@@ -28,7 +28,7 @@ foreach(exe ${EXAMPLES} )
     add_dependencies(${exename} hipocpp4_static)
     install(TARGETS ${exename}
       EXPORT ${PROJECT_NAME}Targets
-      RUNTIME DESTINATION bin/hipo4_examples)
+      RUNTIME DESTINATION bin/examples)
 endforeach( exe ${EXAMPLES} )
 
 file(GLOB EXAMPLES hipo4/*.f90 )
@@ -43,7 +43,7 @@ foreach(exe ${EXAMPLES} )
     add_dependencies(${exename} hipocpp4_static)
     install(TARGETS ${exename}
       EXPORT ${PROJECT_NAME}Targets
-      RUNTIME DESTINATION bin/hipo4_examples)
+      RUNTIME DESTINATION bin/examples)
 endforeach( exe ${EXAMPLES} )
 
 

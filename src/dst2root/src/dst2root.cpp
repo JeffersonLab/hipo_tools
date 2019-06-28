@@ -21,67 +21,7 @@
 #include "clipp.h"
 #include "constants.h"
 
-int main(int argc, char** argv) {
-  std::string InFileName;
-  std::string OutFileName;
-  bool        is_mc      = false;
-  bool        is_batch   = false;
-  bool        is_test    = false;
-  bool        print_help = false;
-  bool        good_rec   = false;
-  bool        elec_first = false;
-  bool        cov        = false;
-  bool        VertDoca   = false;
-  bool        traj       = false;
-
-  auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
-              clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
-              clipp::option("-b", "--batch").set(is_batch) % "Don't show progress and statistics",
-              clipp::option("-r", "--rec").set(good_rec) %
-                  "Only save events where number of partilces in the event > 0",
-              clipp::option("-e", "--elec").set(elec_first) %
-                  "Only save events with good electron as first particle",
-              clipp::option("-c", "--cov").set(cov) % "Save Covariant Matrix for kinematic fitting",
-              clipp::option("-v", "--VertDoca").set(VertDoca) % "Save VertDoca information",
-              clipp::option("-t", "--traj").set(traj) % "Save traj information",
-              clipp::option("-test", "--test").set(is_test) % "Testing",
-              clipp::value("inputFile.hipo", InFileName),
-              clipp::opt_value("outputFile.root", OutFileName));
-
-  clipp::parse(argc, argv, cli);
-  if (print_help || InFileName.empty()) {
-    std::cout << clipp::make_man_page(cli, argv[0]);
-    exit(0);
-  }
-
-  if (OutFileName.empty())
-    OutFileName = InFileName + ".root";
-
-  TFile*           OutputFile = new TFile(OutFileName.c_str(), "RECREATE");
-  TFileCacheWrite* fileCache  = new TFileCacheWrite(OutputFile, 10000000);
-  OutputFile->SetCompressionSettings(404); // kUseAnalysis
-  TTree* clas12 = new TTree("clas12", "clas12");
-
-  auto   reader          = std::make_shared<hipo::reader>(InFileName);
-  size_t tot_hipo_events = reader->numEvents();
-
-  auto dict = std::make_shared<hipo::dictionary>();
-  reader->readDictionary(*dict);
-  auto hipo_event = std::make_shared<hipo::event>();
-
-  auto rec_ForwardTagger = std::make_shared<hipo::bank>(dict->getSchema("REC::ForwardTagger"));
-  auto rec_VertDoca      = std::make_shared<hipo::bank>(dict->getSchema("REC::VertDoca"));
-  auto rec_Track         = std::make_shared<hipo::bank>(dict->getSchema("REC::Track"));
-  auto rec_Traj          = std::make_shared<hipo::bank>(dict->getSchema("REC::Traj"));
-  auto rec_Cherenkov     = std::make_shared<hipo::bank>(dict->getSchema("REC::Cherenkov"));
-  auto rec_Event         = std::make_shared<hipo::bank>(dict->getSchema("REC::Event"));
-  auto rec_Particle      = std::make_shared<hipo::bank>(dict->getSchema("REC::Particle"));
-  auto rec_Scintillator  = std::make_shared<hipo::bank>(dict->getSchema("REC::Scintillator"));
-  auto rec_Calorimeter   = std::make_shared<hipo::bank>(dict->getSchema("REC::Calorimeter"));
-  auto rec_CovMat        = std::make_shared<hipo::bank>(dict->getSchema("REC::CovMat"));
-  auto mc_Header         = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
-  auto mc_Particle       = std::make_shared<hipo::bank>(dict->getSchema("MC::Particle"));
-
+void init(TTree* clas12, bool is_mc, bool cov, bool VertDoca, bool traj) {
   clas12->Branch("category", &category);
   clas12->Branch("topology", &topology);
   clas12->Branch("beamCharge", &beamCharge);
@@ -107,18 +47,25 @@ int main(int argc, char** argv) {
   clas12->Branch("status", &status);
 
   if (is_mc) {
-    clas12->Branch("mc_run", &mc_run);
-    clas12->Branch("mc_event", &mc_event);
-    clas12->Branch("mc_type", &mc_type);
-    clas12->Branch("mc_helicity", &mc_helicity);
-    clas12->Branch("mc_pid_vec", &mc_pid_vec);
-    clas12->Branch("mc_px_vec", &mc_px_vec);
-    clas12->Branch("mc_py_vec", &mc_py_vec);
-    clas12->Branch("mc_pz_vec", &mc_pz_vec);
-    clas12->Branch("mc_vx_vec", &mc_vx_vec);
-    clas12->Branch("mc_vy_vec", &mc_vy_vec);
-    clas12->Branch("mc_vz_vec", &mc_vz_vec);
-    clas12->Branch("mc_vt_vec", &mc_vt_vec);
+    clas12->Branch("mc_pid", &MC_pid);
+    clas12->Branch("mc_px", &MC_px);
+    clas12->Branch("mc_py", &MC_py);
+    clas12->Branch("mc_pz", &MC_pz);
+    clas12->Branch("mc_vx", &MC_vx);
+    clas12->Branch("mc_vy", &MC_vy);
+    clas12->Branch("mc_vz", &MC_vz);
+    clas12->Branch("mc_vt", &MC_vt);
+    clas12->Branch("mc_helicity", &MC_helicity);
+
+    clas12->Branch("lund_pid", &Lund_pid);
+    clas12->Branch("lund_px", &Lund_px);
+    clas12->Branch("lund_py", &Lund_py);
+    clas12->Branch("lund_pz", &Lund_pz);
+    clas12->Branch("lund_E", &Lund_E);
+    clas12->Branch("lund_vx", &Lund_vx);
+    clas12->Branch("lund_vy", &Lund_vy);
+    clas12->Branch("lund_vz", &Lund_vz);
+    clas12->Branch("lund_ltime", &Lund_ltime);
   }
 
   clas12->Branch("dc_sec", &dc_sec);
@@ -128,13 +75,28 @@ int main(int argc, char** argv) {
   clas12->Branch("dc_vx", &dc_vx);
   clas12->Branch("dc_vy", &dc_vy);
   clas12->Branch("dc_vz", &dc_vz);
-
+  clas12->Branch("dc_r1_x", &dc_r1_x);
+  clas12->Branch("dc_r1_y", &dc_r1_y);
+  clas12->Branch("dc_r1_z", &dc_r1_z);
+  clas12->Branch("dc_r2_x", &dc_r2_x);
+  clas12->Branch("dc_r2_y", &dc_r2_y);
+  clas12->Branch("dc_r2_z", &dc_r2_z);
+  clas12->Branch("dc_r3_x", &dc_r3_x);
+  clas12->Branch("dc_r3_y", &dc_r3_y);
+  clas12->Branch("dc_r3_z", &dc_r3_z);
   clas12->Branch("cvt_px", &cvt_px);
   clas12->Branch("cvt_py", &cvt_py);
   clas12->Branch("cvt_pz", &cvt_pz);
   clas12->Branch("cvt_vx", &cvt_vx);
   clas12->Branch("cvt_vy", &cvt_vy);
   clas12->Branch("cvt_vz", &cvt_vz);
+  clas12->Branch("cvt_x", &cvt_x);
+  clas12->Branch("cvt_y", &cvt_y);
+  clas12->Branch("cvt_z", &cvt_z);
+
+  clas12->Branch("fmt_x", &fmt_x);
+  clas12->Branch("fmt_y", &fmt_y);
+  clas12->Branch("fmt_z", &fmt_z);
 
   clas12->Branch("ec_tot_energy", &ec_tot_energy);
   clas12->Branch("ec_pcal_energy", &ec_pcal_energy);
@@ -365,6 +327,77 @@ int main(int argc, char** argv) {
     clas12->Branch("traj_cz", &traj_cz_vec);
     clas12->Branch("traj_pathlength", &traj_pathlength_vec);
   }
+}
+
+int main(int argc, char** argv) {
+  std::string InFileName;
+  std::string OutFileName;
+  bool        is_mc      = false;
+  bool        is_batch   = false;
+  bool        is_test    = false;
+  bool        print_help = false;
+  bool        good_rec   = false;
+  bool        elec_first = false;
+  bool        cov        = false;
+  bool        VertDoca   = false;
+  bool        traj       = false;
+  short       max_size   = 1500;
+
+  auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
+              clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
+              clipp::option("-b", "--batch").set(is_batch) % "Don't show progress and statistics",
+              clipp::option("-r", "--rec").set(good_rec) %
+                  "Only save events where number of partilces in the event > 0",
+              clipp::option("-e", "--elec").set(elec_first) %
+                  "Only save events with good electron as first particle",
+              clipp::option("-c", "--cov").set(cov) % "Save Covariant Matrix for kinematic fitting",
+              clipp::option("-v", "--VertDoca").set(VertDoca) % "Save VertDoca information",
+              clipp::option("-t", "--traj").set(traj) % "Save traj information",
+              clipp::option("-test", "--test").set(is_test) % "Testing",
+              clipp::option("-m", "--max_file_size") &
+                  clipp::value("max_file_size", max_size) % "Max file size in GB (150GB default)",
+              clipp::value("inputFile.hipo", InFileName),
+              clipp::opt_value("outputFile.root", OutFileName));
+
+  clipp::parse(argc, argv, cli);
+  if (print_help || InFileName.empty()) {
+    std::cout << clipp::make_man_page(cli, argv[0]);
+    exit(0);
+  }
+
+  TFile* OutputFile;
+  TTree* clas12;
+
+  if (OutFileName.empty())
+    OutFileName = InFileName + ".root";
+
+  OutputFile = new TFile(OutFileName.c_str(), "RECREATE");
+  OutputFile->SetCompressionSettings(404); // kUseAnalysis
+  clas12                  = new TTree("clas12", "clas12");
+  long long max_tree_size = 1000000000LL * max_size;
+  clas12->SetMaxTreeSize(max_tree_size);
+
+  auto   reader          = std::make_shared<hipo::reader>(InFileName);
+  size_t tot_hipo_events = reader->numEvents();
+
+  auto dict = std::make_shared<hipo::dictionary>();
+  reader->readDictionary(*dict);
+  auto hipo_event = std::make_shared<hipo::event>();
+
+  auto rec_ForwardTagger = std::make_shared<hipo::bank>(dict->getSchema("REC::ForwardTagger"));
+  auto rec_VertDoca      = std::make_shared<hipo::bank>(dict->getSchema("REC::VertDoca"));
+  auto rec_Track         = std::make_shared<hipo::bank>(dict->getSchema("REC::Track"));
+  auto rec_Traj          = std::make_shared<hipo::bank>(dict->getSchema("REC::Traj"));
+  auto rec_Cherenkov     = std::make_shared<hipo::bank>(dict->getSchema("REC::Cherenkov"));
+  auto rec_Event         = std::make_shared<hipo::bank>(dict->getSchema("REC::Event"));
+  auto rec_Particle      = std::make_shared<hipo::bank>(dict->getSchema("REC::Particle"));
+  auto rec_Scintillator  = std::make_shared<hipo::bank>(dict->getSchema("REC::Scintillator"));
+  auto rec_Calorimeter   = std::make_shared<hipo::bank>(dict->getSchema("REC::Calorimeter"));
+  auto rec_CovMat        = std::make_shared<hipo::bank>(dict->getSchema("REC::CovMat"));
+  auto mc_Header         = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
+  auto mc_Particle       = std::make_shared<hipo::bank>(dict->getSchema("MC::Particle"));
+
+  init(clas12, is_mc, cov, VertDoca, traj);
 
   int  entry                = 0;
   int  l                    = 0;
@@ -383,8 +416,7 @@ int main(int argc, char** argv) {
     hipo_event->getStructure(*rec_Event);
     hipo_event->getStructure(*rec_Scintillator);
     hipo_event->getStructure(*rec_Calorimeter);
-    if (traj)
-      hipo_event->getStructure(*rec_Traj);
+    hipo_event->getStructure(*rec_Traj);
     if (VertDoca)
       hipo_event->getStructure(*rec_VertDoca);
     if (cov)
@@ -1086,6 +1118,87 @@ int main(int argc, char** argv) {
     }
 
     len_pid    = rec_Particle->getRows();
+    len_pindex = rec_Traj->getRows();
+
+    dc_r1_x.resize(len_pid);
+    dc_r1_y.resize(len_pid);
+    dc_r1_z.resize(len_pid);
+    dc_r2_x.resize(len_pid);
+    dc_r2_y.resize(len_pid);
+    dc_r2_z.resize(len_pid);
+    dc_r3_x.resize(len_pid);
+    dc_r3_y.resize(len_pid);
+    dc_r3_z.resize(len_pid);
+
+    cvt_x.resize(len_pid);
+    cvt_y.resize(len_pid);
+    cvt_z.resize(len_pid);
+
+    fmt_x.resize(len_pid);
+    fmt_y.resize(len_pid);
+    fmt_z.resize(len_pid);
+
+    for (int i = 0; i < len_pid; i++) {
+      dc_r1_x[i] = NAN;
+      dc_r1_y[i] = NAN;
+      dc_r1_z[i] = NAN;
+      dc_r2_x[i] = NAN;
+      dc_r2_y[i] = NAN;
+      dc_r2_z[i] = NAN;
+      dc_r3_x[i] = NAN;
+      dc_r3_y[i] = NAN;
+      dc_r3_z[i] = NAN;
+
+      cvt_x[i] = NAN;
+      cvt_y[i] = NAN;
+      cvt_z[i] = NAN;
+
+      fmt_x[i] = NAN;
+      fmt_y[i] = NAN;
+      fmt_z[i] = NAN;
+    }
+
+    for (int i = 0; i < len_pid; i++) {
+      int FvsC = rec_Particle->getInt(10, i) / 1000;
+      for (int k = 0; k < len_pindex; k++) {
+        int pindex   = rec_Traj->getShort("pindex", k);
+        int detector = rec_Traj->getByte("detector", k);
+        int layer    = rec_Traj->getByte("layer", k);
+        if (FvsC == FORWARD_DETECTOR && pindex == i) {
+          if (detector == FMT && layer == 1) {
+            fmt_x[i] = rec_Traj->getFloat("x", k);
+            fmt_y[i] = rec_Traj->getFloat("y", k);
+            fmt_z[i] = rec_Traj->getFloat("z", k);
+          }
+          if (detector == DC) {
+            // Layers 6 12 18 24 30 36 are saved
+            // Choose every other one starting at 6, 18, 30
+            // Assuiming they are in r1,r2,r3
+            if (layer == 6) {
+              dc_r1_x[i] = rec_Traj->getFloat("x", k);
+              dc_r1_y[i] = rec_Traj->getFloat("y", k);
+              dc_r1_z[i] = rec_Traj->getFloat("z", k);
+            } else if (layer == 18) {
+              dc_r2_x[i] = rec_Traj->getFloat("x", k);
+              dc_r2_y[i] = rec_Traj->getFloat("y", k);
+              dc_r2_z[i] = rec_Traj->getFloat("z", k);
+            } else if (layer == 30) {
+              dc_r3_x[i] = rec_Traj->getFloat("x", k);
+              dc_r3_y[i] = rec_Traj->getFloat("y", k);
+              dc_r3_z[i] = rec_Traj->getFloat("z", k);
+            }
+          }
+        } else if (FvsC == CENTRAL_DETECTOR && pindex == i) {
+          if (detector == CVT && layer == 1) {
+            cvt_x[i] = rec_Traj->getFloat("x", k);
+            cvt_y[i] = rec_Traj->getFloat("y", k);
+            cvt_z[i] = rec_Traj->getFloat("z", k);
+          }
+        }
+      }
+    }
+
+    len_pid    = rec_Particle->getRows();
     len_pindex = rec_ForwardTagger->getRows();
 
     ft_cal_energy.resize(len_pid);
@@ -1295,21 +1408,22 @@ int main(int argc, char** argv) {
     clas12->Fill();
   }
 
+  OutputFile = clas12->GetCurrentFile();
   OutputFile->cd();
   clas12->Write();
   OutputFile->Close();
 
+  std::chrono::duration<double> elapsed_full =
+      (std::chrono::high_resolution_clock::now() - start_full);
+  std::cout << "Elapsed time: " << elapsed_full.count() << " s" << std::endl;
   if (!is_batch) {
-    std::chrono::duration<double> elapsed_full =
-        (std::chrono::high_resolution_clock::now() - start_full);
-    std::cout << "Elapsed time: " << elapsed_full.count() << " s" << std::endl;
     std::cout << "Events/Sec: " << tot_hipo_events / elapsed_full.count() << " Hz" << std::endl;
-    std::cout << "Total events in file: " << tot_hipo_events << std::endl;
     std::cout << "Events converted: " << tot_events_processed << "\t ("
               << 100.0 * tot_events_processed / tot_hipo_events << "%)" << std::endl;
-    std::cout << "Events converted/Sec: " << tot_events_processed / elapsed_full.count() << " Hz"
-              << std::endl;
   }
+  std::cout << "Total events in file: " << tot_hipo_events << std::endl;
+  std::cout << "Events converted/Sec: " << tot_events_processed / elapsed_full.count() << " Hz"
+            << std::endl;
 
   return 0;
 }

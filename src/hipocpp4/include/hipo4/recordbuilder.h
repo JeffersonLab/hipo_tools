@@ -53,6 +53,9 @@ namespace hipo {
     bool addEvent(hipo::event& evnt);
 
     int                getRecordSize();
+    long               getUserWordOne();
+    long               getUserWordTwo();
+    int                getEntries();
     std::vector<char>& getRecordBuffer() { return bufferRecord; };
     void               reset();
     void               build();

@@ -5,7 +5,6 @@
  */
 
 #include "hipo4/recordbuilder.h"
-//#include "hipoexceptions.h"
 
 #ifdef __LZ4__
 #include <lz4.h>
@@ -58,6 +57,23 @@ namespace hipo {
     int nbytes = 4 * nwords;
     return (bufferSize - nbytes);
   }
+  /**
+   * Returns number of events in the record.
+   */
+  int recordbuilder::getEntries() {
+    int nentries = *reinterpret_cast<int*>(&bufferRecord[12]);
+    return nentries;
+  }
+
+  long recordbuilder::getUserWordOne() {
+    long wOne = *reinterpret_cast<long*>(&bufferRecord[40]);
+    return wOne;
+  }
+
+  long recordbuilder::getUserWordTwo() {
+    long wTwo = *reinterpret_cast<long*>(&bufferRecord[48]);
+    return wTwo;
+  }
 
   int recordbuilder::getRecordSize() {
     int size = *reinterpret_cast<int*>(&bufferRecord[0]);
@@ -93,10 +109,6 @@ namespace hipo {
     hipo::utils::writeInt(&bufferRecord[0], 36, compressionWord);
     hipo::utils::writeLong(&bufferRecord[0], 40, 0);
     hipo::utils::writeLong(&bufferRecord[0], 48, 0);
-    printf("record::build uncompressed size = %8d, compressed size = %8d, rounding = %4d , record "
-           "size = %6d, version = %X, size = %5X\n",
-           uncompressedSize, compressedSize, rounding, compressedSizeToWrite, versionWord,
-           compressionWord);
   }
 
   int recordbuilder::compressRecord(int src_size) {
@@ -104,14 +116,10 @@ namespace hipo {
 #ifdef __LZ4__
     //(const char* src, char* dst, int srcSize, int dstCapacity, int acceleration);
     int result =
-        LZ4_compress_fast(&bufferData[0], &bufferRecord[56], src_size, bufferRecord.size(), 2);
+        LZ4_compress_fast(&bufferData[0], &bufferRecord[56], src_size, bufferRecord.size(), 3);
     // int   result = LZ4_decompress_safe(data,output,dataLength,dataLengthUncompressed);
     // int   result = LZ4_decompress_fast(data,output,dataLengthUncompressed);
     return result;
-// printf(" FIRST (%d) = %x %x %x %x\n",result);//,destUnCompressed[0],destUnCompressed[1],
-// destUnCompressed[2],destUnCompressed[3]);
-// LZ4_decompress_fast(buffer,destUnCompressed,decompressedLength);
-// LZ4_uncompress(buffer,destUnCompressed,decompressedLength);
 #endif
 
 #ifndef __LZ4__
