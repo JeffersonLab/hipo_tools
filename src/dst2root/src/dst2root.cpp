@@ -21,7 +21,7 @@
 #include "clipp.h"
 #include "constants.h"
 
-void init(const std::unique_ptr<TTree>& clas12, bool is_mc, bool cov, bool VertDoca, bool traj) {
+void init(TTree* clas12, bool is_mc, bool cov, bool VertDoca, bool traj) {
   clas12->Branch("category", &category);
   clas12->Branch("topology", &topology);
   clas12->Branch("beamCharge", &beamCharge);
@@ -341,7 +341,7 @@ int main(int argc, char** argv) {
   bool        cov        = false;
   bool        VertDoca   = false;
   bool        traj       = false;
-  short       max_size   = 150;
+  short       max_size   = 1500;
 
   auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
               clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
@@ -355,7 +355,7 @@ int main(int argc, char** argv) {
               clipp::option("-t", "--traj").set(traj) % "Save traj information",
               clipp::option("-test", "--test").set(is_test) % "Testing",
               clipp::option("-m", "--max_file_size") &
-                  clipp::value("Max file size in GB (150GB default)", max_size),
+                  clipp::value("max_file_size", max_size) % "Max file size in GB (150GB default)",
               clipp::value("inputFile.hipo", InFileName),
               clipp::opt_value("outputFile.root", OutFileName));
 
@@ -365,15 +365,15 @@ int main(int argc, char** argv) {
     exit(0);
   }
 
-  std::unique_ptr<TFile> OutputFile;
-  std::unique_ptr<TTree> clas12;
+  TFile* OutputFile;
+  TTree* clas12;
 
   if (OutFileName.empty())
     OutFileName = InFileName + ".root";
 
-  OutputFile = std::make_unique<TFile>(OutFileName.c_str(), "RECREATE");
+  OutputFile = new TFile(OutFileName.c_str(), "RECREATE");
   OutputFile->SetCompressionSettings(404); // kUseAnalysis
-  clas12                  = std::make_unique<TTree>("clas12", "clas12");
+  clas12                  = new TTree("clas12", "clas12");
   long long max_tree_size = 1000000000LL * max_size;
   clas12->SetMaxTreeSize(max_tree_size);
 
@@ -1408,7 +1408,10 @@ int main(int argc, char** argv) {
     clas12->Fill();
   }
 
+  OutputFile = clas12->GetCurrentFile();
+  OutputFile->cd();
   clas12->Write();
+  OutputFile->Close();
 
   std::chrono::duration<double> elapsed_full =
       (std::chrono::high_resolution_clock::now() - start_full);
