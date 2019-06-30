@@ -4,7 +4,7 @@ set(VERSION 1.0.0)
 
 option(BUILD_FPIC "Build with -fPIC" ON)
 option(BUILD_HIPOPY "Build python" OFF)
-option(BUILD_EXAMPLES "Build examples programs" ON)
+option(BUILD_EXAMPLES "Build examples programs" OFF)
 
 if(BUILD_FPIC)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -19,8 +19,8 @@ set(CMAKE_MODULE_PATH
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 find_package(ROOT REQUIRED COMPONENTS RIO Net)
 include(${ROOT_USE_FILE})
-set(CMAKE_C_FLAGS "-Ofast")
-set(CMAKE_CXX_FLAGS "-Ofast ${ROOT_CXX_FLAGS}")
+set(CMAKE_C_FLAGS "-O3 -Ofast-math")
+set(CMAKE_CXX_FLAGS "-O3 -Ofast-math ${ROOT_CXX_FLAGS}")
 add_definitions(-D__FAST__)
 
 # Find the lz4 package
