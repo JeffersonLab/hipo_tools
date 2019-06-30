@@ -10,9 +10,8 @@
 #include <vector>
 // ROOT libs
 #include "TFile.h"
-#include "TFileCacheWrite.h"
+#include "TROOT.h"
 #include "TTree.h"
-#include <ROOT/TTreeProcessorMT.hxx>
 // Hipo libs
 #include "hipo4/reader.h"
 
@@ -330,6 +329,8 @@ void init(TTree* clas12, bool is_mc, bool cov, bool VertDoca, bool traj) {
 }
 
 int main(int argc, char** argv) {
+  ROOT::EnableThreadSafety();
+  ROOT::EnableImplicitMT(2);
   std::string InFileName;
   std::string OutFileName;
   bool        is_mc      = false;

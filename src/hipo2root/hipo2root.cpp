@@ -13,12 +13,15 @@
 #include <vector>
 // ROOT libs
 #include "TFile.h"
+#include "TROOT.h"
 #include "TTree.h"
 // Hipo libs and clipp
 #include "clipp.h"
 #include "hipo4/reader.h"
 
 int main(int argc, char** argv) {
+  ROOT::EnableThreadSafety();
+  ROOT::EnableImplicitMT(2);
   std::string InFileName;
   std::string OutFileName;
   bool        is_mc      = false;
