@@ -606,14 +606,8 @@ int main(int argc, char** argv) {
       REC_Scintillator_status_vec.resize(l);
 
       for (int i = 0; i < l; i++) {
-        REC_Scintillator_index_vec[i]  = rec_Scintillator->getInt(0, i);
-        REC_Scintillator_pindex_vec[i] = rec_Scintillator->getInt(1, i);
-        /* Looks weird
-        REC_Scintillator_detector_vec[i]  = rec_Scintillator->getInt(2, i);
-        REC_Scintillator_sector_vec[i]    = rec_Scintillator->getInt(3, i);
-        REC_Scintillator_layer_vec[i]     = rec_Scintillator->getInt(4, i);
-        REC_Scintillator_component_vec[i] = rec_Scintillator->getInt(5, i);
-        */
+        REC_Scintillator_index_vec[i]     = rec_Scintillator->getInt(0, i);
+        REC_Scintillator_pindex_vec[i]    = rec_Scintillator->getInt(1, i);
         REC_Scintillator_detector_vec[i]  = rec_Scintillator->getInt(2, i);
         REC_Scintillator_sector_vec[i]    = rec_Scintillator->getInt(3, i);
         REC_Scintillator_layer_vec[i]     = rec_Scintillator->getInt(4, i);

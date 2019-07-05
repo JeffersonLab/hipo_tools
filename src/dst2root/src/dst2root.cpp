@@ -1160,17 +1160,24 @@ int main(int argc, char** argv) {
     }
 
     for (int i = 0; i < len_pid; i++) {
-      int FvsC = rec_Particle->getInt(10, i) / 1000;
       for (int k = 0; k < len_pindex; k++) {
         int pindex   = rec_Traj->getShort("pindex", k);
         int detector = rec_Traj->getByte("detector", k);
         int layer    = rec_Traj->getByte("layer", k);
-        if (FvsC == FORWARD_DETECTOR && pindex == i) {
+
+        if (pindex == i) {
           if (detector == FMT && layer == 1) {
             fmt_x[i] = rec_Traj->getFloat("x", k);
             fmt_y[i] = rec_Traj->getFloat("y", k);
             fmt_z[i] = rec_Traj->getFloat("z", k);
           }
+
+          if (detector == CVT && layer == 1) {
+            cvt_x[i] = rec_Traj->getFloat("x", k);
+            cvt_y[i] = rec_Traj->getFloat("y", k);
+            cvt_z[i] = rec_Traj->getFloat("z", k);
+          }
+
           if (detector == DC) {
             // Layers 6 12 18 24 30 36 are saved
             // Choose every other one starting at 6, 18, 30
@@ -1188,12 +1195,6 @@ int main(int argc, char** argv) {
               dc_r3_y[i] = rec_Traj->getFloat("y", k);
               dc_r3_z[i] = rec_Traj->getFloat("z", k);
             }
-          }
-        } else if (FvsC == CENTRAL_DETECTOR && pindex == i) {
-          if (detector == CVT && layer == 1) {
-            cvt_x[i] = rec_Traj->getFloat("x", k);
-            cvt_y[i] = rec_Traj->getFloat("y", k);
-            cvt_z[i] = rec_Traj->getFloat("z", k);
           }
         }
       }
