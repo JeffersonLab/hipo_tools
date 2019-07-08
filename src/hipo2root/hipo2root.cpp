@@ -13,12 +13,15 @@
 #include <vector>
 // ROOT libs
 #include "TFile.h"
+#include "TROOT.h"
 #include "TTree.h"
 // Hipo libs and clipp
 #include "clipp.h"
 #include "hipo4/reader.h"
 
 int main(int argc, char** argv) {
+  ROOT::EnableThreadSafety();
+  ROOT::EnableImplicitMT(2);
   std::string InFileName;
   std::string OutFileName;
   bool        is_mc      = false;
@@ -28,6 +31,7 @@ int main(int argc, char** argv) {
   bool        cov        = false;
   bool        VertDoca   = false;
   bool        traj       = false;
+  bool        tbt        = false;
 
   auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
               clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
@@ -35,6 +39,7 @@ int main(int argc, char** argv) {
               clipp::option("-c", "--cov").set(cov) % "Save Covariant Matrix for kinematic fitting",
               clipp::option("-v", "--VertDoca").set(VertDoca) % "Save VertDoca information",
               clipp::option("-t", "--traj").set(traj) % "Save traj information",
+              clipp::option("-tbt", "--tbt").set(tbt) % "Save TimeBasedTrkg information",
               clipp::option("-test", "--test").set(is_test) %
                   "Only convert first 50000 events for testing",
               clipp::value("inputFile.hipo", InFileName),
@@ -70,7 +75,13 @@ int main(int argc, char** argv) {
   auto rec_Calorimeter   = std::make_shared<hipo::bank>(dict->getSchema("REC::Calorimeter"));
   auto rec_CovMat        = std::make_shared<hipo::bank>(dict->getSchema("REC::CovMat"));
   auto mc_Header         = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
+  auto mc_Event          = std::make_shared<hipo::bank>(dict->getSchema("MC::Event"));
   auto mc_Particle       = std::make_shared<hipo::bank>(dict->getSchema("MC::Particle"));
+  auto mc_Lund           = std::make_shared<hipo::bank>(dict->getSchema("MC::Lund"));
+
+  auto tbt_Tracks  = std::make_shared<hipo::bank>(dict->getSchema("TimeBasedTrkg::TBTracks"));
+  auto tbt_Crosses = std::make_shared<hipo::bank>(dict->getSchema("TimeBasedTrkg::TBCrosses"));
+  auto tbt_Hits    = std::make_shared<hipo::bank>(dict->getSchema("TimeBasedTrkg::TBHits"));
 
   std::vector<long>   REC_Event_category_vec;
   std::vector<long>   REC_Event_topology_vec;
@@ -175,65 +186,116 @@ int main(int argc, char** argv) {
   std::vector<int>    REC_Track_q_vec;
   std::vector<float>  REC_Track_chi2_vec;
   std::vector<int>    REC_Track_NDF_vec;
-  std::vector<int>    REC_CovMat_index_vec;
-  std::vector<int>    REC_CovMat_pindex_vec;
-  std::vector<float>  REC_CovMat_C11_vec;
-  std::vector<float>  REC_CovMat_C12_vec;
-  std::vector<float>  REC_CovMat_C13_vec;
-  std::vector<float>  REC_CovMat_C14_vec;
-  std::vector<float>  REC_CovMat_C15_vec;
-  std::vector<float>  REC_CovMat_C22_vec;
-  std::vector<float>  REC_CovMat_C23_vec;
-  std::vector<float>  REC_CovMat_C24_vec;
-  std::vector<float>  REC_CovMat_C25_vec;
-  std::vector<float>  REC_CovMat_C33_vec;
-  std::vector<float>  REC_CovMat_C34_vec;
-  std::vector<float>  REC_CovMat_C35_vec;
-  std::vector<float>  REC_CovMat_C44_vec;
-  std::vector<float>  REC_CovMat_C45_vec;
-  std::vector<float>  REC_CovMat_C55_vec;
-  std::vector<int>    REC_VertDoca_index1_vec;
-  std::vector<int>    REC_VertDoca_index2_vec;
-  std::vector<float>  REC_VertDoca_x_vec;
-  std::vector<float>  REC_VertDoca_y_vec;
-  std::vector<float>  REC_VertDoca_z_vec;
-  std::vector<float>  REC_VertDoca_x1_vec;
-  std::vector<float>  REC_VertDoca_y1_vec;
-  std::vector<float>  REC_VertDoca_z1_vec;
-  std::vector<float>  REC_VertDoca_cx1_vec;
-  std::vector<float>  REC_VertDoca_cy1_vec;
-  std::vector<float>  REC_VertDoca_cz1_vec;
-  std::vector<float>  REC_VertDoca_x2_vec;
-  std::vector<float>  REC_VertDoca_y2_vec;
-  std::vector<float>  REC_VertDoca_z2_vec;
-  std::vector<float>  REC_VertDoca_cx2_vec;
-  std::vector<float>  REC_VertDoca_cy2_vec;
-  std::vector<float>  REC_VertDoca_cz2_vec;
-  std::vector<float>  REC_VertDoca_r_vec;
-  std::vector<int>    REC_Traj_pindex_vec;
-  std::vector<int>    REC_Traj_index_vec;
-  std::vector<int>    REC_Traj_detector_vec;
-  std::vector<int>    REC_Traj_layer_vec;
-  std::vector<int>    REC_Traj_q_vec;
-  std::vector<float>  REC_Traj_x_vec;
-  std::vector<float>  REC_Traj_y_vec;
-  std::vector<float>  REC_Traj_z_vec;
-  std::vector<float>  REC_Traj_cx_vec;
-  std::vector<float>  REC_Traj_cy_vec;
-  std::vector<float>  REC_Traj_cz_vec;
-  std::vector<float>  REC_Traj_path_vec;
-  std::vector<int>    MC_Header_run_vec;
-  std::vector<int>    MC_Header_event_vec;
-  std::vector<int>    MC_Header_type_vec;
-  std::vector<float>  MC_Header_helicity_vec;
-  std::vector<int>    MC_Particle_pid_vec;
-  std::vector<float>  MC_Particle_px_vec;
-  std::vector<float>  MC_Particle_py_vec;
-  std::vector<float>  MC_Particle_pz_vec;
-  std::vector<float>  MC_Particle_vx_vec;
-  std::vector<float>  MC_Particle_vy_vec;
-  std::vector<float>  MC_Particle_vz_vec;
-  std::vector<float>  MC_Particle_vt_vec;
+
+  std::vector<int>   TBT_Tracks_id_vec;
+  std::vector<int>   TBT_Tracks_sector_vec;
+  std::vector<float> TBT_Tracks_vx_vec;
+  std::vector<float> TBT_Tracks_vy_vec;
+  std::vector<float> TBT_Tracks_vz_vec;
+  std::vector<float> TBT_Tracks_Cross1_ID_vec;
+  std::vector<float> TBT_Tracks_Cross2_ID_vec;
+  std::vector<float> TBT_Tracks_Cross3_ID_vec;
+  std::vector<float> TBT_Tracks_chi2_vec;
+  std::vector<int>   TBT_Tracks_ndf_vec;
+  std::vector<int>   TBT_Crosses_id_vec;
+  std::vector<int>   TBT_Crosses_sector_vec;
+  std::vector<int>   TBT_Crosses_region_vec;
+  std::vector<float> TBT_Crosses_x_vec;
+  std::vector<float> TBT_Crosses_y_vec;
+  std::vector<float> TBT_Crosses_z_vec;
+  std::vector<float> TBT_Crosses_err_x_vec;
+  std::vector<float> TBT_Crosses_err_y_vec;
+  std::vector<float> TBT_Crosses_err_z_vec;
+  std::vector<float> TBT_Crosses_ux_vec;
+  std::vector<float> TBT_Crosses_uy_vec;
+  std::vector<float> TBT_Crosses_uz_vec;
+  std::vector<float> TBT_Crosses_err_ux_vec;
+  std::vector<float> TBT_Crosses_err_uy_vec;
+  std::vector<float> TBT_Crosses_err_uz_vec;
+  std::vector<int>   TBT_Hits_id_vec;
+  std::vector<int>   TBT_Hits_sector_vec;
+  std::vector<int>   TBT_Hits_superlayer_vec;
+  std::vector<int>   TBT_Hits_layer_vec;
+  std::vector<int>   TBT_Hits_wire_vec;
+  std::vector<int>   TBT_Hits_trkID_vec;
+  std::vector<float> TBT_Hits_doca_vec;
+  std::vector<float> TBT_Hits_docaError_vec;
+  std::vector<float> TBT_Hits_trkDoca_vec;
+  std::vector<float> TBT_Hits_timeResidual_vec;
+  std::vector<float> TBT_Hits_fitResidual_vec;
+
+  std::vector<int>   REC_CovMat_index_vec;
+  std::vector<int>   REC_CovMat_pindex_vec;
+  std::vector<float> REC_CovMat_C11_vec;
+  std::vector<float> REC_CovMat_C12_vec;
+  std::vector<float> REC_CovMat_C13_vec;
+  std::vector<float> REC_CovMat_C14_vec;
+  std::vector<float> REC_CovMat_C15_vec;
+  std::vector<float> REC_CovMat_C22_vec;
+  std::vector<float> REC_CovMat_C23_vec;
+  std::vector<float> REC_CovMat_C24_vec;
+  std::vector<float> REC_CovMat_C25_vec;
+  std::vector<float> REC_CovMat_C33_vec;
+  std::vector<float> REC_CovMat_C34_vec;
+  std::vector<float> REC_CovMat_C35_vec;
+  std::vector<float> REC_CovMat_C44_vec;
+  std::vector<float> REC_CovMat_C45_vec;
+  std::vector<float> REC_CovMat_C55_vec;
+  std::vector<int>   REC_VertDoca_index1_vec;
+  std::vector<int>   REC_VertDoca_index2_vec;
+  std::vector<float> REC_VertDoca_x_vec;
+  std::vector<float> REC_VertDoca_y_vec;
+  std::vector<float> REC_VertDoca_z_vec;
+  std::vector<float> REC_VertDoca_x1_vec;
+  std::vector<float> REC_VertDoca_y1_vec;
+  std::vector<float> REC_VertDoca_z1_vec;
+  std::vector<float> REC_VertDoca_cx1_vec;
+  std::vector<float> REC_VertDoca_cy1_vec;
+  std::vector<float> REC_VertDoca_cz1_vec;
+  std::vector<float> REC_VertDoca_x2_vec;
+  std::vector<float> REC_VertDoca_y2_vec;
+  std::vector<float> REC_VertDoca_z2_vec;
+  std::vector<float> REC_VertDoca_cx2_vec;
+  std::vector<float> REC_VertDoca_cy2_vec;
+  std::vector<float> REC_VertDoca_cz2_vec;
+  std::vector<float> REC_VertDoca_r_vec;
+  std::vector<int>   REC_Traj_pindex_vec;
+  std::vector<int>   REC_Traj_index_vec;
+  std::vector<int>   REC_Traj_detector_vec;
+  std::vector<int>   REC_Traj_layer_vec;
+  std::vector<int>   REC_Traj_q_vec;
+  std::vector<float> REC_Traj_x_vec;
+  std::vector<float> REC_Traj_y_vec;
+  std::vector<float> REC_Traj_z_vec;
+  std::vector<float> REC_Traj_cx_vec;
+  std::vector<float> REC_Traj_cy_vec;
+  std::vector<float> REC_Traj_cz_vec;
+  std::vector<float> REC_Traj_path_vec;
+
+  std::vector<int>   MC_Header_run_vec;
+  std::vector<int>   MC_Header_event_vec;
+  std::vector<int>   MC_Header_type_vec;
+  std::vector<float> MC_Header_helicity_vec;
+  std::vector<int>   MC_Event_npart_vec;
+  std::vector<float> MC_Event_ebeam_vec;
+  std::vector<float> MC_Event_weight_vec;
+  std::vector<int>   MC_Particle_pid_vec;
+  std::vector<float> MC_Particle_px_vec;
+  std::vector<float> MC_Particle_py_vec;
+  std::vector<float> MC_Particle_pz_vec;
+  std::vector<float> MC_Particle_vx_vec;
+  std::vector<float> MC_Particle_vy_vec;
+  std::vector<float> MC_Particle_vz_vec;
+  std::vector<float> MC_Particle_vt_vec;
+  std::vector<int>   MC_Lund_pid_vec;
+  std::vector<float> MC_Lund_mass_vec;
+  std::vector<float> MC_Lund_E_vec;
+  std::vector<float> MC_Lund_px_vec;
+  std::vector<float> MC_Lund_py_vec;
+  std::vector<float> MC_Lund_pz_vec;
+  std::vector<float> MC_Lund_vx_vec;
+  std::vector<float> MC_Lund_vy_vec;
+  std::vector<float> MC_Lund_vz_vec;
 
   clas12->Branch("REC_Event_category", &REC_Event_category_vec);
   clas12->Branch("REC_Event_topology", &REC_Event_topology_vec);
@@ -255,6 +317,37 @@ int main(int argc, char** argv) {
   clas12->Branch("REC_Particle_beta", &REC_Particle_beta_vec);
   clas12->Branch("REC_Particle_chi2pid", &REC_Particle_chi2pid_vec);
   clas12->Branch("REC_Particle_status", &REC_Particle_status_vec);
+
+  if (is_mc) {
+    clas12->Branch("MC_Header_run", &MC_Header_run_vec);
+    clas12->Branch("MC_Header_event", &MC_Header_event_vec);
+    clas12->Branch("MC_Header_type", &MC_Header_type_vec);
+    clas12->Branch("MC_Header_helicity", &MC_Header_helicity_vec);
+
+    clas12->Branch("MC_Event_npart", &MC_Event_npart_vec);
+    clas12->Branch("MC_Event_ebeam", &MC_Event_ebeam_vec);
+    clas12->Branch("MC_Event_weight", &MC_Event_weight_vec);
+
+    clas12->Branch("MC_Particle_pid", &MC_Particle_pid_vec);
+    clas12->Branch("MC_Particle_px", &MC_Particle_px_vec);
+    clas12->Branch("MC_Particle_py", &MC_Particle_py_vec);
+    clas12->Branch("MC_Particle_pz", &MC_Particle_pz_vec);
+    clas12->Branch("MC_Particle_vx", &MC_Particle_vx_vec);
+    clas12->Branch("MC_Particle_vy", &MC_Particle_vy_vec);
+    clas12->Branch("MC_Particle_vz", &MC_Particle_vz_vec);
+    clas12->Branch("MC_Particle_vt", &MC_Particle_vt_vec);
+
+    clas12->Branch("MC_Lund_pid", &MC_Lund_pid_vec);
+    clas12->Branch("MC_Lund_mass", &MC_Lund_mass_vec);
+    clas12->Branch("MC_Lund_E", &MC_Lund_E_vec);
+    clas12->Branch("MC_Lund_px", &MC_Lund_px_vec);
+    clas12->Branch("MC_Lund_py", &MC_Lund_py_vec);
+    clas12->Branch("MC_Lund_pz", &MC_Lund_pz_vec);
+    clas12->Branch("MC_Lund_vx", &MC_Lund_vx_vec);
+    clas12->Branch("MC_Lund_vy", &MC_Lund_vy_vec);
+    clas12->Branch("MC_Lund_vz", &MC_Lund_vz_vec);
+  }
+
   clas12->Branch("REC_Calorimeter_index", &REC_Calorimeter_index_vec);
   clas12->Branch("REC_Calorimeter_pindex", &REC_Calorimeter_pindex_vec);
   clas12->Branch("REC_Calorimeter_detector", &REC_Calorimeter_detector_vec);
@@ -338,6 +431,44 @@ int main(int argc, char** argv) {
   clas12->Branch("REC_Track_q", &REC_Track_q_vec);
   clas12->Branch("REC_Track_chi2", &REC_Track_chi2_vec);
   clas12->Branch("REC_Track_NDF", &REC_Track_NDF_vec);
+  if (tbt) {
+    clas12->Branch("TBT_Tracks_id", &TBT_Tracks_id_vec);
+    clas12->Branch("TBT_Tracks_sector", &TBT_Tracks_sector_vec);
+    clas12->Branch("TBT_Tracks_vx", &TBT_Tracks_vx_vec);
+    clas12->Branch("TBT_Tracks_vy", &TBT_Tracks_vy_vec);
+    clas12->Branch("TBT_Tracks_vz", &TBT_Tracks_vz_vec);
+    clas12->Branch("TBT_Tracks_Cross1_ID", &TBT_Tracks_Cross1_ID_vec);
+    clas12->Branch("TBT_Tracks_Cross2_ID", &TBT_Tracks_Cross2_ID_vec);
+    clas12->Branch("TBT_Tracks_Cross3_ID", &TBT_Tracks_Cross3_ID_vec);
+    clas12->Branch("TBT_Tracks_chi2", &TBT_Tracks_chi2_vec);
+    clas12->Branch("TBT_Tracks_ndf", &TBT_Tracks_ndf_vec);
+    clas12->Branch("TBT_Crosses_id", &TBT_Crosses_id_vec);
+    clas12->Branch("TBT_Crosses_sector", &TBT_Crosses_sector_vec);
+    clas12->Branch("TBT_Crosses_region", &TBT_Crosses_region_vec);
+    clas12->Branch("TBT_Crosses_x", &TBT_Crosses_x_vec);
+    clas12->Branch("TBT_Crosses_y", &TBT_Crosses_y_vec);
+    clas12->Branch("TBT_Crosses_z", &TBT_Crosses_z_vec);
+    clas12->Branch("TBT_Crosses_err_x", &TBT_Crosses_err_x_vec);
+    clas12->Branch("TBT_Crosses_err_y", &TBT_Crosses_err_y_vec);
+    clas12->Branch("TBT_Crosses_err_z", &TBT_Crosses_err_z_vec);
+    clas12->Branch("TBT_Crosses_ux", &TBT_Crosses_ux_vec);
+    clas12->Branch("TBT_Crosses_uy", &TBT_Crosses_uy_vec);
+    clas12->Branch("TBT_Crosses_uz", &TBT_Crosses_uz_vec);
+    clas12->Branch("TBT_Crosses_err_ux", &TBT_Crosses_err_ux_vec);
+    clas12->Branch("TBT_Crosses_err_uy", &TBT_Crosses_err_uy_vec);
+    clas12->Branch("TBT_Crosses_err_uz", &TBT_Crosses_err_uz_vec);
+    clas12->Branch("TBT_Hits_id", &TBT_Hits_id_vec);
+    clas12->Branch("TBT_Hits_sector", &TBT_Hits_sector_vec);
+    clas12->Branch("TBT_Hits_superlayer", &TBT_Hits_superlayer_vec);
+    clas12->Branch("TBT_Hits_layer", &TBT_Hits_layer_vec);
+    clas12->Branch("TBT_Hits_wire", &TBT_Hits_wire_vec);
+    clas12->Branch("TBT_Hits_trkID", &TBT_Hits_trkID_vec);
+    clas12->Branch("TBT_Hits_doca", &TBT_Hits_doca_vec);
+    clas12->Branch("TBT_Hits_docaError", &TBT_Hits_docaError_vec);
+    clas12->Branch("TBT_Hits_trkDoca", &TBT_Hits_trkDoca_vec);
+    clas12->Branch("TBT_Hits_timeResidual", &TBT_Hits_timeResidual_vec);
+    clas12->Branch("TBT_Hits_fitResidual", &TBT_Hits_fitResidual_vec);
+  }
   if (cov) {
     clas12->Branch("REC_CovMat_index", &REC_CovMat_index_vec);
     clas12->Branch("REC_CovMat_pindex", &REC_CovMat_pindex_vec);
@@ -380,8 +511,8 @@ int main(int argc, char** argv) {
   if (traj) {
     clas12->Branch("REC_Traj_pindex", &REC_Traj_pindex_vec);
     clas12->Branch("REC_Traj_index", &REC_Traj_index_vec);
-    clas12->Branch("REC_Traj_detector_vec", &REC_Traj_detector_vec);
-    clas12->Branch("REC_Traj_layer_vec", &REC_Traj_layer_vec);
+    clas12->Branch("REC_Traj_detector", &REC_Traj_detector_vec);
+    clas12->Branch("REC_Traj_layer", &REC_Traj_layer_vec);
     clas12->Branch("REC_Traj_x", &REC_Traj_x_vec);
     clas12->Branch("REC_Traj_y", &REC_Traj_y_vec);
     clas12->Branch("REC_Traj_z", &REC_Traj_z_vec);
@@ -389,20 +520,6 @@ int main(int argc, char** argv) {
     clas12->Branch("REC_Traj_cy", &REC_Traj_cy_vec);
     clas12->Branch("REC_Traj_cz", &REC_Traj_cz_vec);
     clas12->Branch("REC_Traj_path", &REC_Traj_path_vec);
-  }
-  if (is_mc) {
-    clas12->Branch("MC_Header_run", &MC_Header_run_vec);
-    clas12->Branch("MC_Header_event", &MC_Header_event_vec);
-    clas12->Branch("MC_Header_type", &MC_Header_type_vec);
-    clas12->Branch("MC_Header_helicity", &MC_Header_helicity_vec);
-    clas12->Branch("MC_Particle_pid", &MC_Particle_pid_vec);
-    clas12->Branch("MC_Particle_px", &MC_Particle_px_vec);
-    clas12->Branch("MC_Particle_py", &MC_Particle_py_vec);
-    clas12->Branch("MC_Particle_pz", &MC_Particle_pz_vec);
-    clas12->Branch("MC_Particle_vx", &MC_Particle_vx_vec);
-    clas12->Branch("MC_Particle_vy", &MC_Particle_vy_vec);
-    clas12->Branch("MC_Particle_vz", &MC_Particle_vz_vec);
-    clas12->Branch("MC_Particle_vt", &MC_Particle_vt_vec);
   }
 
   int  entry      = 0;
@@ -427,10 +544,91 @@ int main(int argc, char** argv) {
     if (is_mc) {
       hipo_event->getStructure(*mc_Header);
       hipo_event->getStructure(*mc_Particle);
+      hipo_event->getStructure(*mc_Event);
+      hipo_event->getStructure(*mc_Lund);
+    }
+    if (tbt) {
+      hipo_event->getStructure(*tbt_Tracks);
+      hipo_event->getStructure(*tbt_Crosses);
+      hipo_event->getStructure(*tbt_Hits);
     }
 
     if (!is_batch && (++entry % 10000) == 0)
       std::cout << "\t" << floor(100 * entry / tot_hipo_events) << "%\r\r" << std::flush;
+
+    if (is_mc) {
+
+      l = mc_Header->getRows();
+      if (l != -1) {
+        MC_Header_run_vec.resize(l);
+        MC_Header_event_vec.resize(l);
+        MC_Header_type_vec.resize(l);
+        MC_Header_helicity_vec.resize(l);
+        for (int i = 0; i < l; i++) {
+          MC_Header_run_vec[i]      = mc_Header->getInt(0, i);
+          MC_Header_event_vec[i]    = mc_Header->getInt(1, i);
+          MC_Header_type_vec[i]     = mc_Header->getInt(2, i);
+          MC_Header_helicity_vec[i] = mc_Header->getFloat(3, i);
+        }
+      }
+
+      l = mc_Event->getRows();
+      MC_Event_npart_vec.resize(l);
+      MC_Event_ebeam_vec.resize(l);
+      MC_Event_weight_vec.resize(l);
+      for (int i = 0; i < l; i++) {
+        MC_Event_npart_vec[i]  = mc_Event->getInt(0, i);
+        MC_Event_ebeam_vec[i]  = mc_Event->getFloat(6, i);
+        MC_Event_weight_vec[i] = mc_Event->getFloat(9, i);
+      }
+
+      l = mc_Particle->getRows();
+      if (l != -1) {
+        MC_Particle_pid_vec.resize(l);
+        MC_Particle_px_vec.resize(l);
+        MC_Particle_py_vec.resize(l);
+        MC_Particle_pz_vec.resize(l);
+        MC_Particle_vx_vec.resize(l);
+        MC_Particle_vy_vec.resize(l);
+        MC_Particle_vz_vec.resize(l);
+        MC_Particle_vt_vec.resize(l);
+        for (int i = 0; i < l; i++) {
+          MC_Particle_pid_vec[i] = mc_Particle->getInt(0, i);
+          MC_Particle_px_vec[i]  = mc_Particle->getFloat(1, i);
+          MC_Particle_py_vec[i]  = mc_Particle->getFloat(2, i);
+          MC_Particle_pz_vec[i]  = mc_Particle->getFloat(3, i);
+          MC_Particle_vx_vec[i]  = mc_Particle->getFloat(4, i);
+          MC_Particle_vy_vec[i]  = mc_Particle->getFloat(5, i);
+          MC_Particle_vz_vec[i]  = mc_Particle->getFloat(6, i);
+          MC_Particle_vt_vec[i]  = mc_Particle->getFloat(7, i);
+        }
+      }
+
+      l = mc_Lund->getRows();
+      if (l != -1) {
+        MC_Lund_pid_vec.resize(l);
+        MC_Lund_px_vec.resize(l);
+        MC_Lund_py_vec.resize(l);
+        MC_Lund_pz_vec.resize(l);
+        MC_Lund_vx_vec.resize(l);
+        MC_Lund_vy_vec.resize(l);
+        MC_Lund_vz_vec.resize(l);
+        MC_Lund_mass_vec.resize(l);
+        MC_Lund_E_vec.resize(l);
+
+        for (int i = 0; i < l; i++) {
+          MC_Lund_pid_vec[i]  = mc_Lund->getInt(3, i);
+          MC_Lund_px_vec[i]   = mc_Lund->getFloat(6, i);
+          MC_Lund_py_vec[i]   = mc_Lund->getFloat(7, i);
+          MC_Lund_pz_vec[i]   = mc_Lund->getFloat(8, i);
+          MC_Lund_E_vec[i]    = mc_Lund->getFloat(9, i);
+          MC_Lund_mass_vec[i] = mc_Lund->getFloat(10, i);
+          MC_Lund_vx_vec[i]   = mc_Lund->getFloat(11, i);
+          MC_Lund_vy_vec[i]   = mc_Lund->getFloat(12, i);
+          MC_Lund_vz_vec[i]   = mc_Lund->getFloat(13, i);
+        }
+      }
+    }
 
     l = rec_Event->getRows();
     if (l != -1) {
@@ -603,14 +801,8 @@ int main(int argc, char** argv) {
       REC_Scintillator_status_vec.resize(l);
 
       for (int i = 0; i < l; i++) {
-        REC_Scintillator_index_vec[i]  = rec_Scintillator->getInt(0, i);
-        REC_Scintillator_pindex_vec[i] = rec_Scintillator->getInt(1, i);
-        /* Looks weird
-        REC_Scintillator_detector_vec[i]  = rec_Scintillator->getInt(2, i);
-        REC_Scintillator_sector_vec[i]    = rec_Scintillator->getInt(3, i);
-        REC_Scintillator_layer_vec[i]     = rec_Scintillator->getInt(4, i);
-        REC_Scintillator_component_vec[i] = rec_Scintillator->getInt(5, i);
-        */
+        REC_Scintillator_index_vec[i]     = rec_Scintillator->getInt(0, i);
+        REC_Scintillator_pindex_vec[i]    = rec_Scintillator->getInt(1, i);
         REC_Scintillator_detector_vec[i]  = rec_Scintillator->getInt(2, i);
         REC_Scintillator_sector_vec[i]    = rec_Scintillator->getInt(3, i);
         REC_Scintillator_layer_vec[i]     = rec_Scintillator->getInt(4, i);
@@ -731,42 +923,94 @@ int main(int argc, char** argv) {
       }
     }
 
-    if (is_mc) {
+    if (tbt) {
+      l = tbt_Tracks->getRows();
+      TBT_Tracks_id_vec.resize(l);
+      TBT_Tracks_sector_vec.resize(l);
+      TBT_Tracks_vx_vec.resize(l);
+      TBT_Tracks_vy_vec.resize(l);
+      TBT_Tracks_vz_vec.resize(l);
+      TBT_Tracks_Cross1_ID_vec.resize(l);
+      TBT_Tracks_Cross2_ID_vec.resize(l);
+      TBT_Tracks_Cross3_ID_vec.resize(l);
+      TBT_Tracks_chi2_vec.resize(l);
+      TBT_Tracks_ndf_vec.resize(l);
 
-      l = mc_Header->getRows();
-      if (l != -1) {
-        MC_Header_run_vec.resize(l);
-        MC_Header_event_vec.resize(l);
-        MC_Header_type_vec.resize(l);
-        MC_Header_helicity_vec.resize(l);
-        for (int i = 0; i < l; i++) {
-          MC_Header_run_vec[i]      = mc_Header->getInt(0, i);
-          MC_Header_event_vec[i]    = mc_Header->getInt(1, i);
-          MC_Header_type_vec[i]     = mc_Header->getInt(2, i);
-          MC_Header_helicity_vec[i] = mc_Header->getFloat(3, i);
-        }
+      for (int i = 0; i < l; i++) {
+        TBT_Tracks_id_vec[i]     = tbt_Tracks->getInt(0, i);
+        TBT_Tracks_sector_vec[i] = tbt_Tracks->getInt(2, i);
+        /*
+                TBT_Tracks_vx_vec[i]        = tbt_Tracks->getFloat(21, i);
+                TBT_Tracks_vy_vec[i]        = tbt_Tracks->getFloat(22, i);
+                TBT_Tracks_vz_vec[i]        = tbt_Tracks->getFloat(23, i);
+        */
+        TBT_Tracks_Cross1_ID_vec[i] = tbt_Tracks->getFloat(27, i);
+        TBT_Tracks_Cross2_ID_vec[i] = tbt_Tracks->getFloat(28, i);
+        TBT_Tracks_Cross3_ID_vec[i] = tbt_Tracks->getFloat(29, i);
+        TBT_Tracks_chi2_vec[i]      = tbt_Tracks->getFloat(32, i);
+        TBT_Tracks_ndf_vec[i]       = tbt_Tracks->getInt(33, i);
       }
 
-      l = mc_Particle->getRows();
-      if (l != -1) {
-        MC_Particle_pid_vec.resize(l);
-        MC_Particle_px_vec.resize(l);
-        MC_Particle_py_vec.resize(l);
-        MC_Particle_pz_vec.resize(l);
-        MC_Particle_vx_vec.resize(l);
-        MC_Particle_vy_vec.resize(l);
-        MC_Particle_vz_vec.resize(l);
-        MC_Particle_vt_vec.resize(l);
-        for (int i = 0; i < l; i++) {
-          MC_Particle_pid_vec[i] = mc_Particle->getInt(0, i);
-          MC_Particle_px_vec[i]  = mc_Particle->getFloat(1, i);
-          MC_Particle_py_vec[i]  = mc_Particle->getFloat(2, i);
-          MC_Particle_pz_vec[i]  = mc_Particle->getFloat(3, i);
-          MC_Particle_vx_vec[i]  = mc_Particle->getFloat(4, i);
-          MC_Particle_vy_vec[i]  = mc_Particle->getFloat(5, i);
-          MC_Particle_vz_vec[i]  = mc_Particle->getFloat(6, i);
-          MC_Particle_vt_vec[i]  = mc_Particle->getFloat(7, i);
-        }
+      l = tbt_Crosses->getRows();
+      TBT_Crosses_id_vec.resize(l);
+      TBT_Crosses_sector_vec.resize(l);
+      TBT_Crosses_region_vec.resize(l);
+      TBT_Crosses_x_vec.resize(l);
+      TBT_Crosses_y_vec.resize(l);
+      TBT_Crosses_z_vec.resize(l);
+      TBT_Crosses_err_x_vec.resize(l);
+      TBT_Crosses_err_y_vec.resize(l);
+      TBT_Crosses_err_z_vec.resize(l);
+      TBT_Crosses_ux_vec.resize(l);
+      TBT_Crosses_uy_vec.resize(l);
+      TBT_Crosses_uz_vec.resize(l);
+      TBT_Crosses_err_ux_vec.resize(l);
+      TBT_Crosses_err_uy_vec.resize(l);
+      TBT_Crosses_err_uz_vec.resize(l);
+
+      for (int i = 0; i < l; i++) {
+        TBT_Crosses_id_vec[i]     = tbt_Crosses->getInt(0, i);
+        TBT_Crosses_sector_vec[i] = tbt_Crosses->getInt(2, i);
+        TBT_Crosses_region_vec[i] = tbt_Crosses->getInt(3, i);
+        TBT_Crosses_x_vec[i]      = tbt_Crosses->getFloat(4, i);
+        TBT_Crosses_y_vec[i]      = tbt_Crosses->getFloat(5, i);
+        TBT_Crosses_z_vec[i]      = tbt_Crosses->getFloat(6, i);
+        TBT_Crosses_err_x_vec[i]  = tbt_Crosses->getFloat(7, i);
+        TBT_Crosses_err_y_vec[i]  = tbt_Crosses->getFloat(8, i);
+        TBT_Crosses_err_z_vec[i]  = tbt_Crosses->getFloat(9, i);
+        TBT_Crosses_ux_vec[i]     = tbt_Crosses->getFloat(10, i);
+        TBT_Crosses_uy_vec[i]     = tbt_Crosses->getFloat(11, i);
+        TBT_Crosses_uz_vec[i]     = tbt_Crosses->getFloat(12, i);
+        TBT_Crosses_err_ux_vec[i] = tbt_Crosses->getFloat(13, i);
+        TBT_Crosses_err_uy_vec[i] = tbt_Crosses->getFloat(14, i);
+        TBT_Crosses_err_uz_vec[i] = tbt_Crosses->getFloat(15, i);
+      }
+
+      l = tbt_Hits->getRows();
+      TBT_Hits_id_vec.resize(l);
+      TBT_Hits_sector_vec.resize(l);
+      TBT_Hits_superlayer_vec.resize(l);
+      TBT_Hits_layer_vec.resize(l);
+      TBT_Hits_wire_vec.resize(l);
+      TBT_Hits_trkID_vec.resize(l);
+      TBT_Hits_doca_vec.resize(l);
+      TBT_Hits_docaError_vec.resize(l);
+      TBT_Hits_trkDoca_vec.resize(l);
+      TBT_Hits_timeResidual_vec.resize(l);
+      TBT_Hits_fitResidual_vec.resize(l);
+
+      for (int i = 0; i < l; i++) {
+        TBT_Hits_id_vec[i]           = tbt_Hits->getInt(0, i);
+        TBT_Hits_sector_vec[i]       = tbt_Hits->getInt(2, i);
+        TBT_Hits_superlayer_vec[i]   = tbt_Hits->getInt(3, i);
+        TBT_Hits_layer_vec[i]        = tbt_Hits->getInt(4, i);
+        TBT_Hits_wire_vec[i]         = tbt_Hits->getInt(5, i);
+        TBT_Hits_doca_vec[i]         = tbt_Hits->getFloat(7, i);
+        TBT_Hits_docaError_vec[i]    = tbt_Hits->getFloat(8, i);
+        TBT_Hits_trkDoca_vec[i]      = tbt_Hits->getFloat(9, i);
+        TBT_Hits_timeResidual_vec[i] = tbt_Hits->getFloat(10, i);
+        TBT_Hits_fitResidual_vec[i]  = tbt_Hits->getFloat(11, i);
+        TBT_Hits_trkID_vec[i]        = tbt_Hits->getInt(22, i);
       }
     }
 
@@ -824,6 +1068,7 @@ int main(int argc, char** argv) {
     }
 
     clas12->Fill();
+    /*
     REC_Event_category_vec.clear();
     REC_Event_topology_vec.clear();
     REC_Event_beamCharge_vec.clear();
@@ -985,6 +1230,7 @@ int main(int argc, char** argv) {
     MC_Particle_vy_vec.clear();
     MC_Particle_vz_vec.clear();
     MC_Particle_vt_vec.clear();
+    */
   }
   OutputFile->cd();
   clas12->Write();
