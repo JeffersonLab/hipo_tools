@@ -986,6 +986,7 @@ int main(int argc, char** argv) {
         TBT_Crosses_err_uz_vec[i] = tbt_Crosses->getFloat(15, i);
       }
 
+      l = tbt_Hits->getRows();
       TBT_Hits_id_vec.resize(l);
       TBT_Hits_sector_vec.resize(l);
       TBT_Hits_superlayer_vec.resize(l);
@@ -997,6 +998,20 @@ int main(int argc, char** argv) {
       TBT_Hits_trkDoca_vec.resize(l);
       TBT_Hits_timeResidual_vec.resize(l);
       TBT_Hits_fitResidual_vec.resize(l);
+
+      for (int i = 0; i < l; i++) {
+        TBT_Hits_id_vec[i]           = tbt_Hits->getInt(0, i);
+        TBT_Hits_sector_vec[i]       = tbt_Hits->getInt(2, i);
+        TBT_Hits_superlayer_vec[i]   = tbt_Hits->getInt(3, i);
+        TBT_Hits_layer_vec[i]        = tbt_Hits->getInt(4, i);
+        TBT_Hits_wire_vec[i]         = tbt_Hits->getInt(5, i);
+        TBT_Hits_doca_vec[i]         = tbt_Hits->getFloat(7, i);
+        TBT_Hits_docaError_vec[i]    = tbt_Hits->getFloat(8, i);
+        TBT_Hits_trkDoca_vec[i]      = tbt_Hits->getFloat(9, i);
+        TBT_Hits_timeResidual_vec[i] = tbt_Hits->getFloat(10, i);
+        TBT_Hits_fitResidual_vec[i]  = tbt_Hits->getFloat(11, i);
+        TBT_Hits_trkID_vec[i]        = tbt_Hits->getInt(22, i);
+      }
     }
 
     if (VertDoca) {
