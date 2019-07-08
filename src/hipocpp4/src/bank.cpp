@@ -257,7 +257,7 @@ namespace hipo {
       int offset = bankSchema.getOffset(item, index, bankRows);
       return getFloatAt(offset);
     }
-    return 0.0;
+    return std::nanf("-99");
   }
 
   double bank::getDouble(const char* name, int index) {
@@ -266,7 +266,7 @@ namespace hipo {
       int offset = bankSchema.getOffset(item, index, bankRows);
       return getDoubleAt(offset);
     }
-    return 0.0;
+    return std::nanf("-99");
   }
 
   long bank::getLong(const char* name, int index) {

@@ -73,7 +73,9 @@ int main(int argc, char** argv) {
   auto rec_Calorimeter   = std::make_shared<hipo::bank>(dict->getSchema("REC::Calorimeter"));
   auto rec_CovMat        = std::make_shared<hipo::bank>(dict->getSchema("REC::CovMat"));
   auto mc_Header         = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
+  auto mc_Event          = std::make_shared<hipo::bank>(dict->getSchema("MC::Event"));
   auto mc_Particle       = std::make_shared<hipo::bank>(dict->getSchema("MC::Particle"));
+  auto mc_Lund           = std::make_shared<hipo::bank>(dict->getSchema("MC::Lund"));
 
   std::vector<long>   REC_Event_category_vec;
   std::vector<long>   REC_Event_topology_vec;
@@ -225,18 +227,34 @@ int main(int argc, char** argv) {
   std::vector<float>  REC_Traj_cy_vec;
   std::vector<float>  REC_Traj_cz_vec;
   std::vector<float>  REC_Traj_path_vec;
-  std::vector<int>    MC_Header_run_vec;
-  std::vector<int>    MC_Header_event_vec;
-  std::vector<int>    MC_Header_type_vec;
-  std::vector<float>  MC_Header_helicity_vec;
-  std::vector<int>    MC_Particle_pid_vec;
-  std::vector<float>  MC_Particle_px_vec;
-  std::vector<float>  MC_Particle_py_vec;
-  std::vector<float>  MC_Particle_pz_vec;
-  std::vector<float>  MC_Particle_vx_vec;
-  std::vector<float>  MC_Particle_vy_vec;
-  std::vector<float>  MC_Particle_vz_vec;
-  std::vector<float>  MC_Particle_vt_vec;
+
+  std::vector<int>   MC_Header_run_vec;
+  std::vector<int>   MC_Header_event_vec;
+  std::vector<int>   MC_Header_type_vec;
+  std::vector<float> MC_Header_helicity_vec;
+
+  std::vector<int>   MC_Event_npart_vec;
+  std::vector<float> MC_Event_ebeam_vec;
+  std::vector<float> MC_Event_weight_vec;
+
+  std::vector<int>   MC_Particle_pid_vec;
+  std::vector<float> MC_Particle_px_vec;
+  std::vector<float> MC_Particle_py_vec;
+  std::vector<float> MC_Particle_pz_vec;
+  std::vector<float> MC_Particle_vx_vec;
+  std::vector<float> MC_Particle_vy_vec;
+  std::vector<float> MC_Particle_vz_vec;
+  std::vector<float> MC_Particle_vt_vec;
+
+  std::vector<int>   MC_Lund_pid_vec;
+  std::vector<float> MC_Lund_mass_vec;
+  std::vector<float> MC_Lund_E_vec;
+  std::vector<float> MC_Lund_px_vec;
+  std::vector<float> MC_Lund_py_vec;
+  std::vector<float> MC_Lund_pz_vec;
+  std::vector<float> MC_Lund_vx_vec;
+  std::vector<float> MC_Lund_vy_vec;
+  std::vector<float> MC_Lund_vz_vec;
 
   clas12->Branch("REC_Event_category", &REC_Event_category_vec);
   clas12->Branch("REC_Event_topology", &REC_Event_topology_vec);
@@ -398,6 +416,11 @@ int main(int argc, char** argv) {
     clas12->Branch("MC_Header_event", &MC_Header_event_vec);
     clas12->Branch("MC_Header_type", &MC_Header_type_vec);
     clas12->Branch("MC_Header_helicity", &MC_Header_helicity_vec);
+
+    clas12->Branch("MC_Event_npart_vec", &MC_Event_npart_vec);
+    clas12->Branch("MC_Event_ebeam_vec", &MC_Event_ebeam_vec);
+    clas12->Branch("MC_Event_weight_vec", &MC_Event_weight_vec);
+
     clas12->Branch("MC_Particle_pid", &MC_Particle_pid_vec);
     clas12->Branch("MC_Particle_px", &MC_Particle_px_vec);
     clas12->Branch("MC_Particle_py", &MC_Particle_py_vec);
@@ -406,6 +429,16 @@ int main(int argc, char** argv) {
     clas12->Branch("MC_Particle_vy", &MC_Particle_vy_vec);
     clas12->Branch("MC_Particle_vz", &MC_Particle_vz_vec);
     clas12->Branch("MC_Particle_vt", &MC_Particle_vt_vec);
+
+    clas12->Branch("MC_Lund_pid_vec", &MC_Lund_pid_vec);
+    clas12->Branch("MC_Lund_mass_vec", &MC_Lund_mass_vec);
+    clas12->Branch("MC_Lund_E_vec", &MC_Lund_E_vec);
+    clas12->Branch("MC_Lund_px_vec", &MC_Lund_px_vec);
+    clas12->Branch("MC_Lund_py_vec", &MC_Lund_py_vec);
+    clas12->Branch("MC_Lund_pz_vec", &MC_Lund_pz_vec);
+    clas12->Branch("MC_Lund_vx_vec", &MC_Lund_vx_vec);
+    clas12->Branch("MC_Lund_vy_vec", &MC_Lund_vy_vec);
+    clas12->Branch("MC_Lund_vz_vec", &MC_Lund_vz_vec);
   }
 
   int  entry      = 0;
@@ -430,10 +463,86 @@ int main(int argc, char** argv) {
     if (is_mc) {
       hipo_event->getStructure(*mc_Header);
       hipo_event->getStructure(*mc_Particle);
+      hipo_event->getStructure(*mc_Event);
+      hipo_event->getStructure(*mc_Lund);
     }
 
     if (!is_batch && (++entry % 10000) == 0)
       std::cout << "\t" << floor(100 * entry / tot_hipo_events) << "%\r\r" << std::flush;
+
+    if (is_mc) {
+
+      l = mc_Header->getRows();
+      if (l != -1) {
+        MC_Header_run_vec.resize(l);
+        MC_Header_event_vec.resize(l);
+        MC_Header_type_vec.resize(l);
+        MC_Header_helicity_vec.resize(l);
+        for (int i = 0; i < l; i++) {
+          MC_Header_run_vec[i]      = mc_Header->getInt(0, i);
+          MC_Header_event_vec[i]    = mc_Header->getInt(1, i);
+          MC_Header_type_vec[i]     = mc_Header->getInt(2, i);
+          MC_Header_helicity_vec[i] = mc_Header->getFloat(3, i);
+        }
+      }
+
+      l = mc_Event->getRows();
+      MC_Event_npart_vec.resize(l);
+      MC_Event_ebeam_vec.resize(l);
+      MC_Event_weight_vec.resize(l);
+      for (int i = 0; i < l; i++) {
+        MC_Event_npart_vec[i]  = mc_Event->getInt(0, i);
+        MC_Event_ebeam_vec[i]  = mc_Event->getFloat(6, i);
+        MC_Event_weight_vec[i] = mc_Event->getFloat(9, i);
+      }
+
+      l = mc_Particle->getRows();
+      if (l != -1) {
+        MC_Particle_pid_vec.resize(l);
+        MC_Particle_px_vec.resize(l);
+        MC_Particle_py_vec.resize(l);
+        MC_Particle_pz_vec.resize(l);
+        MC_Particle_vx_vec.resize(l);
+        MC_Particle_vy_vec.resize(l);
+        MC_Particle_vz_vec.resize(l);
+        MC_Particle_vt_vec.resize(l);
+        for (int i = 0; i < l; i++) {
+          MC_Particle_pid_vec[i] = mc_Particle->getInt(0, i);
+          MC_Particle_px_vec[i]  = mc_Particle->getFloat(1, i);
+          MC_Particle_py_vec[i]  = mc_Particle->getFloat(2, i);
+          MC_Particle_pz_vec[i]  = mc_Particle->getFloat(3, i);
+          MC_Particle_vx_vec[i]  = mc_Particle->getFloat(4, i);
+          MC_Particle_vy_vec[i]  = mc_Particle->getFloat(5, i);
+          MC_Particle_vz_vec[i]  = mc_Particle->getFloat(6, i);
+          MC_Particle_vt_vec[i]  = mc_Particle->getFloat(7, i);
+        }
+      }
+
+      l = mc_Lund->getRows();
+      if (l != -1) {
+        MC_Lund_pid_vec.resize(l);
+        MC_Lund_px_vec.resize(l);
+        MC_Lund_py_vec.resize(l);
+        MC_Lund_pz_vec.resize(l);
+        MC_Lund_vx_vec.resize(l);
+        MC_Lund_vy_vec.resize(l);
+        MC_Lund_vz_vec.resize(l);
+        MC_Lund_mass_vec.resize(l);
+        MC_Lund_E_vec.resize(l);
+
+        for (int i = 0; i < l; i++) {
+          MC_Lund_pid_vec[i]  = mc_Lund->getInt(3, i);
+          MC_Lund_px_vec[i]   = mc_Lund->getFloat(6, i);
+          MC_Lund_py_vec[i]   = mc_Lund->getFloat(7, i);
+          MC_Lund_pz_vec[i]   = mc_Lund->getFloat(8, i);
+          MC_Lund_E_vec[i]    = mc_Lund->getFloat(9, i);
+          MC_Lund_mass_vec[i] = mc_Lund->getFloat(10, i);
+          MC_Lund_vx_vec[i]   = mc_Lund->getFloat(11, i);
+          MC_Lund_vy_vec[i]   = mc_Lund->getFloat(12, i);
+          MC_Lund_vz_vec[i]   = mc_Lund->getFloat(13, i);
+        }
+      }
+    }
 
     l = rec_Event->getRows();
     if (l != -1) {
@@ -724,45 +833,6 @@ int main(int argc, char** argv) {
           REC_CovMat_C44_vec[i]    = rec_CovMat->getFloat(14, i);
           REC_CovMat_C45_vec[i]    = rec_CovMat->getFloat(15, i);
           REC_CovMat_C55_vec[i]    = rec_CovMat->getFloat(16, i);
-        }
-      }
-    }
-
-    if (is_mc) {
-
-      l = mc_Header->getRows();
-      if (l != -1) {
-        MC_Header_run_vec.resize(l);
-        MC_Header_event_vec.resize(l);
-        MC_Header_type_vec.resize(l);
-        MC_Header_helicity_vec.resize(l);
-        for (int i = 0; i < l; i++) {
-          MC_Header_run_vec[i]      = mc_Header->getInt(0, i);
-          MC_Header_event_vec[i]    = mc_Header->getInt(1, i);
-          MC_Header_type_vec[i]     = mc_Header->getInt(2, i);
-          MC_Header_helicity_vec[i] = mc_Header->getFloat(3, i);
-        }
-      }
-
-      l = mc_Particle->getRows();
-      if (l != -1) {
-        MC_Particle_pid_vec.resize(l);
-        MC_Particle_px_vec.resize(l);
-        MC_Particle_py_vec.resize(l);
-        MC_Particle_pz_vec.resize(l);
-        MC_Particle_vx_vec.resize(l);
-        MC_Particle_vy_vec.resize(l);
-        MC_Particle_vz_vec.resize(l);
-        MC_Particle_vt_vec.resize(l);
-        for (int i = 0; i < l; i++) {
-          MC_Particle_pid_vec[i] = mc_Particle->getInt(0, i);
-          MC_Particle_px_vec[i]  = mc_Particle->getFloat(1, i);
-          MC_Particle_py_vec[i]  = mc_Particle->getFloat(2, i);
-          MC_Particle_pz_vec[i]  = mc_Particle->getFloat(3, i);
-          MC_Particle_vx_vec[i]  = mc_Particle->getFloat(4, i);
-          MC_Particle_vy_vec[i]  = mc_Particle->getFloat(5, i);
-          MC_Particle_vz_vec[i]  = mc_Particle->getFloat(6, i);
-          MC_Particle_vt_vec[i]  = mc_Particle->getFloat(7, i);
         }
       }
     }
