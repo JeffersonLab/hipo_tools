@@ -252,6 +252,11 @@ int   mc_run;
 int   mc_event;
 int   mc_type;
 float mc_helicity;
+float mc_wegiht;
+
+int   mc_npart;
+float mc_ebeam;
+float mc_weight;
 
 v_int   mc_pid_vec;
 v_float mc_px_vec;

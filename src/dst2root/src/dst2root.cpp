@@ -46,6 +46,10 @@ void init(TTree* clas12, bool is_mc, bool cov, bool VertDoca, bool traj) {
   clas12->Branch("status", &status);
 
   if (is_mc) {
+    clas12->Branch("mc_npart", &mc_npart);
+    clas12->Branch("mc_ebeam", &mc_ebeam);
+    clas12->Branch("mc_weight", &mc_weight);
+
     clas12->Branch("mc_pid", &MC_pid);
     clas12->Branch("mc_px", &MC_px);
     clas12->Branch("mc_py", &MC_py);
@@ -396,6 +400,7 @@ int main(int argc, char** argv) {
   auto rec_Calorimeter   = std::make_shared<hipo::bank>(dict->getSchema("REC::Calorimeter"));
   auto rec_CovMat        = std::make_shared<hipo::bank>(dict->getSchema("REC::CovMat"));
   auto mc_Header         = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
+  auto mc_Event          = std::make_shared<hipo::bank>(dict->getSchema("MC::Event"));
   auto mc_Particle       = std::make_shared<hipo::bank>(dict->getSchema("MC::Particle"));
 
   init(clas12, is_mc, cov, VertDoca, traj);
@@ -425,6 +430,7 @@ int main(int argc, char** argv) {
     if (is_mc) {
       hipo_event->getStructure(*mc_Header);
       hipo_event->getStructure(*mc_Particle);
+      hipo_event->getStructure(*mc_Event);
     }
 
     if (!is_batch && (++entry % 10000) == 0)
@@ -452,6 +458,13 @@ int main(int argc, char** argv) {
         mc_event    = mc_Header->getInt(1, 0);
         mc_type     = mc_Header->getInt(2, 0);
         mc_helicity = mc_Header->getFloat(3, 0);
+      }
+
+      l = mc_Event->getRows();
+      if (l != -1) {
+        mc_npart  = mc_Event->getInt(0, 0);
+        mc_ebeam  = mc_Event->getFloat(6, 0);
+        mc_weight = mc_Event->getFloat(9, 0);
       }
 
       l = mc_Particle->getRows();
