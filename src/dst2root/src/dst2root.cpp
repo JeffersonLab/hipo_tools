@@ -49,26 +49,28 @@ void init(TTree* clas12, bool is_mc, bool cov, bool VertDoca, bool traj) {
     clas12->Branch("mc_npart", &mc_npart);
     clas12->Branch("mc_ebeam", &mc_ebeam);
     clas12->Branch("mc_weight", &mc_weight);
+    clas12->Branch("mc_helicity", &mc_helicity);
 
-    clas12->Branch("mc_pid", &MC_pid);
-    clas12->Branch("mc_px", &MC_px);
-    clas12->Branch("mc_py", &MC_py);
-    clas12->Branch("mc_pz", &MC_pz);
-    clas12->Branch("mc_vx", &MC_vx);
-    clas12->Branch("mc_vy", &MC_vy);
-    clas12->Branch("mc_vz", &MC_vz);
-    clas12->Branch("mc_vt", &MC_vt);
-    clas12->Branch("mc_helicity", &MC_helicity);
+    clas12->Branch("mc_pid", &mc_pid_vec);
+    clas12->Branch("mc_px", &mc_px_vec);
+    clas12->Branch("mc_py", &mc_py_vec);
+    clas12->Branch("mc_pz", &mc_pz_vec);
+    clas12->Branch("mc_vx", &mc_vx_vec);
+    clas12->Branch("mc_vy", &mc_vy_vec);
+    clas12->Branch("mc_vz", &mc_vz_vec);
+    clas12->Branch("mc_vt", &mc_vt_vec);
 
-    clas12->Branch("lund_pid", &Lund_pid);
-    clas12->Branch("lund_px", &Lund_px);
-    clas12->Branch("lund_py", &Lund_py);
-    clas12->Branch("lund_pz", &Lund_pz);
-    clas12->Branch("lund_E", &Lund_E);
-    clas12->Branch("lund_vx", &Lund_vx);
-    clas12->Branch("lund_vy", &Lund_vy);
-    clas12->Branch("lund_vz", &Lund_vz);
-    clas12->Branch("lund_ltime", &Lund_ltime);
+    /*
+        clas12->Branch("lund_pid", &Lund_pid);
+        clas12->Branch("lund_px", &Lund_px);
+        clas12->Branch("lund_py", &Lund_py);
+        clas12->Branch("lund_pz", &Lund_pz);
+        clas12->Branch("lund_E", &Lund_E);
+        clas12->Branch("lund_vx", &Lund_vx);
+        clas12->Branch("lund_vy", &Lund_vy);
+        clas12->Branch("lund_vz", &Lund_vz);
+        clas12->Branch("lund_ltime", &Lund_ltime);
+    */
   }
 
   clas12->Branch("dc_sec", &dc_sec);

@@ -267,16 +267,6 @@ v_float mc_vy_vec;
 v_float mc_vz_vec;
 v_float mc_vt_vec;
 
-v_int   MC_pid;
-v_float MC_helicity;
-v_float MC_px;
-v_float MC_py;
-v_float MC_pz;
-v_float MC_vx;
-v_float MC_vy;
-v_float MC_vz;
-v_float MC_vt;
-
 v_int   Lund_pid;
 v_float Lund_px;
 v_float Lund_py;
