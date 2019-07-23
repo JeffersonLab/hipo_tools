@@ -75,21 +75,27 @@ An example of reading a hipo4 file in python can be found [here](examples/hipo4/
 Converting hipo files
 ---------------------
 
-### toohip4root
+### hipo2root
 
 ```
-$ toohip4root -h
+$ hipo2root -h
 SYNOPSIS
-        toohip4root (<input file> | [-i <input file>]) [-o <output file>] [-f] [-v] [-N <N events>] [-h]
+        hipo2root [-h] [-mc] [-b] [-c] [-v] [-t] [-tbt] [-test] <inputFile.hipo> [<outputFile.root>]
 
 OPTIONS
-        -f, --force force the output to overwrite existing files
-
-        -v, --verbose
-                    turn on verbose output
-
         -h, --help  print help
+        -mc, --MC   Convert dst and mc banks
+        -b, --batch Don't show progress and statistics
+        -c, --cov   Save Covariant Matrix for kinematic fitting
 
+        -v, --VertDoca
+                    Save VertDoca information
+
+        -t, --traj  Save traj information
+        -tbt, --tbt Save TimeBasedTrkg information
+
+        -test, --test
+                    Only convert first 50000 events for testing
 ```
 
 ### dst2root
@@ -101,7 +107,7 @@ files to an offsite location or a personal computer.
 ```
 $ dst2root -h
 SYNOPSIS
-        dst2root [-h] [-mc] [-b] [-r] [-e] [-c] <inputFile.hipo> [<outputFile.root>]
+        src/dst2root/dst2root [-h] [-mc] [-b] [-r] [-e] [-c] [-v] [-t] [-test] [-m <max_size>] <inputFile.hipo> [<outputFile.root>]
 
 OPTIONS
         -h, --help  print help
@@ -110,6 +116,16 @@ OPTIONS
         -r, --rec   Only save events where number of partilces in the event > 0
         -e, --elec  Only save events with good electron as first particle
         -c, --cov   Save Covariant Matrix for kinematic fitting
+
+        -v, --VertDoca
+                    Save VertDoca information
+
+        -t, --traj  Save traj information
+
+        -test, --test
+                    Testing
+
+        <max_size>  Max file size in GB (150GB default)
 ```
 
 The contents of the file have been re-ordered from the original file and places
