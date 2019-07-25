@@ -66,6 +66,7 @@ int main(int argc, char** argv) {
   auto hipo_event = std::make_shared<hipo::event>();
 
   auto rec_ForwardTagger = std::make_shared<hipo::bank>(dict->getSchema("REC::ForwardTagger"));
+  auto rec_VertDoca      = std::make_shared<hipo::bank>(dict->getSchema("REC::VertDoca"));
   auto rec_Track         = std::make_shared<hipo::bank>(dict->getSchema("REC::Track"));
   auto rec_Traj          = std::make_shared<hipo::bank>(dict->getSchema("REC::Traj"));
   auto rec_Cherenkov     = std::make_shared<hipo::bank>(dict->getSchema("REC::Cherenkov"));
@@ -541,6 +542,8 @@ int main(int argc, char** argv) {
       hipo_event->getStructure(*rec_CovMat);
     if (traj)
       hipo_event->getStructure(*rec_Traj);
+    if (VertDoca)
+      hipo_event->getStructure(*rec_VertDoca);
     if (is_mc) {
       hipo_event->getStructure(*mc_Header);
       hipo_event->getStructure(*mc_Particle);
@@ -1015,25 +1018,46 @@ int main(int argc, char** argv) {
     }
 
     if (VertDoca) {
-      // index1/S
-      // index2/S
-      // x/F
-      // y/F
-      // z/F
-      // x1/F
-      // y1/F
-      // z1/F
-      // cx1/F
-      // cy1/F
-      // cz1/F
-      // x2/F
-      // y2/F
-      // z2/F
-      // cx2/F
-      // cy2/F
-      // cz2/F
-      // r/F
-      std::cerr << "VertDoca Not implemented yet" << '\n';
+      l = rec_VertDoca->getRows();
+      REC_VertDoca_index1_vec.resize(l);
+      REC_VertDoca_index2_vec.resize(l);
+      REC_VertDoca_x_vec.resize(l);
+      REC_VertDoca_y_vec.resize(l);
+      REC_VertDoca_z_vec.resize(l);
+      REC_VertDoca_x1_vec.resize(l);
+      REC_VertDoca_y1_vec.resize(l);
+      REC_VertDoca_z1_vec.resize(l);
+      REC_VertDoca_cx1_vec.resize(l);
+      REC_VertDoca_cy1_vec.resize(l);
+      REC_VertDoca_cz1_vec.resize(l);
+      REC_VertDoca_x2_vec.resize(l);
+      REC_VertDoca_y2_vec.resize(l);
+      REC_VertDoca_z2_vec.resize(l);
+      REC_VertDoca_cx2_vec.resize(l);
+      REC_VertDoca_cy2_vec.resize(l);
+      REC_VertDoca_cz2_vec.resize(l);
+      REC_VertDoca_r_vec.resize(l);
+
+      for (int i = 0; i < l; i++) {
+        REC_VertDoca_index1_vec[i] = rec_VertDoca->getInt(0, i);
+        REC_VertDoca_index2_vec[i] = rec_VertDoca->getInt(1, i);
+        REC_VertDoca_x_vec[i]      = rec_VertDoca->getFloat(2, i);
+        REC_VertDoca_y_vec[i]      = rec_VertDoca->getFloat(3, i);
+        REC_VertDoca_z_vec[i]      = rec_VertDoca->getFloat(4, i);
+        REC_VertDoca_x1_vec[i]     = rec_VertDoca->getFloat(5, i);
+        REC_VertDoca_y1_vec[i]     = rec_VertDoca->getFloat(6, i);
+        REC_VertDoca_z1_vec[i]     = rec_VertDoca->getFloat(7, i);
+        REC_VertDoca_cx1_vec[i]    = rec_VertDoca->getFloat(8, i);
+        REC_VertDoca_cy1_vec[i]    = rec_VertDoca->getFloat(9, i);
+        REC_VertDoca_cz1_vec[i]    = rec_VertDoca->getFloat(10, i);
+        REC_VertDoca_x2_vec[i]     = rec_VertDoca->getFloat(11, i);
+        REC_VertDoca_y2_vec[i]     = rec_VertDoca->getFloat(12, i);
+        REC_VertDoca_z2_vec[i]     = rec_VertDoca->getFloat(13, i);
+        REC_VertDoca_cx2_vec[i]    = rec_VertDoca->getFloat(14, i);
+        REC_VertDoca_cy2_vec[i]    = rec_VertDoca->getFloat(15, i);
+        REC_VertDoca_cz2_vec[i]    = rec_VertDoca->getFloat(16, i);
+        REC_VertDoca_r_vec[i]      = rec_VertDoca->getFloat(17, i);
+      }
     }
 
     if (traj) {
