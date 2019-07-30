@@ -168,6 +168,7 @@ namespace hipo {
 
     hipo::record      inputRecord;
     hipo::readerIndex readerEventIndex;
+    std::vector<long> tagsToRead;
 
     void readHeader();
     void readIndex();
@@ -182,6 +183,7 @@ namespace hipo {
     hipo::dictionary* dictionary();
     void              open(const char* filename);
     void              open(std::string filename) { open(filename.c_str()); };
+    void              setTags(int tag) { tagsToRead.push_back(tag); }
     bool              hasNext();
     bool              next();
     long              numEvents() { return readerEventIndex.getMaxEvents(); }
