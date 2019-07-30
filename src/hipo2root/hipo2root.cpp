@@ -339,8 +339,6 @@ int main(int argc, char** argv) {
       hipo_event->getStructure(*rec_CovMat);
     if (traj)
       hipo_event->getStructure(*rec_Traj);
-    if (VertDoca)
-      hipo_event->getStructure(*rec_VertDoca);
     if (is_mc) {
       hipo_event->getStructure(*mc_Header);
       hipo_event->getStructure(*mc_Particle);
