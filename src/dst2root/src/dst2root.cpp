@@ -362,7 +362,7 @@ int main(int argc, char** argv) {
               clipp::option("-t", "--traj").set(traj) % "Save traj information",
               clipp::option("-test", "--test").set(is_test) % "Testing",
               clipp::option("-m", "--max_file_size") &
-                  clipp::value("max_file_size", max_size) % "Max file size in GB (150GB default)",
+                  clipp::value("max_size", max_size) % "Max file size in GB (150GB default)",
               clipp::value("inputFile.hipo", InFileName),
               clipp::opt_value("outputFile.root", OutFileName));
 
