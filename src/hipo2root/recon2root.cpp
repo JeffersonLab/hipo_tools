@@ -26,7 +26,15 @@ int main(int argc, char** argv) {
   if (print_help || argc <= 2) {
     std::cerr << clipp::make_man_page(cli, argv[0]);
     exit(1);
+  } else if (inputFile.find("hipo") == std::string::npos) {
+    std::cerr << "Input file needs to be hipo file => " << inputFile << std::endl;
+    exit(2);
   }
+
+  
+  auto reader = std::make_unique<hipo::reader>(inputFile);
+  auto dict   = std::make_unique<hipo::dictionary>();
+  reader->readDictionary(*dict);
 
   auto OutputFile = std::make_unique<TFile>((outputFile + ".root").c_str(), "RECREATE");
   OutputFile->SetCompressionSettings(404); // kUseAnalysis
@@ -58,9 +66,6 @@ int main(int argc, char** argv) {
   clas12->Branch("chi2pid", chi2pid, "chi2pid[gpart]/F");
   clas12->Branch("status", status, "status[gpart]/I");
 
-  auto reader = std::make_unique<hipo::reader>(inputFile);
-  auto dict   = std::make_unique<hipo::dictionary>();
-  reader->readDictionary(*dict);
   std::unique_ptr<hipo::writer> writer;
   if (hipo_file) {
     writer = std::make_unique<hipo::writer>((outputFile + ".hipo").c_str());
@@ -69,30 +74,6 @@ int main(int argc, char** argv) {
 
   reader->readDictionary(*dict);
   auto rec_Particle = std::make_shared<hipo::bank>(dict->getSchema("REC::Particle"));
-
-  /*
-  Event
-  RUN::config (size = 1)
-  REC::Event (size = 1)
-
-  Physics
-  REC::Particle
-  REC::Calorimeter
-  REC::Scintillator
-  REC::Cherenkov
-  REC::Track
-  REC::Forward Tagger
-  REC::Traj
-  REC::CovMat
-
-  Special
-  (**Not There Yet??**)??
-  HEL::online
-  HEL::flip (tag=1)
-  RUN::scaler (tag=1)
-  RAW::scaler (tag=1)
-  RAW::epics (tag=1)
-   */
 
   auto event    = std::make_unique<hipo::event>();
   auto outEvent = std::make_unique<hipo::event>();

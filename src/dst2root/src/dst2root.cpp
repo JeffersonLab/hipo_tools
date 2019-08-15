@@ -20,7 +20,18 @@
 #include "clipp.h"
 #include "constants.h"
 
-void init(TTree* clas12, bool is_mc, bool cov, bool VertDoca, bool traj) {
+void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
+
+  clas12->Branch("run", &run);
+  clas12->Branch("event", &event);
+  clas12->Branch("unixtime", &unixtime);
+  clas12->Branch("trigger", &trigger);
+  clas12->Branch("timestamp", &timestamp);
+  clas12->Branch("type", &type);
+  clas12->Branch("mode", &mode);
+  clas12->Branch("torus", &torus);
+  clas12->Branch("solenoid", &solenoid);
+
   clas12->Branch("category", &category);
   clas12->Branch("topology", &topology);
   clas12->Branch("beamCharge", &beamCharge);
@@ -59,18 +70,6 @@ void init(TTree* clas12, bool is_mc, bool cov, bool VertDoca, bool traj) {
     clas12->Branch("mc_vy", &mc_vy_vec);
     clas12->Branch("mc_vz", &mc_vz_vec);
     clas12->Branch("mc_vt", &mc_vt_vec);
-
-    /*
-        clas12->Branch("lund_pid", &Lund_pid);
-        clas12->Branch("lund_px", &Lund_px);
-        clas12->Branch("lund_py", &Lund_py);
-        clas12->Branch("lund_pz", &Lund_pz);
-        clas12->Branch("lund_E", &Lund_E);
-        clas12->Branch("lund_vx", &Lund_vx);
-        clas12->Branch("lund_vy", &Lund_vy);
-        clas12->Branch("lund_vz", &Lund_vz);
-        clas12->Branch("lund_ltime", &Lund_ltime);
-    */
   }
 
   clas12->Branch("dc_sec", &dc_sec);
@@ -299,26 +298,6 @@ void init(TTree* clas12, bool is_mc, bool cov, bool VertDoca, bool traj) {
     clas12->Branch("CovMat_45", &CovMat_45);
     clas12->Branch("CovMat_55", &CovMat_55);
   }
-  if (VertDoca) {
-    clas12->Branch("VertDoca_index1", &VertDoca_index1_vec);
-    clas12->Branch("VertDoca_index2", &VertDoca_index2_vec);
-    clas12->Branch("VertDoca_x", &VertDoca_x_vec);
-    clas12->Branch("VertDoca_y", &VertDoca_y_vec);
-    clas12->Branch("VertDoca_z", &VertDoca_z_vec);
-    clas12->Branch("VertDoca_x1", &VertDoca_x1_vec);
-    clas12->Branch("VertDoca_y1", &VertDoca_y1_vec);
-    clas12->Branch("VertDoca_z1", &VertDoca_z1_vec);
-    clas12->Branch("VertDoca_cx1", &VertDoca_cx1_vec);
-    clas12->Branch("VertDoca_cy1", &VertDoca_cy1_vec);
-    clas12->Branch("VertDoca_cz1", &VertDoca_cz1_vec);
-    clas12->Branch("VertDoca_x2", &VertDoca_x2_vec);
-    clas12->Branch("VertDoca_y2", &VertDoca_y2_vec);
-    clas12->Branch("VertDoca_z2", &VertDoca_z2_vec);
-    clas12->Branch("VertDoca_cx2", &VertDoca_cx2_vec);
-    clas12->Branch("VertDoca_cy2", &VertDoca_cy2_vec);
-    clas12->Branch("VertDoca_cz2", &VertDoca_cz2_vec);
-    clas12->Branch("VertDoca_r", &VertDoca_r_vec);
-  }
   if (traj) {
     clas12->Branch("traj_pindex", &traj_pindex_vec);
     clas12->Branch("traj_index", &traj_index_vec);
@@ -346,7 +325,6 @@ int main(int argc, char** argv) {
   bool        good_rec   = false;
   bool        elec_first = false;
   bool        cov        = false;
-  bool        VertDoca   = false;
   bool        traj       = false;
   short       max_size   = 1500;
 
@@ -358,7 +336,6 @@ int main(int argc, char** argv) {
               clipp::option("-e", "--elec").set(elec_first) %
                   "Only save events with good electron as first particle",
               clipp::option("-c", "--cov").set(cov) % "Save Covariant Matrix for kinematic fitting",
-              clipp::option("-v", "--VertDoca").set(VertDoca) % "Save VertDoca information",
               clipp::option("-t", "--traj").set(traj) % "Save traj information",
               clipp::option("-test", "--test").set(is_test) % "Testing",
               clipp::option("-m", "--max_file_size") &
@@ -391,21 +368,34 @@ int main(int argc, char** argv) {
   reader->readDictionary(*dict);
   auto hipo_event = std::make_shared<hipo::event>();
 
-  auto rec_ForwardTagger = std::make_shared<hipo::bank>(dict->getSchema("REC::ForwardTagger"));
-  auto rec_VertDoca      = std::make_shared<hipo::bank>(dict->getSchema("REC::VertDoca"));
-  auto rec_Track         = std::make_shared<hipo::bank>(dict->getSchema("REC::Track"));
-  auto rec_Traj          = std::make_shared<hipo::bank>(dict->getSchema("REC::Traj"));
-  auto rec_Cherenkov     = std::make_shared<hipo::bank>(dict->getSchema("REC::Cherenkov"));
-  auto rec_Event         = std::make_shared<hipo::bank>(dict->getSchema("REC::Event"));
-  auto rec_Particle      = std::make_shared<hipo::bank>(dict->getSchema("REC::Particle"));
-  auto rec_Scintillator  = std::make_shared<hipo::bank>(dict->getSchema("REC::Scintillator"));
-  auto rec_Calorimeter   = std::make_shared<hipo::bank>(dict->getSchema("REC::Calorimeter"));
-  auto rec_CovMat        = std::make_shared<hipo::bank>(dict->getSchema("REC::CovMat"));
-  auto mc_Header         = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
-  auto mc_Event          = std::make_shared<hipo::bank>(dict->getSchema("MC::Event"));
-  auto mc_Particle       = std::make_shared<hipo::bank>(dict->getSchema("MC::Particle"));
+  // Event config
+  auto run_Config = std::make_shared<hipo::bank>(dict->getSchema("RUN::config"));
+  auto rec_Event  = std::make_shared<hipo::bank>(dict->getSchema("REC::Event"));
+  /*
+  auto hel_Online = std::make_shared<hipo::bank>(dict->getSchema("HEL::online"));
+  auto hel_Flip   = std::make_shared<hipo::bank>(dict->getSchema("HEL::flip"));
+  auto run_Scaler = std::make_shared<hipo::bank>(dict->getSchema("RUN::scaler"));
+  auto raw_Scaler = std::make_shared<hipo::bank>(dict->getSchema("RAW::scaler"));
+  auto raw_Epics  = std::make_shared<hipo::bank>(dict->getSchema("RAW::epics"));
+  */
 
-  init(clas12, is_mc, cov, VertDoca, traj);
+  // Physics
+  auto rec_Particle      = std::make_shared<hipo::bank>(dict->getSchema("REC::Particle"));
+  auto rec_Calorimeter   = std::make_shared<hipo::bank>(dict->getSchema("REC::Calorimeter"));
+  auto rec_Scintillator  = std::make_shared<hipo::bank>(dict->getSchema("REC::Scintillator"));
+  auto rec_Cherenkov     = std::make_shared<hipo::bank>(dict->getSchema("REC::Cherenkov"));
+  auto rec_Track         = std::make_shared<hipo::bank>(dict->getSchema("REC::Track"));
+  auto rec_ForwardTagger = std::make_shared<hipo::bank>(dict->getSchema("REC::ForwardTagger"));
+  auto rec_Traj          = std::make_shared<hipo::bank>(dict->getSchema("REC::Traj"));
+  auto rec_CovMat        = std::make_shared<hipo::bank>(dict->getSchema("REC::CovMat"));
+
+  // Monte Carlo only banks
+  auto mc_Header   = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
+  auto mc_Event    = std::make_shared<hipo::bank>(dict->getSchema("MC::Event"));
+  auto mc_Particle = std::make_shared<hipo::bank>(dict->getSchema("MC::Particle"));
+  auto mc_Lund     = std::make_shared<hipo::bank>(dict->getSchema("MC::Lund"));
+
+  init(clas12, is_mc, cov, traj);
 
   int  entry                = 0;
   int  l                    = 0;
@@ -417,27 +407,34 @@ int main(int argc, char** argv) {
     if (is_test && entry > 50000)
       break;
     reader->read(*hipo_event);
+    hipo_event->getStructure(*rec_Event);
+    hipo_event->getStructure(*run_Config);
+    /*
+    hipo_event->getStructure(*hel_Online);
+    hipo_event->getStructure(*hel_Flip);
+    hipo_event->getStructure(*run_Scaler);
+    hipo_event->getStructure(*raw_Scaler);
+    hipo_event->getStructure(*raw_Epics);
+    */
     hipo_event->getStructure(*rec_Particle);
     hipo_event->getStructure(*rec_ForwardTagger);
     hipo_event->getStructure(*rec_Track);
     hipo_event->getStructure(*rec_Cherenkov);
-    hipo_event->getStructure(*rec_Event);
     hipo_event->getStructure(*rec_Scintillator);
     hipo_event->getStructure(*rec_Calorimeter);
-    hipo_event->getStructure(*rec_Traj);
-    if (VertDoca)
-      hipo_event->getStructure(*rec_VertDoca);
     if (cov)
       hipo_event->getStructure(*rec_CovMat);
+    if (traj)
+      hipo_event->getStructure(*rec_Traj);
     if (is_mc) {
       hipo_event->getStructure(*mc_Header);
       hipo_event->getStructure(*mc_Particle);
       hipo_event->getStructure(*mc_Event);
+      hipo_event->getStructure(*mc_Lund);
     }
 
     if (!is_batch && (++entry % 10000) == 0)
       std::cout << "\t" << floor(100 * entry / tot_hipo_events) << "%\r\r" << std::flush;
-
     tot_events_processed++;
 
     l = rec_Event->getRows();
@@ -451,6 +448,19 @@ int main(int argc, char** argv) {
       helicity    = rec_Event->getByte(6, 0);
       helicityRaw = rec_Event->getByte(7, 0);
       procTime    = rec_Event->getFloat(8, 0);
+    }
+
+    l = run_Config->getRows();
+    if (l != -1) {
+      run       = run_Config->getInt(0, 0);
+      event     = run_Config->getInt(1, 0);
+      unixtime  = run_Config->getInt(2, 0);
+      trigger   = run_Config->getLong(3, 0);
+      timestamp = run_Config->getLong(4, 0);
+      type      = run_Config->getInt(5, 0);
+      mode      = run_Config->getInt(6, 0);
+      torus     = run_Config->getFloat(7, 0);
+      solenoid  = run_Config->getFloat(8, 0);
     }
 
     if (is_mc) {
@@ -1348,49 +1358,6 @@ int main(int argc, char** argv) {
             CovMat_55[i] = rec_CovMat->getFloat(16, k);
           }
         }
-      }
-    }
-
-    if (VertDoca) {
-      l = rec_VertDoca->getRows();
-      VertDoca_index1_vec.resize(l);
-      VertDoca_index2_vec.resize(l);
-      VertDoca_x_vec.resize(l);
-      VertDoca_y_vec.resize(l);
-      VertDoca_z_vec.resize(l);
-      VertDoca_x1_vec.resize(l);
-      VertDoca_y1_vec.resize(l);
-      VertDoca_z1_vec.resize(l);
-      VertDoca_cx1_vec.resize(l);
-      VertDoca_cy1_vec.resize(l);
-      VertDoca_cz1_vec.resize(l);
-      VertDoca_x2_vec.resize(l);
-      VertDoca_y2_vec.resize(l);
-      VertDoca_z2_vec.resize(l);
-      VertDoca_cx2_vec.resize(l);
-      VertDoca_cy2_vec.resize(l);
-      VertDoca_cz2_vec.resize(l);
-      VertDoca_r_vec.resize(l);
-
-      for (int i = 0; i < l; i++) {
-        VertDoca_index1_vec[i] = rec_VertDoca->getInt(0, i);
-        VertDoca_index2_vec[i] = rec_VertDoca->getInt(1, i);
-        VertDoca_x_vec[i]      = rec_VertDoca->getFloat(2, i);
-        VertDoca_y_vec[i]      = rec_VertDoca->getFloat(3, i);
-        VertDoca_z_vec[i]      = rec_VertDoca->getFloat(4, i);
-        VertDoca_x1_vec[i]     = rec_VertDoca->getFloat(5, i);
-        VertDoca_y1_vec[i]     = rec_VertDoca->getFloat(6, i);
-        VertDoca_z1_vec[i]     = rec_VertDoca->getFloat(7, i);
-        VertDoca_cx1_vec[i]    = rec_VertDoca->getFloat(8, i);
-        VertDoca_cy1_vec[i]    = rec_VertDoca->getFloat(9, i);
-        VertDoca_cz1_vec[i]    = rec_VertDoca->getFloat(10, i);
-        VertDoca_x2_vec[i]     = rec_VertDoca->getFloat(11, i);
-        VertDoca_y2_vec[i]     = rec_VertDoca->getFloat(12, i);
-        VertDoca_z2_vec[i]     = rec_VertDoca->getFloat(13, i);
-        VertDoca_cx2_vec[i]    = rec_VertDoca->getFloat(14, i);
-        VertDoca_cy2_vec[i]    = rec_VertDoca->getFloat(15, i);
-        VertDoca_cz2_vec[i]    = rec_VertDoca->getFloat(16, i);
-        VertDoca_r_vec[i]      = rec_VertDoca->getFloat(17, i);
       }
     }
 

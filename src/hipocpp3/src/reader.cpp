@@ -3,8 +3,8 @@
  * (c) 2017.
  */
 
-#include "hipo3/hipoexceptions.h"
 #include "hipo3/reader.h"
+#include "hipo3/hipoexceptions.h"
 #include "hipo3/record.h"
 
 #include <cstdlib>
@@ -55,6 +55,7 @@ namespace hipo {
     inputStream.seekg(0, std::ios_base::beg);
     if (inputStream.is_open() == false) {
       std::cerr << "[ERROR] something went wrong with openning file : " << filename << std::endl;
+      exit(1);
       return;
     }
     readHeader();

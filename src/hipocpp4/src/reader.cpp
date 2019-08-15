@@ -6,7 +6,7 @@
 #include "hipo4/reader.h"
 #include "hipo4/hipoexceptions.h"
 #include "hipo4/record.h"
-
+#include <iostream>
 #include <cstdlib>
 /**
  * HIPO namespace is used for the classes that read write
@@ -46,8 +46,8 @@ namespace hipo {
     inputStreamSize = inputStream.tellg();
     inputStream.seekg(0, std::ios_base::beg);
     if (inputStream.is_open() == false) {
-      printf("[ERROR] something went wrong with openning file : %s\n", filename);
-      return;
+      std::cerr << "[ERROR] something went wrong with openning file : " << filename << std::endl;
+      exit(1);
     }
     readHeader();
     readIndex();

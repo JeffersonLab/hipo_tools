@@ -1,2 +1,7 @@
 {
+    "cmake.configureArgs": [
+        "-DBUILD_EXAMPLES=ON",
+        "-DBUILD_HIPOPY=ON",
+        "-DBUILD_FPIC=OFF"
+    ]
 }

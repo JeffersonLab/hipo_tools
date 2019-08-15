@@ -226,12 +226,7 @@ namespace hipo {
   int record::getUncompressed(const char* data, char* dest, int dataLength,
                               int dataLengthUncompressed) {
 #ifdef __LZ4__
-
-#ifdef __FAST__
-    int result = LZ4_decompress_fast(data, dest, dataLengthUncompressed);
-#else
     int result = LZ4_decompress_safe(data, dest, dataLength, dataLengthUncompressed);
-#endif
     return result;
 #else
     std::cerr >> "LZ4 compression is not supported." << std::endl;
@@ -248,11 +243,7 @@ namespace hipo {
 
 #ifdef __LZ4__
     char* output = (char*)malloc(dataLengthUncompressed);
-#ifdef __FAST__
     int result = LZ4_decompress_safe(data, output, dataLength, dataLengthUncompressed);
-#else
-    int result = LZ4_decompress_fast(data, output, dataLengthUncompressed);
-#endif
     return output;
 #else
     std::cerr >> "LZ4 compression is not supported." << std::endl;
