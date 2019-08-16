@@ -6,7 +6,7 @@
 #include "hipo4/reader.h"
 #include "hipo4/hipoexceptions.h"
 #include "hipo4/record.h"
-
+#include <iostream>
 #include <cstdlib>
 /**
  * HIPO namespace is used for the classes that read write
@@ -46,8 +46,8 @@ namespace hipo {
     inputStreamSize = inputStream.tellg();
     inputStream.seekg(0, std::ios_base::beg);
     if (inputStream.is_open() == false) {
-      printf("[ERROR] something went wrong with openning file : %s\n", filename);
-      return;
+      std::cerr << "[ERROR] something went wrong with openning file : " << filename << std::endl;
+      exit(1);
     }
     readHeader();
     readIndex();
@@ -110,10 +110,18 @@ namespace hipo {
       int  entries  = base.getIntAt(rows * 12 + i * 4);
       long uid1     = base.getLongAt(rows * 16 + i * 8);
       long uid2     = base.getLongAt(rows * 24 + i * 8);
-      // printf("record # %4d POSITION = %12lu , LENGTH = %12d , ENTRIES = %6d , UID = %12lu
-      // %12lu\n", i,position,length,entries, uid1,uid2);
-      readerEventIndex.addSize(entries);
-      readerEventIndex.addPosition(position);
+
+      if (tagsToRead.size() == 0) {
+        readerEventIndex.addPosition(position);
+        readerEventIndex.addSize(entries);
+      } else {
+        for (auto& tag : tagsToRead) {
+          if (tag == uid1) {
+            readerEventIndex.addSize(entries);
+            readerEventIndex.addPosition(position);
+          }
+        }
+      }
     }
 
     readerEventIndex.rewind();

@@ -16,6 +16,7 @@
 #include "TROOT.h"
 #include "TTree.h"
 // Hipo libs and clipp
+#include "banks.h"
 #include "clipp.h"
 #include "hipo4/reader.h"
 
@@ -29,7 +30,6 @@ int main(int argc, char** argv) {
   bool        is_test    = false;
   bool        print_help = false;
   bool        cov        = false;
-  bool        VertDoca   = false;
   bool        traj       = false;
   bool        tbt        = false;
 
@@ -37,7 +37,6 @@ int main(int argc, char** argv) {
               clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
               clipp::option("-b", "--batch").set(is_batch) % "Don't show progress and statistics",
               clipp::option("-c", "--cov").set(cov) % "Save Covariant Matrix for kinematic fitting",
-              clipp::option("-v", "--VertDoca").set(VertDoca) % "Save VertDoca information",
               clipp::option("-t", "--traj").set(traj) % "Save traj information",
               clipp::option("-tbt", "--tbt").set(tbt) % "Save TimeBasedTrkg information",
               clipp::option("-test", "--test").set(is_test) %
@@ -65,247 +64,58 @@ int main(int argc, char** argv) {
   reader->readDictionary(*dict);
   auto hipo_event = std::make_shared<hipo::event>();
 
-  auto rec_ForwardTagger = std::make_shared<hipo::bank>(dict->getSchema("REC::ForwardTagger"));
-  auto rec_Track         = std::make_shared<hipo::bank>(dict->getSchema("REC::Track"));
-  auto rec_Traj          = std::make_shared<hipo::bank>(dict->getSchema("REC::Traj"));
-  auto rec_Cherenkov     = std::make_shared<hipo::bank>(dict->getSchema("REC::Cherenkov"));
-  auto rec_Event         = std::make_shared<hipo::bank>(dict->getSchema("REC::Event"));
-  auto rec_Particle      = std::make_shared<hipo::bank>(dict->getSchema("REC::Particle"));
-  auto rec_Scintillator  = std::make_shared<hipo::bank>(dict->getSchema("REC::Scintillator"));
-  auto rec_Calorimeter   = std::make_shared<hipo::bank>(dict->getSchema("REC::Calorimeter"));
-  auto rec_CovMat        = std::make_shared<hipo::bank>(dict->getSchema("REC::CovMat"));
-  auto mc_Header         = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
-  auto mc_Event          = std::make_shared<hipo::bank>(dict->getSchema("MC::Event"));
-  auto mc_Particle       = std::make_shared<hipo::bank>(dict->getSchema("MC::Particle"));
-  auto mc_Lund           = std::make_shared<hipo::bank>(dict->getSchema("MC::Lund"));
+  // Event config
+  auto run_Config = std::make_shared<hipo::bank>(dict->getSchema("RUN::config"));
+  auto rec_Event  = std::make_shared<hipo::bank>(dict->getSchema("REC::Event"));
+  /*
+  auto hel_Online = std::make_shared<hipo::bank>(dict->getSchema("HEL::online"));
+  auto hel_Flip   = std::make_shared<hipo::bank>(dict->getSchema("HEL::flip"));
+  auto run_Scaler = std::make_shared<hipo::bank>(dict->getSchema("RUN::scaler"));
+  auto raw_Scaler = std::make_shared<hipo::bank>(dict->getSchema("RAW::scaler"));
+  auto raw_Epics  = std::make_shared<hipo::bank>(dict->getSchema("RAW::epics"));
+  */
 
+  // Physics
+  auto rec_Particle      = std::make_shared<hipo::bank>(dict->getSchema("REC::Particle"));
+  auto rec_Calorimeter   = std::make_shared<hipo::bank>(dict->getSchema("REC::Calorimeter"));
+  auto rec_Scintillator  = std::make_shared<hipo::bank>(dict->getSchema("REC::Scintillator"));
+  auto rec_Cherenkov     = std::make_shared<hipo::bank>(dict->getSchema("REC::Cherenkov"));
+  auto rec_Track         = std::make_shared<hipo::bank>(dict->getSchema("REC::Track"));
+  auto rec_ForwardTagger = std::make_shared<hipo::bank>(dict->getSchema("REC::ForwardTagger"));
+  auto rec_Traj          = std::make_shared<hipo::bank>(dict->getSchema("REC::Traj"));
+  auto rec_CovMat        = std::make_shared<hipo::bank>(dict->getSchema("REC::CovMat"));
+
+  // Monte Carlo only banks
+  auto mc_Header   = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
+  auto mc_Event    = std::make_shared<hipo::bank>(dict->getSchema("MC::Event"));
+  auto mc_Particle = std::make_shared<hipo::bank>(dict->getSchema("MC::Particle"));
+  auto mc_Lund     = std::make_shared<hipo::bank>(dict->getSchema("MC::Lund"));
+
+  // Time Based Tracking Banks
   auto tbt_Tracks  = std::make_shared<hipo::bank>(dict->getSchema("TimeBasedTrkg::TBTracks"));
   auto tbt_Crosses = std::make_shared<hipo::bank>(dict->getSchema("TimeBasedTrkg::TBCrosses"));
   auto tbt_Hits    = std::make_shared<hipo::bank>(dict->getSchema("TimeBasedTrkg::TBHits"));
 
-  std::vector<long>   REC_Event_category_vec;
-  std::vector<long>   REC_Event_topology_vec;
-  std::vector<float>  REC_Event_beamCharge_vec;
-  std::vector<double> REC_Event_liveTime_vec;
-  std::vector<float>  REC_Event_startTime_vec;
-  std::vector<float>  REC_Event_RFTime_vec;
-  std::vector<int>    REC_Event_helicity_vec;
-  std::vector<int>    REC_Event_helicityRaw_vec;
-  std::vector<float>  REC_Event_procTime_vec;
-  std::vector<int>    REC_Particle_pid_vec;
-  std::vector<float>  REC_Particle_px_vec;
-  std::vector<float>  REC_Particle_py_vec;
-  std::vector<float>  REC_Particle_pz_vec;
-  std::vector<float>  REC_Particle_vx_vec;
-  std::vector<float>  REC_Particle_vy_vec;
-  std::vector<float>  REC_Particle_vz_vec;
-  std::vector<int>    REC_Particle_charge_vec;
-  std::vector<float>  REC_Particle_beta_vec;
-  std::vector<float>  REC_Particle_chi2pid_vec;
-  std::vector<int>    REC_Particle_status_vec;
-  std::vector<int>    REC_Calorimeter_index_vec;
-  std::vector<int>    REC_Calorimeter_pindex_vec;
-  std::vector<int>    REC_Calorimeter_detector_vec;
-  std::vector<int>    REC_Calorimeter_sector_vec;
-  std::vector<int>    REC_Calorimeter_layer_vec;
-  std::vector<float>  REC_Calorimeter_energy_vec;
-  std::vector<float>  REC_Calorimeter_time_vec;
-  std::vector<float>  REC_Calorimeter_path_vec;
-  std::vector<float>  REC_Calorimeter_chi2_vec;
-  std::vector<float>  REC_Calorimeter_x_vec;
-  std::vector<float>  REC_Calorimeter_y_vec;
-  std::vector<float>  REC_Calorimeter_z_vec;
-  std::vector<float>  REC_Calorimeter_hx_vec;
-  std::vector<float>  REC_Calorimeter_hy_vec;
-  std::vector<float>  REC_Calorimeter_hz_vec;
-  std::vector<float>  REC_Calorimeter_lu_vec;
-  std::vector<float>  REC_Calorimeter_lv_vec;
-  std::vector<float>  REC_Calorimeter_lw_vec;
-  std::vector<float>  REC_Calorimeter_du_vec;
-  std::vector<float>  REC_Calorimeter_dv_vec;
-  std::vector<float>  REC_Calorimeter_dw_vec;
-  std::vector<float>  REC_Calorimeter_m2u_vec;
-  std::vector<float>  REC_Calorimeter_m2v_vec;
-  std::vector<float>  REC_Calorimeter_m2w_vec;
-  std::vector<float>  REC_Calorimeter_m3u_vec;
-  std::vector<float>  REC_Calorimeter_m3v_vec;
-  std::vector<float>  REC_Calorimeter_m3w_vec;
-  std::vector<int>    REC_Calorimeter_status_vec;
-  std::vector<int>    REC_Cherenkov_index_vec;
-  std::vector<int>    REC_Cherenkov_pindex_vec;
-  std::vector<int>    REC_Cherenkov_detector_vec;
-  std::vector<int>    REC_Cherenkov_sector_vec;
-  std::vector<float>  REC_Cherenkov_nphe_vec;
-  std::vector<float>  REC_Cherenkov_time_vec;
-  std::vector<float>  REC_Cherenkov_path_vec;
-  std::vector<float>  REC_Cherenkov_chi2_vec;
-  std::vector<float>  REC_Cherenkov_x_vec;
-  std::vector<float>  REC_Cherenkov_y_vec;
-  std::vector<float>  REC_Cherenkov_z_vec;
-  std::vector<float>  REC_Cherenkov_dtheta_vec;
-  std::vector<float>  REC_Cherenkov_dphi_vec;
-  std::vector<int>    REC_Cherenkov_status_vec;
-  std::vector<int>    REC_ForwardTagger_index_vec;
-  std::vector<int>    REC_ForwardTagger_pindex_vec;
-  std::vector<int>    REC_ForwardTagger_detector_vec;
-  std::vector<int>    REC_ForwardTagger_layer_vec;
-  std::vector<float>  REC_ForwardTagger_energy_vec;
-  std::vector<float>  REC_ForwardTagger_time_vec;
-  std::vector<float>  REC_ForwardTagger_path_vec;
-  std::vector<float>  REC_ForwardTagger_chi2_vec;
-  std::vector<float>  REC_ForwardTagger_x_vec;
-  std::vector<float>  REC_ForwardTagger_y_vec;
-  std::vector<float>  REC_ForwardTagger_z_vec;
-  std::vector<float>  REC_ForwardTagger_dx_vec;
-  std::vector<float>  REC_ForwardTagger_dy_vec;
-  std::vector<float>  REC_ForwardTagger_radius_vec;
-  std::vector<int>    REC_ForwardTagger_size_vec;
-  std::vector<int>    REC_ForwardTagger_status_vec;
-  std::vector<int>    REC_Scintillator_index_vec;
-  std::vector<int>    REC_Scintillator_pindex_vec;
-  std::vector<int>    REC_Scintillator_detector_vec;
-  std::vector<int>    REC_Scintillator_sector_vec;
-  std::vector<int>    REC_Scintillator_layer_vec;
-  std::vector<int>    REC_Scintillator_component_vec;
-  std::vector<float>  REC_Scintillator_energy_vec;
-  std::vector<float>  REC_Scintillator_time_vec;
-  std::vector<float>  REC_Scintillator_path_vec;
-  std::vector<float>  REC_Scintillator_chi2_vec;
-  std::vector<float>  REC_Scintillator_x_vec;
-  std::vector<float>  REC_Scintillator_y_vec;
-  std::vector<float>  REC_Scintillator_z_vec;
-  std::vector<float>  REC_Scintillator_hx_vec;
-  std::vector<float>  REC_Scintillator_hy_vec;
-  std::vector<float>  REC_Scintillator_hz_vec;
-  std::vector<int>    REC_Scintillator_status_vec;
-  std::vector<int>    REC_Track_index_vec;
-  std::vector<int>    REC_Track_pindex_vec;
-  std::vector<int>    REC_Track_detector_vec;
-  std::vector<int>    REC_Track_sector_vec;
-  std::vector<int>    REC_Track_status_vec;
-  std::vector<int>    REC_Track_q_vec;
-  std::vector<float>  REC_Track_chi2_vec;
-  std::vector<int>    REC_Track_NDF_vec;
+  clas12->Branch("RUN_Config_run", &RUN_Config_run);
+  clas12->Branch("RUN_Config_event", &RUN_Config_event);
+  clas12->Branch("RUN_Config_unixtime", &RUN_Config_unixtime);
+  clas12->Branch("RUN_Config_trigger", &RUN_Config_trigger);
+  clas12->Branch("RUN_Config_timestamp", &RUN_Config_timestamp);
+  clas12->Branch("RUN_Config_type", &RUN_Config_type);
+  clas12->Branch("RUN_Config_mode", &RUN_Config_mode);
+  clas12->Branch("RUN_Config_torus", &RUN_Config_torus);
+  clas12->Branch("RUN_Config_solenoid", &RUN_Config_solenoid);
 
-  std::vector<int>   TBT_Tracks_id_vec;
-  std::vector<int>   TBT_Tracks_sector_vec;
-  std::vector<float> TBT_Tracks_vx_vec;
-  std::vector<float> TBT_Tracks_vy_vec;
-  std::vector<float> TBT_Tracks_vz_vec;
-  std::vector<float> TBT_Tracks_Cross1_ID_vec;
-  std::vector<float> TBT_Tracks_Cross2_ID_vec;
-  std::vector<float> TBT_Tracks_Cross3_ID_vec;
-  std::vector<float> TBT_Tracks_chi2_vec;
-  std::vector<int>   TBT_Tracks_ndf_vec;
-  std::vector<int>   TBT_Crosses_id_vec;
-  std::vector<int>   TBT_Crosses_sector_vec;
-  std::vector<int>   TBT_Crosses_region_vec;
-  std::vector<float> TBT_Crosses_x_vec;
-  std::vector<float> TBT_Crosses_y_vec;
-  std::vector<float> TBT_Crosses_z_vec;
-  std::vector<float> TBT_Crosses_err_x_vec;
-  std::vector<float> TBT_Crosses_err_y_vec;
-  std::vector<float> TBT_Crosses_err_z_vec;
-  std::vector<float> TBT_Crosses_ux_vec;
-  std::vector<float> TBT_Crosses_uy_vec;
-  std::vector<float> TBT_Crosses_uz_vec;
-  std::vector<float> TBT_Crosses_err_ux_vec;
-  std::vector<float> TBT_Crosses_err_uy_vec;
-  std::vector<float> TBT_Crosses_err_uz_vec;
-  std::vector<int>   TBT_Hits_id_vec;
-  std::vector<int>   TBT_Hits_sector_vec;
-  std::vector<int>   TBT_Hits_superlayer_vec;
-  std::vector<int>   TBT_Hits_layer_vec;
-  std::vector<int>   TBT_Hits_wire_vec;
-  std::vector<int>   TBT_Hits_trkID_vec;
-  std::vector<float> TBT_Hits_doca_vec;
-  std::vector<float> TBT_Hits_docaError_vec;
-  std::vector<float> TBT_Hits_trkDoca_vec;
-  std::vector<float> TBT_Hits_timeResidual_vec;
-  std::vector<float> TBT_Hits_fitResidual_vec;
+  clas12->Branch("REC_Event_category", &REC_Event_category);
+  clas12->Branch("REC_Event_topology", &REC_Event_topology);
+  clas12->Branch("REC_Event_beamCharge", &REC_Event_beamCharge);
+  clas12->Branch("REC_Event_liveTime", &REC_Event_liveTime);
+  clas12->Branch("REC_Event_startTime", &REC_Event_startTime);
+  clas12->Branch("REC_Event_RFTime", &REC_Event_RFTime);
+  clas12->Branch("REC_Event_helicity", &REC_Event_helicity);
+  clas12->Branch("REC_Event_helicityRaw", &REC_Event_helicityRaw);
+  clas12->Branch("REC_Event_procTime", &REC_Event_procTime);
 
-  std::vector<int>   REC_CovMat_index_vec;
-  std::vector<int>   REC_CovMat_pindex_vec;
-  std::vector<float> REC_CovMat_C11_vec;
-  std::vector<float> REC_CovMat_C12_vec;
-  std::vector<float> REC_CovMat_C13_vec;
-  std::vector<float> REC_CovMat_C14_vec;
-  std::vector<float> REC_CovMat_C15_vec;
-  std::vector<float> REC_CovMat_C22_vec;
-  std::vector<float> REC_CovMat_C23_vec;
-  std::vector<float> REC_CovMat_C24_vec;
-  std::vector<float> REC_CovMat_C25_vec;
-  std::vector<float> REC_CovMat_C33_vec;
-  std::vector<float> REC_CovMat_C34_vec;
-  std::vector<float> REC_CovMat_C35_vec;
-  std::vector<float> REC_CovMat_C44_vec;
-  std::vector<float> REC_CovMat_C45_vec;
-  std::vector<float> REC_CovMat_C55_vec;
-  std::vector<int>   REC_VertDoca_index1_vec;
-  std::vector<int>   REC_VertDoca_index2_vec;
-  std::vector<float> REC_VertDoca_x_vec;
-  std::vector<float> REC_VertDoca_y_vec;
-  std::vector<float> REC_VertDoca_z_vec;
-  std::vector<float> REC_VertDoca_x1_vec;
-  std::vector<float> REC_VertDoca_y1_vec;
-  std::vector<float> REC_VertDoca_z1_vec;
-  std::vector<float> REC_VertDoca_cx1_vec;
-  std::vector<float> REC_VertDoca_cy1_vec;
-  std::vector<float> REC_VertDoca_cz1_vec;
-  std::vector<float> REC_VertDoca_x2_vec;
-  std::vector<float> REC_VertDoca_y2_vec;
-  std::vector<float> REC_VertDoca_z2_vec;
-  std::vector<float> REC_VertDoca_cx2_vec;
-  std::vector<float> REC_VertDoca_cy2_vec;
-  std::vector<float> REC_VertDoca_cz2_vec;
-  std::vector<float> REC_VertDoca_r_vec;
-  std::vector<int>   REC_Traj_pindex_vec;
-  std::vector<int>   REC_Traj_index_vec;
-  std::vector<int>   REC_Traj_detector_vec;
-  std::vector<int>   REC_Traj_layer_vec;
-  std::vector<int>   REC_Traj_q_vec;
-  std::vector<float> REC_Traj_x_vec;
-  std::vector<float> REC_Traj_y_vec;
-  std::vector<float> REC_Traj_z_vec;
-  std::vector<float> REC_Traj_cx_vec;
-  std::vector<float> REC_Traj_cy_vec;
-  std::vector<float> REC_Traj_cz_vec;
-  std::vector<float> REC_Traj_path_vec;
-
-  std::vector<int>   MC_Header_run_vec;
-  std::vector<int>   MC_Header_event_vec;
-  std::vector<int>   MC_Header_type_vec;
-  std::vector<float> MC_Header_helicity_vec;
-  std::vector<int>   MC_Event_npart_vec;
-  std::vector<float> MC_Event_ebeam_vec;
-  std::vector<float> MC_Event_weight_vec;
-  std::vector<int>   MC_Particle_pid_vec;
-  std::vector<float> MC_Particle_px_vec;
-  std::vector<float> MC_Particle_py_vec;
-  std::vector<float> MC_Particle_pz_vec;
-  std::vector<float> MC_Particle_vx_vec;
-  std::vector<float> MC_Particle_vy_vec;
-  std::vector<float> MC_Particle_vz_vec;
-  std::vector<float> MC_Particle_vt_vec;
-  std::vector<int>   MC_Lund_pid_vec;
-  std::vector<float> MC_Lund_mass_vec;
-  std::vector<float> MC_Lund_E_vec;
-  std::vector<float> MC_Lund_px_vec;
-  std::vector<float> MC_Lund_py_vec;
-  std::vector<float> MC_Lund_pz_vec;
-  std::vector<float> MC_Lund_vx_vec;
-  std::vector<float> MC_Lund_vy_vec;
-  std::vector<float> MC_Lund_vz_vec;
-
-  clas12->Branch("REC_Event_category", &REC_Event_category_vec);
-  clas12->Branch("REC_Event_topology", &REC_Event_topology_vec);
-  clas12->Branch("REC_Event_beamCharge", &REC_Event_beamCharge_vec);
-  clas12->Branch("REC_Event_liveTime", &REC_Event_liveTime_vec);
-  clas12->Branch("REC_Event_startTime", &REC_Event_startTime_vec);
-  clas12->Branch("REC_Event_RFTime", &REC_Event_RFTime_vec);
-  clas12->Branch("REC_Event_helicity", &REC_Event_helicity_vec);
-  clas12->Branch("REC_Event_helicityRaw", &REC_Event_helicityRaw_vec);
-  clas12->Branch("REC_Event_procTime", &REC_Event_procTime_vec);
   clas12->Branch("REC_Particle_pid", &REC_Particle_pid_vec);
   clas12->Branch("REC_Particle_px", &REC_Particle_px_vec);
   clas12->Branch("REC_Particle_py", &REC_Particle_py_vec);
@@ -313,6 +123,7 @@ int main(int argc, char** argv) {
   clas12->Branch("REC_Particle_vx", &REC_Particle_vx_vec);
   clas12->Branch("REC_Particle_vy", &REC_Particle_vy_vec);
   clas12->Branch("REC_Particle_vz", &REC_Particle_vz_vec);
+  clas12->Branch("REC_Particle_vt", &REC_Particle_vt_vec);
   clas12->Branch("REC_Particle_charge", &REC_Particle_charge_vec);
   clas12->Branch("REC_Particle_beta", &REC_Particle_beta_vec);
   clas12->Branch("REC_Particle_chi2pid", &REC_Particle_chi2pid_vec);
@@ -488,26 +299,6 @@ int main(int argc, char** argv) {
     clas12->Branch("REC_CovMat_C45", &REC_CovMat_C45_vec);
     clas12->Branch("REC_CovMat_C55", &REC_CovMat_C55_vec);
   }
-  if (VertDoca) {
-    clas12->Branch("REC_VertDoca_index1", &REC_VertDoca_index1_vec);
-    clas12->Branch("REC_VertDoca_index2", &REC_VertDoca_index2_vec);
-    clas12->Branch("REC_VertDoca_x", &REC_VertDoca_x_vec);
-    clas12->Branch("REC_VertDoca_y", &REC_VertDoca_y_vec);
-    clas12->Branch("REC_VertDoca_z", &REC_VertDoca_z_vec);
-    clas12->Branch("REC_VertDoca_x1", &REC_VertDoca_x1_vec);
-    clas12->Branch("REC_VertDoca_y1", &REC_VertDoca_y1_vec);
-    clas12->Branch("REC_VertDoca_z1", &REC_VertDoca_z1_vec);
-    clas12->Branch("REC_VertDoca_cx1", &REC_VertDoca_cx1_vec);
-    clas12->Branch("REC_VertDoca_cy1", &REC_VertDoca_cy1_vec);
-    clas12->Branch("REC_VertDoca_cz1", &REC_VertDoca_cz1_vec);
-    clas12->Branch("REC_VertDoca_x2", &REC_VertDoca_x2_vec);
-    clas12->Branch("REC_VertDoca_y2", &REC_VertDoca_y2_vec);
-    clas12->Branch("REC_VertDoca_z2", &REC_VertDoca_z2_vec);
-    clas12->Branch("REC_VertDoca_cx2", &REC_VertDoca_cx2_vec);
-    clas12->Branch("REC_VertDoca_cy2", &REC_VertDoca_cy2_vec);
-    clas12->Branch("REC_VertDoca_cz2", &REC_VertDoca_cz2_vec);
-    clas12->Branch("REC_VertDoca_r", &REC_VertDoca_r_vec);
-  }
   if (traj) {
     clas12->Branch("REC_Traj_pindex", &REC_Traj_pindex_vec);
     clas12->Branch("REC_Traj_index", &REC_Traj_index_vec);
@@ -530,11 +321,19 @@ int main(int argc, char** argv) {
       break;
 
     reader->read(*hipo_event);
+    hipo_event->getStructure(*rec_Event);
+    hipo_event->getStructure(*run_Config);
+    /*
+    hipo_event->getStructure(*hel_Online);
+    hipo_event->getStructure(*hel_Flip);
+    hipo_event->getStructure(*run_Scaler);
+    hipo_event->getStructure(*raw_Scaler);
+    hipo_event->getStructure(*raw_Epics);
+    */
     hipo_event->getStructure(*rec_Particle);
     hipo_event->getStructure(*rec_ForwardTagger);
     hipo_event->getStructure(*rec_Track);
     hipo_event->getStructure(*rec_Cherenkov);
-    hipo_event->getStructure(*rec_Event);
     hipo_event->getStructure(*rec_Scintillator);
     hipo_event->getStructure(*rec_Calorimeter);
     if (cov)
@@ -630,31 +429,33 @@ int main(int argc, char** argv) {
       }
     }
 
+    l = run_Config->getRows();
+    if (l != -1) {
+      RUN_Config_run       = run_Config->getInt(0, 0);
+      RUN_Config_event     = run_Config->getInt(1, 0);
+      RUN_Config_unixtime  = run_Config->getInt(2, 0);
+      RUN_Config_trigger   = run_Config->getLong(3, 0);
+      RUN_Config_timestamp = run_Config->getLong(4, 0);
+      RUN_Config_type      = run_Config->getInt(5, 0);
+      RUN_Config_mode      = run_Config->getInt(6, 0);
+      RUN_Config_torus     = run_Config->getFloat(7, 0);
+      RUN_Config_solenoid  = run_Config->getFloat(8, 0);
+    }
+
     l = rec_Event->getRows();
     if (l != -1) {
-      REC_Event_category_vec.resize(l);
-      REC_Event_topology_vec.resize(l);
-      REC_Event_beamCharge_vec.resize(l);
-      REC_Event_liveTime_vec.resize(l);
-      REC_Event_startTime_vec.resize(l);
-      REC_Event_RFTime_vec.resize(l);
-      REC_Event_helicity_vec.resize(l);
-      REC_Event_helicityRaw_vec.resize(l);
-      REC_Event_procTime_vec.resize(l);
-
-      for (int i = 0; i < l; i++) {
-        REC_Event_category_vec[i]   = rec_Event->getLong(0, i);
-        REC_Event_topology_vec[i]   = rec_Event->getLong(1, i);
-        REC_Event_beamCharge_vec[i] = rec_Event->getFloat(2, i);
-        REC_Event_liveTime_vec[i]   = rec_Event->getDouble(3, i);
-        REC_Event_startTime_vec[i] =
-            ((rec_Event->getFloat(4, i) != -1000) ? rec_Event->getFloat(4, i) : NAN);
-        REC_Event_RFTime_vec[i]      = rec_Event->getFloat(5, i);
-        REC_Event_helicity_vec[i]    = rec_Event->getByte(6, i);
-        REC_Event_helicityRaw_vec[i] = rec_Event->getByte(7, i);
-        REC_Event_procTime_vec[i]    = rec_Event->getFloat(8, i);
-      }
+      REC_Event_category   = rec_Event->getLong(0, 0);
+      REC_Event_topology   = rec_Event->getLong(1, 0);
+      REC_Event_beamCharge = rec_Event->getFloat(2, 0);
+      REC_Event_liveTime   = rec_Event->getDouble(3, 0);
+      REC_Event_startTime =
+          ((rec_Event->getFloat(4, 0) != -1000) ? rec_Event->getFloat(4, 0) : NAN);
+      REC_Event_RFTime      = rec_Event->getFloat(5, 0);
+      REC_Event_helicity    = rec_Event->getByte(6, 0);
+      REC_Event_helicityRaw = rec_Event->getByte(7, 0);
+      REC_Event_procTime    = rec_Event->getFloat(8, 0);
     }
+
     l = rec_Particle->getRows();
     if (l != -1) {
       REC_Particle_pid_vec.resize(l);
@@ -664,6 +465,7 @@ int main(int argc, char** argv) {
       REC_Particle_vx_vec.resize(l);
       REC_Particle_vy_vec.resize(l);
       REC_Particle_vz_vec.resize(l);
+      REC_Particle_vt_vec.resize(l);
       REC_Particle_charge_vec.resize(l);
       REC_Particle_beta_vec.resize(l);
       REC_Particle_chi2pid_vec.resize(l);
@@ -677,11 +479,12 @@ int main(int argc, char** argv) {
         REC_Particle_vx_vec[i]     = rec_Particle->getFloat(4, i);
         REC_Particle_vy_vec[i]     = rec_Particle->getFloat(5, i);
         REC_Particle_vz_vec[i]     = rec_Particle->getFloat(6, i);
-        REC_Particle_charge_vec[i] = rec_Particle->getInt(7, i);
+        REC_Particle_vt_vec[i]     = rec_Particle->getFloat(7, i);
+        REC_Particle_charge_vec[i] = rec_Particle->getInt(8, i);
         REC_Particle_beta_vec[i] =
-            ((rec_Particle->getFloat(8, i) != -9999) ? rec_Particle->getFloat(8, i) : NAN);
-        REC_Particle_chi2pid_vec[i] = rec_Particle->getFloat(9, i);
-        REC_Particle_status_vec[i]  = rec_Particle->getInt(10, i);
+            ((rec_Particle->getFloat(9, i) != -9999) ? rec_Particle->getFloat(9, i) : NAN);
+        REC_Particle_chi2pid_vec[i] = rec_Particle->getFloat(10, i);
+        REC_Particle_status_vec[i]  = rec_Particle->getInt(11, i);
       }
     }
     l = rec_Calorimeter->getRows();
@@ -1014,28 +817,6 @@ int main(int argc, char** argv) {
       }
     }
 
-    if (VertDoca) {
-      // index1/S
-      // index2/S
-      // x/F
-      // y/F
-      // z/F
-      // x1/F
-      // y1/F
-      // z1/F
-      // cx1/F
-      // cy1/F
-      // cz1/F
-      // x2/F
-      // y2/F
-      // z2/F
-      // cx2/F
-      // cy2/F
-      // cz2/F
-      // r/F
-      std::cerr << "VertDoca Not implemented yet" << '\n';
-    }
-
     if (traj) {
       l = rec_Traj->getRows();
       if (l != -1) {
@@ -1068,169 +849,6 @@ int main(int argc, char** argv) {
     }
 
     clas12->Fill();
-    /*
-    REC_Event_category_vec.clear();
-    REC_Event_topology_vec.clear();
-    REC_Event_beamCharge_vec.clear();
-    REC_Event_liveTime_vec.clear();
-    REC_Event_startTime_vec.clear();
-    REC_Event_RFTime_vec.clear();
-    REC_Event_helicity_vec.clear();
-    REC_Event_helicityRaw_vec.clear();
-    REC_Event_procTime_vec.clear();
-    REC_Particle_pid_vec.clear();
-    REC_Particle_px_vec.clear();
-    REC_Particle_py_vec.clear();
-    REC_Particle_pz_vec.clear();
-    REC_Particle_vx_vec.clear();
-    REC_Particle_vy_vec.clear();
-    REC_Particle_vz_vec.clear();
-    REC_Particle_charge_vec.clear();
-    REC_Particle_beta_vec.clear();
-    REC_Particle_chi2pid_vec.clear();
-    REC_Particle_status_vec.clear();
-    REC_Calorimeter_index_vec.clear();
-    REC_Calorimeter_pindex_vec.clear();
-    REC_Calorimeter_detector_vec.clear();
-    REC_Calorimeter_sector_vec.clear();
-    REC_Calorimeter_layer_vec.clear();
-    REC_Calorimeter_energy_vec.clear();
-    REC_Calorimeter_time_vec.clear();
-    REC_Calorimeter_path_vec.clear();
-    REC_Calorimeter_chi2_vec.clear();
-    REC_Calorimeter_x_vec.clear();
-    REC_Calorimeter_y_vec.clear();
-    REC_Calorimeter_z_vec.clear();
-    REC_Calorimeter_hx_vec.clear();
-    REC_Calorimeter_hy_vec.clear();
-    REC_Calorimeter_hz_vec.clear();
-    REC_Calorimeter_lu_vec.clear();
-    REC_Calorimeter_lv_vec.clear();
-    REC_Calorimeter_lw_vec.clear();
-    REC_Calorimeter_du_vec.clear();
-    REC_Calorimeter_dv_vec.clear();
-    REC_Calorimeter_dw_vec.clear();
-    REC_Calorimeter_m2u_vec.clear();
-    REC_Calorimeter_m2v_vec.clear();
-    REC_Calorimeter_m2w_vec.clear();
-    REC_Calorimeter_m3u_vec.clear();
-    REC_Calorimeter_m3v_vec.clear();
-    REC_Calorimeter_m3w_vec.clear();
-    REC_Calorimeter_status_vec.clear();
-    REC_Cherenkov_index_vec.clear();
-    REC_Cherenkov_pindex_vec.clear();
-    REC_Cherenkov_detector_vec.clear();
-    REC_Cherenkov_sector_vec.clear();
-    REC_Cherenkov_nphe_vec.clear();
-    REC_Cherenkov_time_vec.clear();
-    REC_Cherenkov_path_vec.clear();
-    REC_Cherenkov_chi2_vec.clear();
-    REC_Cherenkov_x_vec.clear();
-    REC_Cherenkov_y_vec.clear();
-    REC_Cherenkov_z_vec.clear();
-    REC_Cherenkov_dtheta_vec.clear();
-    REC_Cherenkov_dphi_vec.clear();
-    REC_Cherenkov_status_vec.clear();
-    REC_ForwardTagger_index_vec.clear();
-    REC_ForwardTagger_pindex_vec.clear();
-    REC_ForwardTagger_detector_vec.clear();
-    REC_ForwardTagger_layer_vec.clear();
-    REC_ForwardTagger_energy_vec.clear();
-    REC_ForwardTagger_time_vec.clear();
-    REC_ForwardTagger_path_vec.clear();
-    REC_ForwardTagger_chi2_vec.clear();
-    REC_ForwardTagger_x_vec.clear();
-    REC_ForwardTagger_y_vec.clear();
-    REC_ForwardTagger_z_vec.clear();
-    REC_ForwardTagger_dx_vec.clear();
-    REC_ForwardTagger_dy_vec.clear();
-    REC_ForwardTagger_radius_vec.clear();
-    REC_ForwardTagger_size_vec.clear();
-    REC_ForwardTagger_status_vec.clear();
-    REC_Scintillator_index_vec.clear();
-    REC_Scintillator_pindex_vec.clear();
-    REC_Scintillator_detector_vec.clear();
-    REC_Scintillator_sector_vec.clear();
-    REC_Scintillator_layer_vec.clear();
-    REC_Scintillator_component_vec.clear();
-    REC_Scintillator_energy_vec.clear();
-    REC_Scintillator_time_vec.clear();
-    REC_Scintillator_path_vec.clear();
-    REC_Scintillator_chi2_vec.clear();
-    REC_Scintillator_x_vec.clear();
-    REC_Scintillator_y_vec.clear();
-    REC_Scintillator_z_vec.clear();
-    REC_Scintillator_hx_vec.clear();
-    REC_Scintillator_hy_vec.clear();
-    REC_Scintillator_hz_vec.clear();
-    REC_Scintillator_status_vec.clear();
-    REC_Track_index_vec.clear();
-    REC_Track_pindex_vec.clear();
-    REC_Track_detector_vec.clear();
-    REC_Track_sector_vec.clear();
-    REC_Track_status_vec.clear();
-    REC_Track_q_vec.clear();
-    REC_Track_chi2_vec.clear();
-    REC_Track_NDF_vec.clear();
-    REC_CovMat_index_vec.clear();
-    REC_CovMat_pindex_vec.clear();
-    REC_CovMat_C11_vec.clear();
-    REC_CovMat_C12_vec.clear();
-    REC_CovMat_C13_vec.clear();
-    REC_CovMat_C14_vec.clear();
-    REC_CovMat_C15_vec.clear();
-    REC_CovMat_C22_vec.clear();
-    REC_CovMat_C23_vec.clear();
-    REC_CovMat_C24_vec.clear();
-    REC_CovMat_C25_vec.clear();
-    REC_CovMat_C33_vec.clear();
-    REC_CovMat_C34_vec.clear();
-    REC_CovMat_C35_vec.clear();
-    REC_CovMat_C44_vec.clear();
-    REC_CovMat_C45_vec.clear();
-    REC_CovMat_C55_vec.clear();
-    REC_VertDoca_index1_vec.clear();
-    REC_VertDoca_index2_vec.clear();
-    REC_VertDoca_x_vec.clear();
-    REC_VertDoca_y_vec.clear();
-    REC_VertDoca_z_vec.clear();
-    REC_VertDoca_x1_vec.clear();
-    REC_VertDoca_y1_vec.clear();
-    REC_VertDoca_z1_vec.clear();
-    REC_VertDoca_cx1_vec.clear();
-    REC_VertDoca_cy1_vec.clear();
-    REC_VertDoca_cz1_vec.clear();
-    REC_VertDoca_x2_vec.clear();
-    REC_VertDoca_y2_vec.clear();
-    REC_VertDoca_z2_vec.clear();
-    REC_VertDoca_cx2_vec.clear();
-    REC_VertDoca_cy2_vec.clear();
-    REC_VertDoca_cz2_vec.clear();
-    REC_VertDoca_r_vec.clear();
-    REC_Traj_pindex_vec.clear();
-    REC_Traj_index_vec.clear();
-    REC_Traj_detector_vec.clear();
-    REC_Traj_layer_vec.clear();
-    REC_Traj_x_vec.clear();
-    REC_Traj_y_vec.clear();
-    REC_Traj_z_vec.clear();
-    REC_Traj_cx_vec.clear();
-    REC_Traj_cy_vec.clear();
-    REC_Traj_cz_vec.clear();
-    REC_Traj_path_vec.clear();
-    MC_Header_run_vec.clear();
-    MC_Header_event_vec.clear();
-    MC_Header_type_vec.clear();
-    MC_Header_helicity_vec.clear();
-    MC_Particle_pid_vec.clear();
-    MC_Particle_px_vec.clear();
-    MC_Particle_py_vec.clear();
-    MC_Particle_pz_vec.clear();
-    MC_Particle_vx_vec.clear();
-    MC_Particle_vy_vec.clear();
-    MC_Particle_vz_vec.clear();
-    MC_Particle_vt_vec.clear();
-    */
   }
   OutputFile->cd();
   clas12->Write();

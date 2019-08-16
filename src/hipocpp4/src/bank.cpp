@@ -92,8 +92,6 @@ namespace hipo {
   void bank::notify() {
     int size = bankSchema.getRowLength();
     bankRows = getSize() / size;
-    // printf("---> bank notify called structure size = %8d (size = %5d)  rows = %d\n",
-    //    getSize(),size, bankRows);
   }
 
   int bank::getInt(int item, int index) {
@@ -107,9 +105,12 @@ namespace hipo {
     case 3:
       return getIntAt(offset);
     default:
-      printf("---> error : requested INT for [%s] type = %d\n",
-             bankSchema.getEntryName(item).c_str(), type);
+#ifdef __DEBUG__
+      std::cerr << "---> error : requested INT for [" << bankSchema.getEntryName(item)
+                << "] type = " << type << std::endl;
       break;
+#endif
+      return -99;
     }
     return -99;
   }
@@ -121,10 +122,15 @@ namespace hipo {
       return (int)getByteAt(offset);
     case 2:
       return (int)getShortAt(offset);
+    case 3:
+      return getIntAt(offset);
     default:
-      printf("---> error : requested SHORT for [%s] type = %d\n",
-             bankSchema.getEntryName(item).c_str(), type);
+#ifdef __DEBUG__
+      std::cerr << "---> error : requested SHORT for [" << bankSchema.getEntryName(item)
+                << "] type = " << type << std::endl;
       break;
+#endif
+      return -99;
     }
     return -99;
   }
@@ -134,10 +140,17 @@ namespace hipo {
     switch (type) {
     case 1:
       return (int)getByteAt(offset);
+    case 2:
+      return (int)getShortAt(offset);
+    case 3:
+      return getIntAt(offset);
     default:
-      printf("---> error : requested BYTE for [%s] type = %d\n",
-             bankSchema.getEntryName(item).c_str(), type);
+#ifdef __DEBUG__
+      std::cerr << "---> error : requested BYTE for [" << bankSchema.getEntryName(item)
+                << "] type = " << type << std::endl;
       break;
+#endif
+      return -99;
     }
     return -99;
   }
@@ -186,7 +199,6 @@ namespace hipo {
     int item   = bankSchema.getEntryOrder(name);
     int type   = bankSchema.getEntryType(item);
     int offset = bankSchema.getOffset(item, index, bankRows);
-    // printf("---- put float %f at position = %d\n",value,offset);
     putFloatAt(offset, value);
   }
   void bank::putDouble(const char* name, int index, double value) {
@@ -203,52 +215,17 @@ namespace hipo {
   }
 
   int bank::getInt(const char* name, int index) {
-    int item   = bankSchema.getEntryOrder(name);
-    int type   = bankSchema.getEntryType(item);
-    int offset = bankSchema.getOffset(item, index, bankRows);
-    switch (type) {
-    case 1:
-      return (int)getByteAt(offset);
-    case 2:
-      return (int)getShortAt(offset);
-    case 3:
-      return getIntAt(offset);
-    default:
-      printf("---> error : requested INT for [%s] type = %d\n", name, type);
-      break;
-    }
-    return -99;
+    int item = bankSchema.getEntryOrder(name);
+    return getInt(item, index);
   }
 
   int bank::getShort(const char* name, int index) {
-    int item   = bankSchema.getEntryOrder(name);
-    int type   = bankSchema.getEntryType(item);
-    int offset = bankSchema.getOffset(item, index, bankRows);
-    switch (type) {
-    case 1:
-      return (int)getByteAt(offset);
-    case 2:
-      return (int)getShortAt(offset);
-    default:
-      printf("---> error : requested SHORT for [%s] type = %d\n",
-             bankSchema.getEntryName(item).c_str(), type);
-      break;
-    }
-    return -99;
+    int item = bankSchema.getEntryOrder(name);
+    return getInt(item, index);
   }
   int bank::getByte(const char* name, int index) {
-    int item   = bankSchema.getEntryOrder(name);
-    int type   = bankSchema.getEntryType(item);
-    int offset = bankSchema.getOffset(item, index, bankRows);
-    switch (type) {
-    case 1:
-      return (int)getByteAt(offset);
-    default:
-      printf("---> error : requested BYTE for [%s] type = %d\n",
-             bankSchema.getEntryName(item).c_str(), type);
-      break;
-    }
-    return -99;
+    int item = bankSchema.getEntryOrder(name);
+    return getInt(item, index);
   }
 
   float bank::getFloat(const char* name, int index) {

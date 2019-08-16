@@ -287,7 +287,6 @@ namespace hipo {
                               int dataLengthUncompressed) {
 #ifdef __LZ4__
     int result = LZ4_decompress_safe(data, dest, dataLength, dataLengthUncompressed);
-    // int result = LZ4_decompress_fast(data,dest,dataLengthUncompressed);
     return result;
 #endif
 
@@ -306,12 +305,7 @@ namespace hipo {
 #ifdef __LZ4__
     char* output = (char*)malloc(dataLengthUncompressed);
     int   result = LZ4_decompress_safe(data, output, dataLength, dataLengthUncompressed);
-    // int   result = LZ4_decompress_fast(data,output,dataLengthUncompressed);
     return output;
-// printf(" FIRST (%d) = %x %x %x %x\n",result);//,destUnCompressed[0],destUnCompressed[1],
-// destUnCompressed[2],destUnCompressed[3]);
-// LZ4_decompress_fast(buffer,destUnCompressed,decompressedLength);
-// LZ4_uncompress(buffer,destUnCompressed,decompressedLength);
 #endif
 
 #ifndef __LZ4__

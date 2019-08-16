@@ -16,15 +16,25 @@ int    NPGP;
 double LT;
 float  PTIME;
 
-int    category;
-int    topology;
-float  beamCharge;
-double liveTime;
-float  startTime;
-float  RFTime;
-int    helicity;
-int    helicityRaw;
-float  procTime;
+Int_t   run;
+Int_t   event;
+Int_t   unixtime;
+Float_t trigger;
+Float_t timestamp;
+Int_t   type;
+Int_t   mode;
+Float_t torus;
+Float_t solenoid;
+
+Int_t    category;
+Int_t    topology;
+Float_t  beamCharge;
+Double_t liveTime;
+Float_t  startTime;
+Float_t  RFTime;
+Int_t    helicity;
+Int_t    helicityRaw;
+Float_t  procTime;
 
 v_int   pid;
 v_float p;
@@ -35,6 +45,7 @@ v_float pz;
 v_float vx;
 v_float vy;
 v_float vz;
+v_float vt;
 v_int   charge;
 v_float beta;
 v_float chi2pid;
@@ -252,6 +263,11 @@ int   mc_run;
 int   mc_event;
 int   mc_type;
 float mc_helicity;
+float mc_wegiht;
+
+int   mc_npart;
+float mc_ebeam;
+float mc_weight;
 
 v_int   mc_pid_vec;
 v_float mc_px_vec;
