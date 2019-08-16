@@ -31,7 +31,6 @@ int main(int argc, char** argv) {
     exit(2);
   }
 
-  
   auto reader = std::make_unique<hipo::reader>(inputFile);
   auto dict   = std::make_unique<hipo::dictionary>();
   reader->readDictionary(*dict);
@@ -48,6 +47,7 @@ int main(int argc, char** argv) {
   Float_t vx[kMaxChar];
   Float_t vy[kMaxChar];
   Float_t vz[kMaxChar];
+  Float_t vt[kMaxChar];
   Int_t   charge[kMaxChar];
   Float_t beta[kMaxChar];
   Float_t chi2pid[kMaxChar];
@@ -61,6 +61,7 @@ int main(int argc, char** argv) {
   clas12->Branch("vx", vx, "vx[gpart]/F");
   clas12->Branch("vy", vy, "vy[gpart]/F");
   clas12->Branch("vz", vz, "vz[gpart]/F");
+  clas12->Branch("vt", vt, "vt[gpart]/F");
   clas12->Branch("charge", charge, "charge[gpart]/I");
   clas12->Branch("beta", beta, "beta[gpart]/F");
   clas12->Branch("chi2pid", chi2pid, "chi2pid[gpart]/F");
@@ -104,10 +105,11 @@ int main(int argc, char** argv) {
         vx[i]      = rec_Particle->getFloat(4, i);
         vy[i]      = rec_Particle->getFloat(5, i);
         vz[i]      = rec_Particle->getFloat(6, i);
-        charge[i]  = rec_Particle->getInt(7, i);
-        beta[i]    = ((rec_Particle->getFloat(8, i) != -9999) ? rec_Particle->getFloat(8, i) : NAN);
-        chi2pid[i] = rec_Particle->getFloat(9, i);
-        status[i]  = rec_Particle->getInt(10, i);
+        vt[i]      = rec_Particle->getFloat(7, i);
+        charge[i]  = rec_Particle->getInt(8, i);
+        beta[i]    = ((rec_Particle->getFloat(9, i) != -9999) ? rec_Particle->getFloat(9, i) : NAN);
+        chi2pid[i] = rec_Particle->getFloat(10, i);
+        status[i]  = rec_Particle->getInt(11, i);
       }
       clas12->Fill();
     }
