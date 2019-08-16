@@ -123,6 +123,7 @@ int main(int argc, char** argv) {
   clas12->Branch("REC_Particle_vx", &REC_Particle_vx_vec);
   clas12->Branch("REC_Particle_vy", &REC_Particle_vy_vec);
   clas12->Branch("REC_Particle_vz", &REC_Particle_vz_vec);
+  clas12->Branch("REC_Particle_vt", &REC_Particle_vt_vec);
   clas12->Branch("REC_Particle_charge", &REC_Particle_charge_vec);
   clas12->Branch("REC_Particle_beta", &REC_Particle_beta_vec);
   clas12->Branch("REC_Particle_chi2pid", &REC_Particle_chi2pid_vec);
@@ -464,6 +465,7 @@ int main(int argc, char** argv) {
       REC_Particle_vx_vec.resize(l);
       REC_Particle_vy_vec.resize(l);
       REC_Particle_vz_vec.resize(l);
+      REC_Particle_vt_vec.resize(l);
       REC_Particle_charge_vec.resize(l);
       REC_Particle_beta_vec.resize(l);
       REC_Particle_chi2pid_vec.resize(l);
@@ -477,11 +479,12 @@ int main(int argc, char** argv) {
         REC_Particle_vx_vec[i]     = rec_Particle->getFloat(4, i);
         REC_Particle_vy_vec[i]     = rec_Particle->getFloat(5, i);
         REC_Particle_vz_vec[i]     = rec_Particle->getFloat(6, i);
-        REC_Particle_charge_vec[i] = rec_Particle->getInt(7, i);
+        REC_Particle_vt_vec[i]     = rec_Particle->getFloat(7, i);
+        REC_Particle_charge_vec[i] = rec_Particle->getInt(8, i);
         REC_Particle_beta_vec[i] =
-            ((rec_Particle->getFloat(8, i) != -9999) ? rec_Particle->getFloat(8, i) : NAN);
-        REC_Particle_chi2pid_vec[i] = rec_Particle->getFloat(9, i);
-        REC_Particle_status_vec[i]  = rec_Particle->getInt(10, i);
+            ((rec_Particle->getFloat(9, i) != -9999) ? rec_Particle->getFloat(9, i) : NAN);
+        REC_Particle_chi2pid_vec[i] = rec_Particle->getFloat(10, i);
+        REC_Particle_status_vec[i]  = rec_Particle->getInt(11, i);
       }
     }
     l = rec_Calorimeter->getRows();
