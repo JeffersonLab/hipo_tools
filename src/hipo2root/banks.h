@@ -28,6 +28,7 @@ v_float REC_Particle_pz_vec;
 v_float REC_Particle_vx_vec;
 v_float REC_Particle_vy_vec;
 v_float REC_Particle_vz_vec;
+v_float REC_Particle_vt_vec;
 v_int   REC_Particle_charge_vec;
 v_float REC_Particle_beta_vec;
 v_float REC_Particle_chi2pid_vec;

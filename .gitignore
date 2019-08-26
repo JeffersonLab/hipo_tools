@@ -38,5 +38,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 .ipynb_checkpoints
+
+.vscode
 src/hipopy/hipopy.cpp
 *.root

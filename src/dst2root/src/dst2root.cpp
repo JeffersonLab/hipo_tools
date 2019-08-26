@@ -51,6 +51,7 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
   clas12->Branch("vx", &vx);
   clas12->Branch("vy", &vy);
   clas12->Branch("vz", &vz);
+  clas12->Branch("vt", &vt);
   clas12->Branch("charge", &charge);
   clas12->Branch("beta", &beta);
   clas12->Branch("chi2pid", &chi2pid);
@@ -508,9 +509,9 @@ int main(int argc, char** argv) {
       continue;
 
     l = rec_Particle->getRows();
-    if (l == -1) {
+    if (l == -1)
       continue;
-    }
+
     pid.resize(l);
     p.resize(l);
     p2.resize(l);
@@ -520,6 +521,7 @@ int main(int argc, char** argv) {
     vx.resize(l);
     vy.resize(l);
     vz.resize(l);
+    vt.resize(l);
     charge.resize(l);
     beta.resize(l);
     chi2pid.resize(l);
@@ -537,10 +539,11 @@ int main(int argc, char** argv) {
       vx[i]      = rec_Particle->getFloat(4, i);
       vy[i]      = rec_Particle->getFloat(5, i);
       vz[i]      = rec_Particle->getFloat(6, i);
-      charge[i]  = rec_Particle->getInt(7, i);
-      beta[i]    = ((rec_Particle->getFloat(8, i) != -9999) ? rec_Particle->getFloat(8, i) : NAN);
-      chi2pid[i] = rec_Particle->getFloat(9, i);
-      status[i]  = rec_Particle->getInt(10, i);
+      vt[i]      = rec_Particle->getFloat(7, i);
+      charge[i]  = rec_Particle->getInt(8, i);
+      beta[i]    = ((rec_Particle->getFloat(9, i) != -9999) ? rec_Particle->getFloat(9, i) : NAN);
+      chi2pid[i] = rec_Particle->getFloat(10, i);
+      status[i]  = rec_Particle->getInt(11, i);
     }
 
     len_pid    = rec_Particle->getRows();

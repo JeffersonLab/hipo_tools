@@ -45,6 +45,7 @@ v_float pz;
 v_float vx;
 v_float vy;
 v_float vz;
+v_float vt;
 v_int   charge;
 v_float beta;
 v_float chi2pid;
