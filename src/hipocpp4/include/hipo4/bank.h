@@ -95,8 +95,6 @@ namespace hipo {
     friend class event;
   };
 
-  // typedef std::auto_ptr<hipo::generic_node> node_pointer;
-
   class bank : public hipo::structure {
 
   private:
