@@ -323,22 +323,26 @@ cdef class clas12Event:
     if i >= self.c_Particle.getRows():
       return NAN
     return self.c_Particle.getFloat(6,i)
+  def vt(clas12Event self,unsigned int i):
+    if i >= self.c_Particle.getRows():
+      return NAN
+    return self.c_Particle.getFloat(7,i)
   def charge(clas12Event self,unsigned int i):
     if i >= self.c_Particle.getRows():
       return -9999
-    return self.c_Particle.getByte(7, i)
+    return self.c_Particle.getByte(8, i)
   def beta(clas12Event self,unsigned int i):
     if i >= self.c_Particle.getRows():
       return NAN
-    return self.c_Particle.getFloat(8, i)
+    return self.c_Particle.getFloat(9, i)
   def chi2pid(clas12Event self,unsigned int i):
     if i >= self.c_Particle.getRows():
       return NAN
-    return self.c_Particle.getFloat(9, i)
+    return self.c_Particle.getFloat(10, i)
   def status(clas12Event self,unsigned int i):
     if i >= self.c_Particle.getRows():
       return -1
-    return self.c_Particle.getShort(10, i)
+    return self.c_Particle.getShort(11, i)
   def detector_system(clas12Event self,unsigned int i):
     if i >= self.c_Particle.getRows():
       return "unknown"
