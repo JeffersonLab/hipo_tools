@@ -16,9 +16,6 @@ namespace hipo {
     //
     dataBuffer.resize(20 * 1024);
     reset();
-    // printf("creating event class.....\n");
-    // hipo::node<int> *type = new hipo::node<int>();
-    // nodes.push_back(type);
   }
 
   event::event(int size) {
@@ -40,7 +37,6 @@ namespace hipo {
     } else {
       str.initStructureBySize(group, item, 1, 0);
       str.notify();
-      // printf("*** error *** : structure (%5d,%5d) does not exist\n", group,item);
     }
   }
 
