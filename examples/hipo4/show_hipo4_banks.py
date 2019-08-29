@@ -12,9 +12,7 @@ import json
 
 file_name = sys.argv[1]
 
-hipo4_file = hipo4_reader(file_name)
+hipo4_file = hipo4_reader(file_name.encode())
 
 print(hipo4_file)
 
-dictionary = json.loads(str(hipo4_file))
-print(dictionary)
