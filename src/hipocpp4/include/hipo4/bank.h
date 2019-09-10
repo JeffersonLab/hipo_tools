@@ -14,12 +14,14 @@
 #ifndef HIPO_BANK_H
 #define HIPO_BANK_H
 #include "dictionary.h"
+#include <cmath>
 #include <cstring>
 #include <iostream>
 #include <map>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <typeinfo>
 #include <vector>
 
 namespace hipo {
@@ -95,8 +97,6 @@ namespace hipo {
     friend class event;
   };
 
-  // typedef std::auto_ptr<hipo::generic_node> node_pointer;
-
   class bank : public hipo::structure {
 
   private:
@@ -129,8 +129,40 @@ namespace hipo {
 
     hipo::schema& getSchema() { return bankSchema; }
 
-    int    getRows() { return bankRows; }
-    void   setRows(int rows);
+    int  getRows() { return bankRows; }
+    void setRows(int rows);
+
+    template <typename T>
+    T get(int item, int index) {
+      int type   = bankSchema.getEntryType(item);
+      int offset = bankSchema.getOffset(item, index, bankRows);
+      switch (type) {
+      case 1:
+        return (int)getByteAt(offset);
+      case 2:
+        return (int)getShortAt(offset);
+      case 3:
+        return getIntAt(offset);
+      case 4:
+        return getFloatAt(offset);
+      case 5:
+        return getDoubleAt(offset);
+      case 8:
+        return getLongAt(offset);
+      default:
+        if (typeid(T) == typeid(float()) || typeid(T) == typeid(double()))
+          return NAN;
+        else
+          return -99;
+      }
+    }
+
+    template <typename T>
+    T get(std::string name, int index) {
+      int item = bankSchema.getEntryOrder(name.c_str());
+      return this->get<T>(item, index);
+    }
+
     int    getInt(int item, int index);
     int    getShort(int item, int index);
     int    getByte(int item, int index);
@@ -151,12 +183,13 @@ namespace hipo {
     float  getFloat(std::string name, int index) { return getFloat(name.c_str(), index); }
     double getDouble(std::string name, int index) { return getDouble(name.c_str(), index); }
     long   getLong(std::string name, int index) { return getLong(name.c_str(), index); }
-    void   putInt(const char* name, int index, int32_t value);
-    void   putShort(const char* name, int index, int16_t value);
-    void   putByte(const char* name, int index, int8_t value);
-    void   putFloat(const char* name, int index, float value);
-    void   putDouble(const char* name, int index, double value);
-    void   putLong(const char* name, int index, int64_t value);
+
+    void putInt(const char* name, int index, int32_t value);
+    void putShort(const char* name, int index, int16_t value);
+    void putByte(const char* name, int index, int8_t value);
+    void putFloat(const char* name, int index, float value);
+    void putDouble(const char* name, int index, double value);
+    void putLong(const char* name, int index, int64_t value);
 
     void show();
     void reset();

@@ -38,21 +38,21 @@ int main(int argc, char** argv) {
   auto hipo_event   = std::make_shared<hipo::event>();
   auto rec_Particle = std::make_shared<hipo::bank>(dict->getSchema("REC::Particle"));
 
-  int  entry      = 0;
-  int  l          = 0;
-  auto start_full = std::chrono::high_resolution_clock::now();
+  int entry = 0;
+  int l     = 0;
+
   while (reader->next() == true) {
-    if (++entry % 10000 == 0)
-      std::cout << " " << entry << "\r\r" << std::flush;
+    if (++entry % 100000 == 0)
+      std::cout << "\t" << (100 * entry / tot_hipo_events) << "%\r\r" << std::flush;
 
     reader->read(*hipo_event);
     hipo_event->getStructure(*rec_Particle);
     l = rec_Particle->getRows();
     if (l != -1) {
       for (int i = 0; i < l; i++) {
-        if (rec_Particle->getFloat("pz", i) < 10 && rec_Particle->getFloat("pz", i) > -1 &&
-            rec_Particle->getInt("pid", i) == 11)
-          hist->Fill(rec_Particle->getFloat("pz", i));
+        if (rec_Particle->get<float>("pz", i) < 10 && rec_Particle->get<float>("pz", i) > -1 &&
+            rec_Particle->get<int>("pid", i) == 11)
+          hist->Fill(rec_Particle->get<float>("pz", i));
       }
     }
   }

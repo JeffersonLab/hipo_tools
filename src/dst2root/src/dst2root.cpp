@@ -74,12 +74,6 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
   }
 
   clas12->Branch("dc_sec", &dc_sec);
-  clas12->Branch("dc_px", &dc_px);
-  clas12->Branch("dc_py", &dc_py);
-  clas12->Branch("dc_pz", &dc_pz);
-  clas12->Branch("dc_vx", &dc_vx);
-  clas12->Branch("dc_vy", &dc_vy);
-  clas12->Branch("dc_vz", &dc_vz);
   clas12->Branch("dc_r1_x", &dc_r1_x);
   clas12->Branch("dc_r1_y", &dc_r1_y);
   clas12->Branch("dc_r1_z", &dc_r1_z);
@@ -89,12 +83,6 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
   clas12->Branch("dc_r3_x", &dc_r3_x);
   clas12->Branch("dc_r3_y", &dc_r3_y);
   clas12->Branch("dc_r3_z", &dc_r3_z);
-  clas12->Branch("cvt_px", &cvt_px);
-  clas12->Branch("cvt_py", &cvt_py);
-  clas12->Branch("cvt_pz", &cvt_pz);
-  clas12->Branch("cvt_vx", &cvt_vx);
-  clas12->Branch("cvt_vy", &cvt_vy);
-  clas12->Branch("cvt_vz", &cvt_vz);
   clas12->Branch("cvt_x", &cvt_x);
   clas12->Branch("cvt_y", &cvt_y);
   clas12->Branch("cvt_z", &cvt_z);
@@ -423,10 +411,9 @@ int main(int argc, char** argv) {
     hipo_event->getStructure(*rec_Cherenkov);
     hipo_event->getStructure(*rec_Scintillator);
     hipo_event->getStructure(*rec_Calorimeter);
+    hipo_event->getStructure(*rec_Traj);
     if (cov)
       hipo_event->getStructure(*rec_CovMat);
-    if (traj)
-      hipo_event->getStructure(*rec_Traj);
     if (is_mc) {
       hipo_event->getStructure(*mc_Header);
       hipo_event->getStructure(*mc_Particle);
@@ -528,22 +515,23 @@ int main(int argc, char** argv) {
     status.resize(l);
 
     for (int i = 0; i < l; i++) {
-      pid[i]     = rec_Particle->getInt(0, i);
-      p2[i]      = (rec_Particle->getFloat(1, i) * rec_Particle->getFloat(1, i) +
-               rec_Particle->getFloat(2, i) * rec_Particle->getFloat(2, i) +
-               rec_Particle->getFloat(3, i) * rec_Particle->getFloat(3, i));
-      p[i]       = sqrt(p2[i]);
-      px[i]      = rec_Particle->getFloat(1, i);
-      py[i]      = rec_Particle->getFloat(2, i);
-      pz[i]      = rec_Particle->getFloat(3, i);
-      vx[i]      = rec_Particle->getFloat(4, i);
-      vy[i]      = rec_Particle->getFloat(5, i);
-      vz[i]      = rec_Particle->getFloat(6, i);
-      vt[i]      = rec_Particle->getFloat(7, i);
-      charge[i]  = rec_Particle->getInt(8, i);
-      beta[i]    = ((rec_Particle->getFloat(9, i) != -9999) ? rec_Particle->getFloat(9, i) : NAN);
-      chi2pid[i] = rec_Particle->getFloat(10, i);
-      status[i]  = rec_Particle->getInt(11, i);
+      pid[i]    = rec_Particle->getInt("pid", i);
+      p2[i]     = (rec_Particle->getFloat("px", i) * rec_Particle->getFloat("px", i) +
+               rec_Particle->getFloat("py", i) * rec_Particle->getFloat("py", i) +
+               rec_Particle->getFloat("pz", i) * rec_Particle->getFloat("pz", i));
+      p[i]      = sqrt(p2[i]);
+      px[i]     = rec_Particle->getFloat("px", i);
+      py[i]     = rec_Particle->getFloat("py", i);
+      pz[i]     = rec_Particle->getFloat("pz", i);
+      vx[i]     = rec_Particle->getFloat("vx", i);
+      vy[i]     = rec_Particle->getFloat("vy", i);
+      vz[i]     = rec_Particle->getFloat("vz", i);
+      vt[i]     = rec_Particle->getFloat("vt", i);
+      charge[i] = rec_Particle->getInt("charge", i);
+      beta[i] =
+          ((rec_Particle->getFloat("beta", i) != -9999) ? rec_Particle->getFloat("beta", i) : NAN);
+      chi2pid[i] = rec_Particle->getFloat("chi2pid", i);
+      status[i]  = rec_Particle->getInt("status", i);
     }
 
     len_pid    = rec_Particle->getRows();
@@ -1090,35 +1078,9 @@ int main(int argc, char** argv) {
     len_pindex = rec_Track->getRows();
 
     dc_sec.resize(len_pid);
-    dc_px.resize(len_pid);
-    dc_py.resize(len_pid);
-    dc_pz.resize(len_pid);
-    dc_vx.resize(len_pid);
-    dc_vy.resize(len_pid);
-    dc_vz.resize(len_pid);
-
-    cvt_px.resize(len_pid);
-    cvt_py.resize(len_pid);
-    cvt_pz.resize(len_pid);
-    cvt_vx.resize(len_pid);
-    cvt_vy.resize(len_pid);
-    cvt_vz.resize(len_pid);
 
     for (int i = 0; i < len_pid; i++) {
       dc_sec[i] = -1;
-      dc_px[i]  = NAN;
-      dc_py[i]  = NAN;
-      dc_pz[i]  = NAN;
-      dc_vx[i]  = NAN;
-      dc_vy[i]  = NAN;
-      dc_vz[i]  = NAN;
-
-      cvt_px[i] = NAN;
-      cvt_py[i] = NAN;
-      cvt_pz[i] = NAN;
-      cvt_vx[i] = NAN;
-      cvt_vy[i] = NAN;
-      cvt_vz[i] = NAN;
     }
 
     for (int i = 0; i < len_pid; i++) {
@@ -1126,22 +1088,8 @@ int main(int argc, char** argv) {
         int pindex   = rec_Track->getInt(1, k);
         int detector = rec_Track->getInt(2, k);
 
-        if (pindex == i && detector == CVT) {
-          cvt_px[i] = rec_Track->getFloat(8, k);
-          cvt_py[i] = rec_Track->getFloat(9, k);
-          cvt_pz[i] = rec_Track->getFloat(10, k);
-          cvt_vx[i] = rec_Track->getFloat(11, k);
-          cvt_vy[i] = rec_Track->getFloat(12, k);
-          cvt_vz[i] = rec_Track->getFloat(13, k);
-
-        } else if (pindex == i && detector == DC) {
+        if (pindex == i && detector == DC) {
           dc_sec[i] = rec_Track->getInt(3, k);
-          dc_px[i]  = rec_Track->getFloat(8, k);
-          dc_py[i]  = rec_Track->getFloat(9, k);
-          dc_pz[i]  = rec_Track->getFloat(10, k);
-          dc_vx[i]  = rec_Track->getFloat(11, k);
-          dc_vy[i]  = rec_Track->getFloat(12, k);
-          dc_vz[i]  = rec_Track->getFloat(13, k);
         }
       }
     }
