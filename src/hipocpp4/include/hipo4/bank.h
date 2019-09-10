@@ -14,6 +14,7 @@
 #ifndef HIPO_BANK_H
 #define HIPO_BANK_H
 #include "dictionary.h"
+#include <cmath>
 #include <cstring>
 #include <iostream>
 #include <map>
