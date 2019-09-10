@@ -20,6 +20,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <typeinfo>
 #include <vector>
 
 namespace hipo {
@@ -149,7 +150,7 @@ namespace hipo {
         return getLongAt(offset);
       default:
         if (typeid(T) == typeid(float()) || typeid(T) == typeid(double()))
-          return std::nanf("-99");
+          return NAN;
         else
           return -99;
       }
