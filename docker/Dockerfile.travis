@@ -1,4 +1,5 @@
-FROM rootproject/root-ubuntu16
+FROM tylern4/rootv6:py3
+#FROM rootproject/root-ubuntu16
 USER root
 
 ENV HIPO_TOOLS /usr/local/hipo_tools
@@ -6,19 +7,19 @@ ENV PATH $PATH:$HIPO_TOOLS/bin
 ENV LD_LIBRARY_PATH $HIPO_TOOLS/lib:/usr/local/lib/root
 ENV PYTHONPATH $HIPO_TOOLS/lib:/usr/local/lib/root
 
-RUN apt-get update && apt-get install -y liblz4-dev python-pip python-dev && rm -rf /var/lib/apt/lists/*
+#RUN apt-get update && apt-get install -y liblz4-dev python-pip python-dev && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip
 RUN pip install numpy cython scikit-build
 
 #install latest cmake
-ENV CMAKE_MAJ_VER 3.13
-ENV CMAKE_MIN_VER 4
-RUN curl https://cmake.org/files/v$CMAKE_MAJ_VER/cmake-$CMAKE_MAJ_VER.$CMAKE_MIN_VER-Linux-x86_64.sh -o /tmp/cmake-$CMAKE_MAJ_VER.$CMAKE_MIN_VER-Linux-x86_64.sh \
-	&& mkdir /opt/cmake \
-	&& sh /tmp/cmake-$CMAKE_MAJ_VER.$CMAKE_MIN_VER-Linux-x86_64.sh --prefix=/opt/cmake --skip-license \
-	&& ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake \
-	&& rm -rf /tmp/*
+#ENV CMAKE_MAJ_VER 3.13
+#ENV CMAKE_MIN_VER 4
+#RUN curl https://cmake.org/files/v$CMAKE_MAJ_VER/cmake-$CMAKE_MAJ_VER.$CMAKE_MIN_VER-Linux-x86_64.sh -o /tmp/cmake-$CMAKE_MAJ_VER.$CMAKE_MIN_VER-Linux-x86_64.sh \
+#	&& mkdir /opt/cmake \
+#	&& sh /tmp/cmake-$CMAKE_MAJ_VER.$CMAKE_MIN_VER-Linux-x86_64.sh --prefix=/opt/cmake --skip-license \
+#	&& ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake \
+#	&& rm -rf /tmp/*
 
 ADD . /tmp/hipo_tools/
 RUN mkdir -p /tmp/hipo_tools/build && cd /tmp/hipo_tools/build \
