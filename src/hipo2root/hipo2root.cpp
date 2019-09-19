@@ -68,8 +68,8 @@ int main(int argc, char** argv) {
   auto run_Config = std::make_shared<hipo::bank>(dict->getSchema("RUN::config"));
   auto rec_Event  = std::make_shared<hipo::bank>(dict->getSchema("REC::Event"));
   auto hel_Online = std::make_shared<hipo::bank>(dict->getSchema("HEL::online"));
-  /*
   auto hel_Flip   = std::make_shared<hipo::bank>(dict->getSchema("HEL::flip"));
+  /*
   auto run_Scaler = std::make_shared<hipo::bank>(dict->getSchema("RUN::scaler"));
   auto raw_Scaler = std::make_shared<hipo::bank>(dict->getSchema("RAW::scaler"));
   auto raw_Epics  = std::make_shared<hipo::bank>(dict->getSchema("RAW::epics"));
@@ -118,6 +118,15 @@ int main(int argc, char** argv) {
 
   clas12->Branch("HEL_Online_helicity", &HEL_Online_helicity);
   clas12->Branch("HEL_Online_helicityRaw", &HEL_Online_helicityRaw);
+
+  clas12->Branch("HEL_Flip_run", &HEL_Flip_run);
+  clas12->Branch("HEL_Flip_event", &HEL_Flip_event);
+  clas12->Branch("HEL_Flip_timestamp", &HEL_Flip_timestamp);
+  clas12->Branch("HEL_Flip_helicity", &HEL_Flip_helicity);
+  clas12->Branch("HEL_Flip_helicityRaw", &HEL_Flip_helicityRaw);
+  clas12->Branch("HEL_Flip_pair", &HEL_Flip_pair);
+  clas12->Branch("HEL_Flip_pattern", &HEL_Flip_pattern);
+  clas12->Branch("HEL_Flip_status", &HEL_Flip_status);
 
   clas12->Branch("REC_Particle_pid", &REC_Particle_pid_vec);
   clas12->Branch("REC_Particle_px", &REC_Particle_px_vec);
@@ -327,9 +336,8 @@ int main(int argc, char** argv) {
     hipo_event->getStructure(*rec_Event);
     hipo_event->getStructure(*run_Config);
     hipo_event->getStructure(*hel_Online);
-
-    /*
     hipo_event->getStructure(*hel_Flip);
+    /*
     hipo_event->getStructure(*run_Scaler);
     hipo_event->getStructure(*raw_Scaler);
     hipo_event->getStructure(*raw_Epics);
@@ -444,6 +452,26 @@ int main(int argc, char** argv) {
       RUN_Config_mode      = run_Config->getInt(6, 0);
       RUN_Config_torus     = run_Config->getFloat(7, 0);
       RUN_Config_solenoid  = run_Config->getFloat(8, 0);
+    }
+    l = hel_Online->getRows();
+    if (l != -1) {
+      HEL_Online_helicity    = hel_Online->getInt(0, 0);
+      HEL_Online_helicityRaw = hel_Online->getInt(1, 0);
+    }
+
+    l = hel_Flip->getRows();
+    if (l != -1) {
+      int hel = hel_Flip->getInt(3, 0);
+      if (hel == 1 || hel == -1 || hel == 0) {
+        HEL_Flip_run         = hel_Flip->getInt(0, 0);
+        HEL_Flip_event       = hel_Flip->getInt(1, 0);
+        HEL_Flip_timestamp   = hel_Flip->getLong(2, 0);
+        HEL_Flip_helicity    = hel_Flip->getInt(3, 0);
+        HEL_Flip_helicityRaw = hel_Flip->getInt(4, 0);
+        HEL_Flip_pair        = hel_Flip->getInt(5, 0);
+        HEL_Flip_pattern     = hel_Flip->getInt(6, 0);
+        HEL_Flip_status      = hel_Flip->getInt(7, 0);
+      }
     }
 
     l = rec_Event->getRows();
