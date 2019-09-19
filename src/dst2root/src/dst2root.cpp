@@ -360,6 +360,7 @@ int main(int argc, char** argv) {
   // Event config
   auto run_Config = std::make_shared<hipo::bank>(dict->getSchema("RUN::config"));
   auto rec_Event  = std::make_shared<hipo::bank>(dict->getSchema("REC::Event"));
+
   /*
   auto hel_Online = std::make_shared<hipo::bank>(dict->getSchema("HEL::online"));
   auto hel_Flip   = std::make_shared<hipo::bank>(dict->getSchema("HEL::flip"));
@@ -450,7 +451,13 @@ int main(int argc, char** argv) {
       torus     = run_Config->getFloat(7, 0);
       solenoid  = run_Config->getFloat(8, 0);
     }
-
+    /*
+        l = hel_Online->getRows();
+        if (l != -1) {
+          helicity    = hel_Online->getInt(0, 0);
+          helicityRaw = hel_Online->getInt(1, 0);
+        }
+    */
     if (is_mc) {
       l = mc_Header->getRows();
       if (l != -1) {

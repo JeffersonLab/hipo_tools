@@ -1,3 +1,4 @@
+
 using v_int   = std::vector<Int_t>;
 using v_float = std::vector<Float_t>;
 
@@ -20,6 +21,9 @@ Float_t  REC_Event_RFTime;
 Int_t    REC_Event_helicity;
 Int_t    REC_Event_helicityRaw;
 Float_t  REC_Event_procTime;
+
+Int_t HEL_Online_helicity;
+Int_t HEL_Online_helicityRaw;
 
 v_int   REC_Particle_pid_vec;
 v_float REC_Particle_px_vec;

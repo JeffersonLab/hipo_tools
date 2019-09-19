@@ -151,7 +151,7 @@ namespace hipo {
         return getLongAt(offset);
       default:
         if (typeid(T) == typeid(float()) || typeid(T) == typeid(double()))
-          return NAN;
+          return (float)NAN;
         else
           return -99;
       }
