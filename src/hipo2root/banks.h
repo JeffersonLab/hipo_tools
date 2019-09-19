@@ -25,6 +25,15 @@ Float_t  REC_Event_procTime;
 Int_t HEL_Online_helicity;
 Int_t HEL_Online_helicityRaw;
 
+Int_t   HEL_Flip_run;
+Int_t   HEL_Flip_event;
+Float_t HEL_Flip_timestamp;
+Int_t   HEL_Flip_helicity;
+Int_t   HEL_Flip_helicityRaw;
+Int_t   HEL_Flip_pair;
+Int_t   HEL_Flip_pattern;
+Int_t   HEL_Flip_status;
+
 v_int   REC_Particle_pid_vec;
 v_float REC_Particle_px_vec;
 v_float REC_Particle_py_vec;
