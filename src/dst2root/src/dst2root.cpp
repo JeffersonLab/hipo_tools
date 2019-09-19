@@ -42,6 +42,15 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
   clas12->Branch("helicityRaw", &helicityRaw);
   clas12->Branch("procTime", &procTime);
 
+  clas12->Branch("hel_run", &hel_run);
+  clas12->Branch("hel_event", &hel_event);
+  clas12->Branch("hel_timestamp", &hel_timestamp);
+  clas12->Branch("hel_helicity", &hel_helicity);
+  clas12->Branch("hel_helicityRaw", &hel_helicityRaw);
+  clas12->Branch("hel_pair", &hel_pair);
+  clas12->Branch("hel_pattern", &hel_pattern);
+  clas12->Branch("hel_status", &hel_status);
+
   clas12->Branch("pid", &pid);
   clas12->Branch("p", &p);
   clas12->Branch("p2", &p2);
@@ -360,10 +369,10 @@ int main(int argc, char** argv) {
   // Event config
   auto run_Config = std::make_shared<hipo::bank>(dict->getSchema("RUN::config"));
   auto rec_Event  = std::make_shared<hipo::bank>(dict->getSchema("REC::Event"));
+  auto hel_Flip   = std::make_shared<hipo::bank>(dict->getSchema("HEL::flip"));
 
   /*
   auto hel_Online = std::make_shared<hipo::bank>(dict->getSchema("HEL::online"));
-  auto hel_Flip   = std::make_shared<hipo::bank>(dict->getSchema("HEL::flip"));
   auto run_Scaler = std::make_shared<hipo::bank>(dict->getSchema("RUN::scaler"));
   auto raw_Scaler = std::make_shared<hipo::bank>(dict->getSchema("RAW::scaler"));
   auto raw_Epics  = std::make_shared<hipo::bank>(dict->getSchema("RAW::epics"));
@@ -399,9 +408,9 @@ int main(int argc, char** argv) {
     reader->read(*hipo_event);
     hipo_event->getStructure(*rec_Event);
     hipo_event->getStructure(*run_Config);
+    hipo_event->getStructure(*hel_Flip);
     /*
     hipo_event->getStructure(*hel_Online);
-    hipo_event->getStructure(*hel_Flip);
     hipo_event->getStructure(*run_Scaler);
     hipo_event->getStructure(*raw_Scaler);
     hipo_event->getStructure(*raw_Epics);
@@ -451,13 +460,22 @@ int main(int argc, char** argv) {
       torus     = run_Config->getFloat(7, 0);
       solenoid  = run_Config->getFloat(8, 0);
     }
-    /*
-        l = hel_Online->getRows();
-        if (l != -1) {
-          helicity    = hel_Online->getInt(0, 0);
-          helicityRaw = hel_Online->getInt(1, 0);
-        }
-    */
+
+    l = hel_Flip->getRows();
+    if (l != -1) {
+      int hel = hel_Flip->getInt(3, 0);
+      if (hel == 1 || hel == -1) {
+        hel_run         = hel_Flip->getInt(0, 0);
+        hel_event       = hel_Flip->getInt(1, 0);
+        hel_timestamp   = hel_Flip->getLong(2, 0);
+        hel_helicity    = hel_Flip->getInt(3, 0);
+        hel_helicityRaw = hel_Flip->getInt(4, 0);
+        hel_pair        = hel_Flip->getInt(5, 0);
+        hel_pattern     = hel_Flip->getInt(6, 0);
+        hel_status      = hel_Flip->getInt(7, 0);
+      }
+    }
+
     if (is_mc) {
       l = mc_Header->getRows();
       if (l != -1) {

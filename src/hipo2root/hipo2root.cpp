@@ -462,7 +462,7 @@ int main(int argc, char** argv) {
     l = hel_Flip->getRows();
     if (l != -1) {
       int hel = hel_Flip->getInt(3, 0);
-      if (hel == 1 || hel == -1 || hel == 0) {
+      if (hel == 1 || hel == -1) {
         HEL_Flip_run         = hel_Flip->getInt(0, 0);
         HEL_Flip_event       = hel_Flip->getInt(1, 0);
         HEL_Flip_timestamp   = hel_Flip->getLong(2, 0);
