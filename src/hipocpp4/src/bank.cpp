@@ -154,6 +154,7 @@ namespace hipo {
     }
     return -99;
   }
+
   float bank::getFloat(int item, int index) {
     if (bankSchema.getEntryType(item) == 4) {
       int offset = bankSchema.getOffset(item, index, bankRows);

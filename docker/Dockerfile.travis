@@ -1,4 +1,4 @@
-FROM tylern4/rootv6:py3
+FROM uofscphysics/root
 USER root
 
 ENV HIPO_TOOLS /usr/local/hipo_tools

@@ -67,8 +67,8 @@ int main(int argc, char** argv) {
   // Event config
   auto run_Config = std::make_shared<hipo::bank>(dict->getSchema("RUN::config"));
   auto rec_Event  = std::make_shared<hipo::bank>(dict->getSchema("REC::Event"));
-  /*
   auto hel_Online = std::make_shared<hipo::bank>(dict->getSchema("HEL::online"));
+  /*
   auto hel_Flip   = std::make_shared<hipo::bank>(dict->getSchema("HEL::flip"));
   auto run_Scaler = std::make_shared<hipo::bank>(dict->getSchema("RUN::scaler"));
   auto raw_Scaler = std::make_shared<hipo::bank>(dict->getSchema("RAW::scaler"));
@@ -115,6 +115,9 @@ int main(int argc, char** argv) {
   clas12->Branch("REC_Event_helicity", &REC_Event_helicity);
   clas12->Branch("REC_Event_helicityRaw", &REC_Event_helicityRaw);
   clas12->Branch("REC_Event_procTime", &REC_Event_procTime);
+
+  clas12->Branch("HEL_Online_helicity", &HEL_Online_helicity);
+  clas12->Branch("HEL_Online_helicityRaw", &HEL_Online_helicityRaw);
 
   clas12->Branch("REC_Particle_pid", &REC_Particle_pid_vec);
   clas12->Branch("REC_Particle_px", &REC_Particle_px_vec);
@@ -323,8 +326,9 @@ int main(int argc, char** argv) {
     reader->read(*hipo_event);
     hipo_event->getStructure(*rec_Event);
     hipo_event->getStructure(*run_Config);
-    /*
     hipo_event->getStructure(*hel_Online);
+
+    /*
     hipo_event->getStructure(*hel_Flip);
     hipo_event->getStructure(*run_Scaler);
     hipo_event->getStructure(*raw_Scaler);
@@ -472,19 +476,20 @@ int main(int argc, char** argv) {
       REC_Particle_status_vec.resize(l);
 
       for (int i = 0; i < l; i++) {
-        REC_Particle_pid_vec[i]    = rec_Particle->getInt(0, i);
-        REC_Particle_px_vec[i]     = rec_Particle->getFloat(1, i);
-        REC_Particle_py_vec[i]     = rec_Particle->getFloat(2, i);
-        REC_Particle_pz_vec[i]     = rec_Particle->getFloat(3, i);
-        REC_Particle_vx_vec[i]     = rec_Particle->getFloat(4, i);
-        REC_Particle_vy_vec[i]     = rec_Particle->getFloat(5, i);
-        REC_Particle_vz_vec[i]     = rec_Particle->getFloat(6, i);
-        REC_Particle_vt_vec[i]     = rec_Particle->getFloat(7, i);
-        REC_Particle_charge_vec[i] = rec_Particle->getInt(8, i);
+        REC_Particle_pid_vec[i]    = rec_Particle->getInt("pid", i);
+        REC_Particle_px_vec[i]     = rec_Particle->getFloat("px", i);
+        REC_Particle_py_vec[i]     = rec_Particle->getFloat("py", i);
+        REC_Particle_pz_vec[i]     = rec_Particle->getFloat("pz", i);
+        REC_Particle_vx_vec[i]     = rec_Particle->getFloat("vx", i);
+        REC_Particle_vy_vec[i]     = rec_Particle->getFloat("vy", i);
+        REC_Particle_vz_vec[i]     = rec_Particle->getFloat("vz", i);
+        REC_Particle_vt_vec[i]     = rec_Particle->getFloat("vt", i);
+        REC_Particle_charge_vec[i] = rec_Particle->getInt("charge", i);
         REC_Particle_beta_vec[i] =
-            ((rec_Particle->getFloat(9, i) != -9999) ? rec_Particle->getFloat(9, i) : NAN);
-        REC_Particle_chi2pid_vec[i] = rec_Particle->getFloat(10, i);
-        REC_Particle_status_vec[i]  = rec_Particle->getInt(11, i);
+            ((rec_Particle->getFloat("beta", i) != -9999) ? rec_Particle->getFloat("beta", i)
+                                                          : NAN);
+        REC_Particle_chi2pid_vec[i] = rec_Particle->getFloat("chi2pid", i);
+        REC_Particle_status_vec[i]  = rec_Particle->getInt("status", i);
       }
     }
     l = rec_Calorimeter->getRows();
