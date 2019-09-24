@@ -36,6 +36,15 @@ Int_t    helicity;
 Int_t    helicityRaw;
 Float_t  procTime;
 
+Int_t   hel_run;
+Int_t   hel_event;
+Float_t hel_timestamp;
+Int_t   hel_helicity;
+Int_t   hel_helicityRaw;
+Int_t   hel_pair;
+Int_t   hel_pattern;
+Int_t   hel_status;
+
 v_int   pid;
 v_float p;
 v_float p2;

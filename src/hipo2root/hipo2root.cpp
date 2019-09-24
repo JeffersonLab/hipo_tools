@@ -32,17 +32,20 @@ int main(int argc, char** argv) {
   bool        cov        = false;
   bool        traj       = false;
   bool        tbt        = false;
+  bool        hits       = false;
 
-  auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
-              clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
-              clipp::option("-b", "--batch").set(is_batch) % "Don't show progress and statistics",
-              clipp::option("-c", "--cov").set(cov) % "Save Covariant Matrix for kinematic fitting",
-              clipp::option("-t", "--traj").set(traj) % "Save traj information",
-              clipp::option("-tbt", "--tbt").set(tbt) % "Save TimeBasedTrkg information",
-              clipp::option("-test", "--test").set(is_test) %
-                  "Only convert first 50000 events for testing",
-              clipp::value("inputFile.hipo", InFileName),
-              clipp::opt_value("outputFile.root", OutFileName));
+  auto cli =
+      (clipp::option("-h", "--help").set(print_help) % "print help",
+       clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
+       clipp::option("-b", "--batch").set(is_batch) % "Don't show progress and statistics",
+       clipp::option("-c", "--cov").set(cov) % "Save Covariant Matrix for kinematic fitting",
+       clipp::option("-hits", "--hits").set(hits) % "Save CND::hits, CND::clusters, CTOF::hits",
+       clipp::option("-t", "--traj").set(traj) % "Save traj information",
+       clipp::option("-tbt", "--tbt").set(tbt) % "Save TimeBasedTrkg information",
+       clipp::option("-test", "--test").set(is_test) %
+           "Only convert first 50000 events for testing",
+       clipp::value("inputFile.hipo", InFileName),
+       clipp::opt_value("outputFile.root", OutFileName));
 
   clipp::parse(argc, argv, cli);
   if (print_help || InFileName.empty()) {
@@ -69,11 +72,6 @@ int main(int argc, char** argv) {
   auto rec_Event  = std::make_shared<hipo::bank>(dict->getSchema("REC::Event"));
   auto hel_Online = std::make_shared<hipo::bank>(dict->getSchema("HEL::online"));
   auto hel_Flip   = std::make_shared<hipo::bank>(dict->getSchema("HEL::flip"));
-  /*
-  auto run_Scaler = std::make_shared<hipo::bank>(dict->getSchema("RUN::scaler"));
-  auto raw_Scaler = std::make_shared<hipo::bank>(dict->getSchema("RAW::scaler"));
-  auto raw_Epics  = std::make_shared<hipo::bank>(dict->getSchema("RAW::epics"));
-  */
 
   // Physics
   auto rec_Particle      = std::make_shared<hipo::bank>(dict->getSchema("REC::Particle"));
@@ -95,6 +93,11 @@ int main(int argc, char** argv) {
   auto tbt_Tracks  = std::make_shared<hipo::bank>(dict->getSchema("TimeBasedTrkg::TBTracks"));
   auto tbt_Crosses = std::make_shared<hipo::bank>(dict->getSchema("TimeBasedTrkg::TBCrosses"));
   auto tbt_Hits    = std::make_shared<hipo::bank>(dict->getSchema("TimeBasedTrkg::TBHits"));
+
+  // CND and CTOF hits
+  auto cnd_Hits     = std::make_shared<hipo::bank>(dict->getSchema("CND::hits"));
+  auto cnd_Clusters = std::make_shared<hipo::bank>(dict->getSchema("CND::clusters"));
+  auto ctof_Hits    = std::make_shared<hipo::bank>(dict->getSchema("CTOF::hits"));
 
   clas12->Branch("RUN_Config_run", &RUN_Config_run);
   clas12->Branch("RUN_Config_event", &RUN_Config_event);
@@ -324,6 +327,71 @@ int main(int argc, char** argv) {
     clas12->Branch("REC_Traj_cz", &REC_Traj_cz_vec);
     clas12->Branch("REC_Traj_path", &REC_Traj_path_vec);
   }
+  if (hits) {
+    clas12->Branch("CND_Hits_id", &CND_Hits_id_vec);
+    clas12->Branch("CND_Hits_status", &CND_Hits_status_vec);
+    clas12->Branch("CND_Hits_trkID", &CND_Hits_trkID_vec);
+    clas12->Branch("CND_Hits_sector", &CND_Hits_sector_vec);
+    clas12->Branch("CND_Hits_layer", &CND_Hits_layer_vec);
+    clas12->Branch("CND_Hits_component", &CND_Hits_component_vec);
+    clas12->Branch("CND_Hits_energy", &CND_Hits_energy_vec);
+    clas12->Branch("CND_Hits_time", &CND_Hits_time_vec);
+    clas12->Branch("CND_Hits_energy_unc", &CND_Hits_energy_unc_vec);
+    clas12->Branch("CND_Hits_time_unc", &CND_Hits_time_unc_vec);
+    clas12->Branch("CND_Hits_x", &CND_Hits_x_vec);
+    clas12->Branch("CND_Hits_y", &CND_Hits_y_vec);
+    clas12->Branch("CND_Hits_z", &CND_Hits_z_vec);
+    clas12->Branch("CND_Hits_x_unc", &CND_Hits_x_unc_vec);
+    clas12->Branch("CND_Hits_y_unc", &CND_Hits_y_unc_vec);
+    clas12->Branch("CND_Hits_z_unc", &CND_Hits_z_unc_vec);
+    clas12->Branch("CND_Hits_tx", &CND_Hits_tx_vec);
+    clas12->Branch("CND_Hits_ty", &CND_Hits_ty_vec);
+    clas12->Branch("CND_Hits_tz", &CND_Hits_tz_vec);
+    clas12->Branch("CND_Hits_tlength", &CND_Hits_tlength_vec);
+    clas12->Branch("CND_Hits_pathlength", &CND_Hits_pathlength_vec);
+    clas12->Branch("CND_Hits_indexLadc", &CND_Hits_indexLadc_vec);
+    clas12->Branch("CND_Hits_indexRadc", &CND_Hits_indexRadc_vec);
+    clas12->Branch("CND_Hits_indexLtdc", &CND_Hits_indexLtdc_vec);
+    clas12->Branch("CND_Hits_indexRtdc", &CND_Hits_indexRtdc_vec);
+
+    clas12->Branch("CND_Clusters_id", &CND_Clusters_id_vec);
+    clas12->Branch("CND_Clusters_sector", &CND_Clusters_sector_vec);
+    clas12->Branch("CND_Clusters_layer", &CND_Clusters_layer_vec);
+    clas12->Branch("CND_Clusters_component", &CND_Clusters_component_vec);
+    clas12->Branch("CND_Clusters_nhits", &CND_Clusters_nhits_vec);
+    clas12->Branch("CND_Clusters_energy", &CND_Clusters_energy_vec);
+    clas12->Branch("CND_Clusters_x", &CND_Clusters_x_vec);
+    clas12->Branch("CND_Clusters_y", &CND_Clusters_y_vec);
+    clas12->Branch("CND_Clusters_z", &CND_Clusters_z_vec);
+    clas12->Branch("CND_Clusters_time", &CND_Clusters_time_vec);
+    clas12->Branch("CND_Clusters_status", &CND_Clusters_status_vec);
+
+    clas12->Branch("CTOF_Hits_id", &CTOF_Hits_id_vec);
+    clas12->Branch("CTOF_Hits_status", &CTOF_Hits_status_vec);
+    clas12->Branch("CTOF_Hits_trkID", &CTOF_Hits_trkID_vec);
+    clas12->Branch("CTOF_Hits_sector", &CTOF_Hits_sector_vec);
+    clas12->Branch("CTOF_Hits_layer", &CTOF_Hits_layer_vec);
+    clas12->Branch("CTOF_Hits_component", &CTOF_Hits_component_vec);
+    clas12->Branch("CTOF_Hits_energy", &CTOF_Hits_energy_vec);
+    clas12->Branch("CTOF_Hits_time", &CTOF_Hits_time_vec);
+    clas12->Branch("CTOF_Hits_energy_unc", &CTOF_Hits_energy_unc_vec);
+    clas12->Branch("CTOF_Hits_time_unc", &CTOF_Hits_time_unc_vec);
+    clas12->Branch("CTOF_Hits_x", &CTOF_Hits_x_vec);
+    clas12->Branch("CTOF_Hits_y", &CTOF_Hits_y_vec);
+    clas12->Branch("CTOF_Hits_z", &CTOF_Hits_z_vec);
+    clas12->Branch("CTOF_Hits_x_unc", &CTOF_Hits_x_unc_vec);
+    clas12->Branch("CTOF_Hits_y_unc", &CTOF_Hits_y_unc_vec);
+    clas12->Branch("CTOF_Hits_z_unc", &CTOF_Hits_z_unc_vec);
+    clas12->Branch("CTOF_Hits_tx", &CTOF_Hits_tx_vec);
+    clas12->Branch("CTOF_Hits_ty", &CTOF_Hits_ty_vec);
+    clas12->Branch("CTOF_Hits_tz", &CTOF_Hits_tz_vec);
+    clas12->Branch("CTOF_Hits_adc_idx1", &CTOF_Hits_adc_idx1_vec);
+    clas12->Branch("CTOF_Hits_adc_idx2", &CTOF_Hits_adc_idx2_vec);
+    clas12->Branch("CTOF_Hits_tdc_idx1", &CTOF_Hits_tdc_idx1_vec);
+    clas12->Branch("CTOF_Hits_tdc_idx2", &CTOF_Hits_tdc_idx2_vec);
+    clas12->Branch("CTOF_Hits_pathLength", &CTOF_Hits_pathLength_vec);
+    clas12->Branch("CTOF_Hits_pathLengthThruBar", &CTOF_Hits_pathLengthThruBar_vec);
+  }
 
   int  entry      = 0;
   int  l          = 0;
@@ -362,6 +430,11 @@ int main(int argc, char** argv) {
       hipo_event->getStructure(*tbt_Tracks);
       hipo_event->getStructure(*tbt_Crosses);
       hipo_event->getStructure(*tbt_Hits);
+    }
+    if (hits) {
+      hipo_event->getStructure(*cnd_Hits);
+      hipo_event->getStructure(*cnd_Clusters);
+      hipo_event->getStructure(*ctof_Hits);
     }
 
     if (!is_batch && (++entry % 10000) == 0)
@@ -462,7 +535,7 @@ int main(int argc, char** argv) {
     l = hel_Flip->getRows();
     if (l != -1) {
       int hel = hel_Flip->getInt(3, 0);
-      if (hel == 1 || hel == -1 || hel == 0) {
+      if (hel == 1 || hel == -1) {
         HEL_Flip_run         = hel_Flip->getInt(0, 0);
         HEL_Flip_event       = hel_Flip->getInt(1, 0);
         HEL_Flip_timestamp   = hel_Flip->getLong(2, 0);
@@ -877,6 +950,150 @@ int main(int argc, char** argv) {
           REC_Traj_cy_vec[i]       = rec_Traj->getFloat(8, i);
           REC_Traj_cz_vec[i]       = rec_Traj->getFloat(9, i);
           REC_Traj_path_vec[i]     = rec_Traj->getFloat(10, i);
+        }
+      }
+    }
+    if (hits) {
+      l = cnd_Hits->getRows();
+      if (l != -1) {
+        CND_Hits_id_vec.resize(l);
+        CND_Hits_status_vec.resize(l);
+        CND_Hits_trkID_vec.resize(l);
+        CND_Hits_sector_vec.resize(l);
+        CND_Hits_layer_vec.resize(l);
+        CND_Hits_component_vec.resize(l);
+        CND_Hits_energy_vec.resize(l);
+        CND_Hits_time_vec.resize(l);
+        CND_Hits_energy_unc_vec.resize(l);
+        CND_Hits_time_unc_vec.resize(l);
+        CND_Hits_x_vec.resize(l);
+        CND_Hits_y_vec.resize(l);
+        CND_Hits_z_vec.resize(l);
+        CND_Hits_x_unc_vec.resize(l);
+        CND_Hits_y_unc_vec.resize(l);
+        CND_Hits_z_unc_vec.resize(l);
+        CND_Hits_tx_vec.resize(l);
+        CND_Hits_ty_vec.resize(l);
+        CND_Hits_tz_vec.resize(l);
+        CND_Hits_tlength_vec.resize(l);
+        CND_Hits_pathlength_vec.resize(l);
+        CND_Hits_indexLadc_vec.resize(l);
+        CND_Hits_indexRadc_vec.resize(l);
+        CND_Hits_indexLtdc_vec.resize(l);
+        CND_Hits_indexRtdc_vec.resize(l);
+
+        for (int i = 0; i < l; i++) {
+          CND_Hits_id_vec[i]         = cnd_Hits->getInt("id", i);
+          CND_Hits_status_vec[i]     = cnd_Hits->getInt("status", i);
+          CND_Hits_trkID_vec[i]      = cnd_Hits->getInt("trkID", i);
+          CND_Hits_sector_vec[i]     = cnd_Hits->getInt("sector", i);
+          CND_Hits_layer_vec[i]      = cnd_Hits->getInt("layer", i);
+          CND_Hits_component_vec[i]  = cnd_Hits->getInt("component", i);
+          CND_Hits_energy_vec[i]     = cnd_Hits->getFloat("energy", i);
+          CND_Hits_time_vec[i]       = cnd_Hits->getFloat("time", i);
+          CND_Hits_energy_unc_vec[i] = cnd_Hits->getFloat("energy_unc", i);
+          CND_Hits_time_unc_vec[i]   = cnd_Hits->getFloat("time_unc", i);
+          CND_Hits_x_vec[i]          = cnd_Hits->getFloat("x", i);
+          CND_Hits_y_vec[i]          = cnd_Hits->getFloat("y", i);
+          CND_Hits_z_vec[i]          = cnd_Hits->getFloat("z", i);
+          CND_Hits_x_unc_vec[i]      = cnd_Hits->getFloat("x_unc", i);
+          CND_Hits_y_unc_vec[i]      = cnd_Hits->getFloat("y_unc", i);
+          CND_Hits_z_unc_vec[i]      = cnd_Hits->getFloat("z_unc", i);
+          CND_Hits_tx_vec[i]         = cnd_Hits->getFloat("tx", i);
+          CND_Hits_ty_vec[i]         = cnd_Hits->getFloat("ty", i);
+          CND_Hits_tz_vec[i]         = cnd_Hits->getFloat("tz", i);
+          CND_Hits_tlength_vec[i]    = cnd_Hits->getFloat("tlength", i);
+          CND_Hits_pathlength_vec[i] = cnd_Hits->getFloat("pathlength", i);
+          CND_Hits_indexLadc_vec[i]  = cnd_Hits->getInt("indexLadc", i);
+          CND_Hits_indexRadc_vec[i]  = cnd_Hits->getInt("indexRadc", i);
+          CND_Hits_indexLtdc_vec[i]  = cnd_Hits->getInt("indexLtdc", i);
+          CND_Hits_indexRtdc_vec[i]  = cnd_Hits->getInt("indexRtdc", i);
+        }
+      }
+
+      l = cnd_Clusters->getRows();
+      if (l != -1) {
+        CND_Clusters_id_vec.resize(l);
+        CND_Clusters_sector_vec.resize(l);
+        CND_Clusters_layer_vec.resize(l);
+        CND_Clusters_component_vec.resize(l);
+        CND_Clusters_nhits_vec.resize(l);
+        CND_Clusters_energy_vec.resize(l);
+        CND_Clusters_x_vec.resize(l);
+        CND_Clusters_y_vec.resize(l);
+        CND_Clusters_z_vec.resize(l);
+        CND_Clusters_time_vec.resize(l);
+        CND_Clusters_status_vec.resize(l);
+
+        for (int i = 0; i < l; i++) {
+          CND_Clusters_id_vec[i]        = cnd_Clusters->getInt("id", i);
+          CND_Clusters_sector_vec[i]    = cnd_Clusters->getInt("sector", i);
+          CND_Clusters_layer_vec[i]     = cnd_Clusters->getInt("layer", i);
+          CND_Clusters_component_vec[i] = cnd_Clusters->getInt("component", i);
+          CND_Clusters_nhits_vec[i]     = cnd_Clusters->getInt("nhits", i);
+          CND_Clusters_energy_vec[i]    = cnd_Clusters->getFloat("energy", i);
+          CND_Clusters_x_vec[i]         = cnd_Clusters->getFloat("x", i);
+          CND_Clusters_y_vec[i]         = cnd_Clusters->getFloat("y", i);
+          CND_Clusters_z_vec[i]         = cnd_Clusters->getFloat("z", i);
+          CND_Clusters_time_vec[i]      = cnd_Clusters->getFloat("time", i);
+          CND_Clusters_status_vec[i]    = cnd_Clusters->getInt("status", i);
+        }
+      }
+
+      l = ctof_Hits->getRows();
+      if (l != -1) {
+        CTOF_Hits_id_vec.resize(l);
+        CTOF_Hits_status_vec.resize(l);
+        CTOF_Hits_trkID_vec.resize(l);
+        CTOF_Hits_sector_vec.resize(l);
+        CTOF_Hits_layer_vec.resize(l);
+        CTOF_Hits_component_vec.resize(l);
+        CTOF_Hits_energy_vec.resize(l);
+        CTOF_Hits_time_vec.resize(l);
+        CTOF_Hits_energy_unc_vec.resize(l);
+        CTOF_Hits_time_unc_vec.resize(l);
+        CTOF_Hits_x_vec.resize(l);
+        CTOF_Hits_y_vec.resize(l);
+        CTOF_Hits_z_vec.resize(l);
+        CTOF_Hits_x_unc_vec.resize(l);
+        CTOF_Hits_y_unc_vec.resize(l);
+        CTOF_Hits_z_unc_vec.resize(l);
+        CTOF_Hits_tx_vec.resize(l);
+        CTOF_Hits_ty_vec.resize(l);
+        CTOF_Hits_tz_vec.resize(l);
+        CTOF_Hits_adc_idx1_vec.resize(l);
+        CTOF_Hits_adc_idx2_vec.resize(l);
+        CTOF_Hits_tdc_idx1_vec.resize(l);
+        CTOF_Hits_tdc_idx2_vec.resize(l);
+        CTOF_Hits_pathLength_vec.resize(l);
+        CTOF_Hits_pathLengthThruBar_vec.resize(l);
+
+        for (int i = 0; i < l; i++) {
+          CTOF_Hits_id_vec[i]                = ctof_Hits->getInt("id", i);
+          CTOF_Hits_status_vec[i]            = ctof_Hits->getInt("status", i);
+          CTOF_Hits_trkID_vec[i]             = ctof_Hits->getInt("trkID", i);
+          CTOF_Hits_sector_vec[i]            = ctof_Hits->getInt("sector", i);
+          CTOF_Hits_layer_vec[i]             = ctof_Hits->getInt("layer", i);
+          CTOF_Hits_component_vec[i]         = ctof_Hits->getInt("component", i);
+          CTOF_Hits_energy_vec[i]            = ctof_Hits->getFloat("energy", i);
+          CTOF_Hits_time_vec[i]              = ctof_Hits->getFloat("time", i);
+          CTOF_Hits_energy_unc_vec[i]        = ctof_Hits->getFloat("energy_unc", i);
+          CTOF_Hits_time_unc_vec[i]          = ctof_Hits->getFloat("time_unc", i);
+          CTOF_Hits_x_vec[i]                 = ctof_Hits->getFloat("x", i);
+          CTOF_Hits_y_vec[i]                 = ctof_Hits->getFloat("y", i);
+          CTOF_Hits_z_vec[i]                 = ctof_Hits->getFloat("z", i);
+          CTOF_Hits_x_unc_vec[i]             = ctof_Hits->getFloat("x_unc", i);
+          CTOF_Hits_y_unc_vec[i]             = ctof_Hits->getFloat("y_unc", i);
+          CTOF_Hits_z_unc_vec[i]             = ctof_Hits->getFloat("z_unc", i);
+          CTOF_Hits_tx_vec[i]                = ctof_Hits->getFloat("tx", i);
+          CTOF_Hits_ty_vec[i]                = ctof_Hits->getFloat("ty", i);
+          CTOF_Hits_tz_vec[i]                = ctof_Hits->getFloat("tz", i);
+          CTOF_Hits_adc_idx1_vec[i]          = ctof_Hits->getInt("adc_idx1", i);
+          CTOF_Hits_adc_idx2_vec[i]          = ctof_Hits->getInt("adc_idx2", i);
+          CTOF_Hits_tdc_idx1_vec[i]          = ctof_Hits->getInt("tdc_idx1", i);
+          CTOF_Hits_tdc_idx2_vec[i]          = ctof_Hits->getInt("tdc_idx2", i);
+          CTOF_Hits_pathLength_vec[i]        = ctof_Hits->getFloat("pathLength", i);
+          CTOF_Hits_pathLengthThruBar_vec[i] = ctof_Hits->getFloat("pathLengthThruBar", i);
         }
       }
     }
