@@ -91,15 +91,10 @@ namespace hipo {
 
   void bank::notify() {
     int size = bankSchema.getRowLength();
-    if (size != 0)
-      bankRows = getSize() / size;
-    else
-      bankRows = 0;
+    bankRows = getSize() / size;
   }
 
   int bank::getInt(int item, int index) {
-    if (bankRows == 0)
-      return -99;
     int type   = bankSchema.getEntryType(item);
     int offset = bankSchema.getOffset(item, index, bankRows);
     switch (type) {
@@ -120,8 +115,6 @@ namespace hipo {
     return -99;
   }
   int bank::getShort(int item, int index) {
-    if (bankRows == 0)
-      return -99;
     int type   = bankSchema.getEntryType(item);
     int offset = bankSchema.getOffset(item, index, bankRows);
     switch (type) {
@@ -142,8 +135,6 @@ namespace hipo {
     return -99;
   }
   int bank::getByte(int item, int index) {
-    if (bankRows == 0)
-      return -99;
     int type   = bankSchema.getEntryType(item);
     int offset = bankSchema.getOffset(item, index, bankRows);
     switch (type) {
@@ -165,8 +156,6 @@ namespace hipo {
   }
 
   float bank::getFloat(int item, int index) {
-    if (bankRows == 0)
-      return std::nanf("-99");
     if (bankSchema.getEntryType(item) == 4) {
       int offset = bankSchema.getOffset(item, index, bankRows);
       return getFloatAt(offset);
@@ -174,8 +163,6 @@ namespace hipo {
     return std::nanf("-99");
   }
   double bank::getDouble(int item, int index) {
-    if (bankRows == 0)
-      return std::nanf("-99");
     if (bankSchema.getEntryType(item) == 5) {
       int offset = bankSchema.getOffset(item, index, bankRows);
       return getDoubleAt(offset);
@@ -184,8 +171,6 @@ namespace hipo {
   }
 
   long bank::getLong(int item, int index) {
-    if (bankRows == 0)
-      return std::nanf("-99");
     if (bankSchema.getEntryType(item) == 8) {
       int offset = bankSchema.getOffset(item, index, bankRows);
       return getLongAt(offset);
