@@ -115,7 +115,9 @@ namespace hipo {
 
   int schema::getRowLength() {
     int nentries = schemaEntries.size();
-    int size     = schemaEntries[nentries - 1].offset + schemaEntries[nentries - 1].typeSize;
+    int size     = 0;
+    if (nentries >= 1 && nentries < schemaEntries.size())
+      size = schemaEntries[nentries - 1].offset + schemaEntries[nentries - 1].typeSize;
     return size;
   }
 
