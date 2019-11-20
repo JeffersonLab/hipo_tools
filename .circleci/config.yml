@@ -8,9 +8,9 @@ jobs:
       - checkout
 
       - run:
-          name: Figure Out Where I am
-          command: pwd && ls
+          name: build dir
+          command: mkdir build
 
       - run:
-          name: Print the Current Time
-          command: date
+          name: cmake and make
+          command: cd build && cmake .. -DBUILD_HIPOPY=ON -DBUILD_EXAMPLES=ON && make -j2
