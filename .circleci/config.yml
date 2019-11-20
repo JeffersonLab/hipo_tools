@@ -6,6 +6,9 @@ jobs:
 
     steps:
       - checkout
+      - run:
+        name: Checkout recursive
+        command: git submodule sync --recursive && git submodule update --recursive --init
 
       - run:
           name: build dir
