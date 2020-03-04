@@ -33,6 +33,7 @@ int main(int argc, char** argv) {
   bool        traj       = false;
   bool        tbt        = false;
   bool        hits       = false;
+  bool        hel_off    = false;
 
   auto cli =
       (clipp::option("-h", "--help").set(print_help) % "print help",
@@ -41,6 +42,7 @@ int main(int argc, char** argv) {
        clipp::option("-c", "--cov").set(cov) % "Save Covariant Matrix for kinematic fitting",
        clipp::option("-hits", "--hits").set(hits) % "Save CND::hits, CND::clusters, CTOF::hits",
        clipp::option("-t", "--traj").set(traj) % "Save traj information",
+       clipp::option("-hel_off", "--hel_off").set(hel_off) % "Turn off helicity information",
        clipp::option("-tbt", "--tbt").set(tbt) % "Save TimeBasedTrkg information",
        clipp::option("-test", "--test").set(is_test) %
            "Only convert first 50000 events for testing",
@@ -118,18 +120,19 @@ int main(int argc, char** argv) {
   clas12->Branch("REC_Event_helicity", &REC_Event_helicity);
   clas12->Branch("REC_Event_helicityRaw", &REC_Event_helicityRaw);
   clas12->Branch("REC_Event_procTime", &REC_Event_procTime);
+  if (!hel_off) {
+    clas12->Branch("HEL_Online_helicity", &HEL_Online_helicity);
+    clas12->Branch("HEL_Online_helicityRaw", &HEL_Online_helicityRaw);
 
-  clas12->Branch("HEL_Online_helicity", &HEL_Online_helicity);
-  clas12->Branch("HEL_Online_helicityRaw", &HEL_Online_helicityRaw);
-
-  clas12->Branch("HEL_Flip_run", &HEL_Flip_run);
-  clas12->Branch("HEL_Flip_event", &HEL_Flip_event);
-  clas12->Branch("HEL_Flip_timestamp", &HEL_Flip_timestamp);
-  clas12->Branch("HEL_Flip_helicity", &HEL_Flip_helicity);
-  clas12->Branch("HEL_Flip_helicityRaw", &HEL_Flip_helicityRaw);
-  clas12->Branch("HEL_Flip_pair", &HEL_Flip_pair);
-  clas12->Branch("HEL_Flip_pattern", &HEL_Flip_pattern);
-  clas12->Branch("HEL_Flip_status", &HEL_Flip_status);
+    clas12->Branch("HEL_Flip_run", &HEL_Flip_run);
+    clas12->Branch("HEL_Flip_event", &HEL_Flip_event);
+    clas12->Branch("HEL_Flip_timestamp", &HEL_Flip_timestamp);
+    clas12->Branch("HEL_Flip_helicity", &HEL_Flip_helicity);
+    clas12->Branch("HEL_Flip_helicityRaw", &HEL_Flip_helicityRaw);
+    clas12->Branch("HEL_Flip_pair", &HEL_Flip_pair);
+    clas12->Branch("HEL_Flip_pattern", &HEL_Flip_pattern);
+    clas12->Branch("HEL_Flip_status", &HEL_Flip_status);
+  }
 
   clas12->Branch("REC_Particle_pid", &REC_Particle_pid_vec);
   clas12->Branch("REC_Particle_px", &REC_Particle_px_vec);
@@ -399,12 +402,15 @@ int main(int argc, char** argv) {
   while (reader->next() == true) {
     if (is_test && entry > 50000)
       break;
-
+    int i = 0;
     reader->read(*hipo_event);
     hipo_event->getStructure(*rec_Event);
     hipo_event->getStructure(*run_Config);
-    hipo_event->getStructure(*hel_Online);
-    hipo_event->getStructure(*hel_Flip);
+    if (!hel_off) {
+      hipo_event->getStructure(*hel_Online);
+      hipo_event->getStructure(*hel_Flip);
+    }
+
     /*
     hipo_event->getStructure(*run_Scaler);
     hipo_event->getStructure(*raw_Scaler);

@@ -6,8 +6,8 @@
 #include "hipo4/reader.h"
 #include "hipo4/hipoexceptions.h"
 #include "hipo4/record.h"
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 /**
  * HIPO namespace is used for the classes that read write
  * files and records.

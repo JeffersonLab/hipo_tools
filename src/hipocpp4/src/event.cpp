@@ -12,9 +12,9 @@ namespace hipo {
 #if __cplusplus < 199711L
     std::cerr << "*****>>>>> NOT compiled with c++11 support." << std::endl;
 #endif
-    // default allocation size for the event is 20 Kb
+    // default allocation size for the event is 128 Kb
     //
-    dataBuffer.resize(20 * 1024);
+    dataBuffer.resize(128 * 1024);
     reset();
   }
 
@@ -41,10 +41,18 @@ namespace hipo {
   }
 
   void event::addStructure(hipo::structure& str) {
-    int str_size = str.getStructureBufferSize();
-    int evt_size = getSize();
-    memcpy(&dataBuffer[evt_size], &str.getStructureBuffer()[0], str_size);
+    int str_size     = str.getStructureBufferSize();
+    int evt_size     = getSize();
+    int evt_capacity = dataBuffer.size();
+
     *(reinterpret_cast<uint32_t*>(&dataBuffer[4])) = (evt_size + str_size);
+    if ((evt_size + str_size) < evt_capacity) {
+      memcpy(&dataBuffer[evt_size], &str.getStructureBuffer()[0], str_size);
+      *(reinterpret_cast<uint32_t*>(&dataBuffer[4])) = (evt_size + str_size);
+    } else {
+      std::cerr << "event::add : error adding structure with size = " << str_size
+                << " (capacity = " << evt_capacity << ", size = " << evt_size << ")" << std::endl;
+    }
   }
 
   void event::init(std::vector<char>& buffer) {

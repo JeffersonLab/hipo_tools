@@ -517,7 +517,7 @@ int main(int argc, char** argv) {
 
     if (good_rec && rec_Particle->getRows() == -1)
       continue;
-    if (elec_first && rec_Particle->getInt(0, 0) != 11)
+    if (elec_first && (rec_Particle->getInt(0, 0) != 11 || rec_Particle->getInt(0, 0) != 0))
       continue;
 
     l = rec_Particle->getRows();
@@ -1338,20 +1338,20 @@ int main(int argc, char** argv) {
     }
 
     if (traj) {
-      l = rec_Traj->getRows();
-      traj_pindex_vec.resize(l);
-      traj_index_vec.resize(l);
-      traj_detId_vec.resize(l);
-      traj_q_vec.resize(l);
-      traj_x_vec.resize(l);
-      traj_y_vec.resize(l);
-      traj_z_vec.resize(l);
-      traj_cx_vec.resize(l);
-      traj_cy_vec.resize(l);
-      traj_cz_vec.resize(l);
-      traj_pathlength_vec.resize(l);
+      len_pid = rec_Traj->getRows();
+      traj_pindex_vec.resize(len_pid);
+      traj_index_vec.resize(len_pid);
+      traj_detId_vec.resize(len_pid);
+      traj_q_vec.resize(len_pid);
+      traj_x_vec.resize(len_pid);
+      traj_y_vec.resize(len_pid);
+      traj_z_vec.resize(len_pid);
+      traj_cx_vec.resize(len_pid);
+      traj_cy_vec.resize(len_pid);
+      traj_cz_vec.resize(len_pid);
+      traj_pathlength_vec.resize(len_pid);
 
-      for (int i = 0; i < l; i++) {
+      for (int i = 0; i < len_pid; i++) {
         traj_pindex_vec[i]     = rec_Traj->getInt(1, i);
         traj_index_vec[i]      = rec_Traj->getInt(2, i);
         traj_detId_vec[i]      = rec_Traj->getInt(3, i);
