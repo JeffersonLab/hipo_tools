@@ -324,7 +324,7 @@ int main(int argc, char** argv) {
   bool        elec_first = false;
   bool        cov        = false;
   bool        traj       = false;
-  short       max_size   = 1500;
+  float       max_size   = 1500;
 
   auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
               clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
@@ -371,13 +371,6 @@ int main(int argc, char** argv) {
   auto rec_Event  = std::make_shared<hipo::bank>(dict->getSchema("REC::Event"));
   auto hel_Flip   = std::make_shared<hipo::bank>(dict->getSchema("HEL::flip"));
 
-  /*
-  auto hel_Online = std::make_shared<hipo::bank>(dict->getSchema("HEL::online"));
-  auto run_Scaler = std::make_shared<hipo::bank>(dict->getSchema("RUN::scaler"));
-  auto raw_Scaler = std::make_shared<hipo::bank>(dict->getSchema("RAW::scaler"));
-  auto raw_Epics  = std::make_shared<hipo::bank>(dict->getSchema("RAW::epics"));
-  */
-
   // Physics
   auto rec_Particle      = std::make_shared<hipo::bank>(dict->getSchema("REC::Particle"));
   auto rec_Calorimeter   = std::make_shared<hipo::bank>(dict->getSchema("REC::Calorimeter"));
@@ -409,12 +402,6 @@ int main(int argc, char** argv) {
     hipo_event->getStructure(*rec_Event);
     hipo_event->getStructure(*run_Config);
     hipo_event->getStructure(*hel_Flip);
-    /*
-    hipo_event->getStructure(*hel_Online);
-    hipo_event->getStructure(*run_Scaler);
-    hipo_event->getStructure(*raw_Scaler);
-    hipo_event->getStructure(*raw_Epics);
-    */
     hipo_event->getStructure(*rec_Particle);
     hipo_event->getStructure(*rec_ForwardTagger);
     hipo_event->getStructure(*rec_Track);
@@ -1252,25 +1239,25 @@ int main(int argc, char** argv) {
         int detector = rec_ForwardTagger->getInt(2, k);
 
         if (pindex == i && detector == FTCAL) {
-          ft_cal_energy[i] = rec_ForwardTagger->getFloat(3, k);
-          ft_cal_time[i]   = rec_ForwardTagger->getFloat(4, k);
-          ft_cal_path[i]   = rec_ForwardTagger->getFloat(5, k);
-          ft_cal_x[i]      = rec_ForwardTagger->getFloat(7, k);
-          ft_cal_y[i]      = rec_ForwardTagger->getFloat(8, k);
-          ft_cal_z[i]      = rec_ForwardTagger->getFloat(9, k);
-          ft_cal_dx[i]     = rec_ForwardTagger->getFloat(10, k);
-          ft_cal_dy[i]     = rec_ForwardTagger->getFloat(11, k);
-          ft_cal_radius[i] = rec_ForwardTagger->getFloat(12, k);
+          ft_cal_energy[i] = rec_ForwardTagger->getFloat("energy", k);
+          ft_cal_time[i]   = rec_ForwardTagger->getFloat("time", k);
+          ft_cal_path[i]   = rec_ForwardTagger->getFloat("path", k);
+          ft_cal_x[i]      = rec_ForwardTagger->getFloat("x", k);
+          ft_cal_y[i]      = rec_ForwardTagger->getFloat("y", k);
+          ft_cal_z[i]      = rec_ForwardTagger->getFloat("z", k);
+          ft_cal_dx[i]     = rec_ForwardTagger->getFloat("dx", k);
+          ft_cal_dy[i]     = rec_ForwardTagger->getFloat("dy", k);
+          ft_cal_radius[i] = rec_ForwardTagger->getFloat("radius", k);
         } else if (pindex == i && detector == FTHODO) {
-          ft_hodo_energy[i] = rec_ForwardTagger->getFloat(3, k);
-          ft_hodo_time[i]   = rec_ForwardTagger->getFloat(4, k);
-          ft_hodo_path[i]   = rec_ForwardTagger->getFloat(5, k);
-          ft_hodo_x[i]      = rec_ForwardTagger->getFloat(7, k);
-          ft_hodo_y[i]      = rec_ForwardTagger->getFloat(8, k);
-          ft_hodo_z[i]      = rec_ForwardTagger->getFloat(9, k);
-          ft_hodo_dx[i]     = rec_ForwardTagger->getFloat(10, k);
-          ft_hodo_dy[i]     = rec_ForwardTagger->getFloat(11, k);
-          ft_hodo_radius[i] = rec_ForwardTagger->getFloat(12, k);
+          ft_hodo_energy[i] = rec_ForwardTagger->getFloat("energy", k);
+          ft_hodo_time[i]   = rec_ForwardTagger->getFloat("time", k);
+          ft_hodo_path[i]   = rec_ForwardTagger->getFloat("path", k);
+          ft_hodo_x[i]      = rec_ForwardTagger->getFloat("x", k);
+          ft_hodo_y[i]      = rec_ForwardTagger->getFloat("y", k);
+          ft_hodo_z[i]      = rec_ForwardTagger->getFloat("z", k);
+          ft_hodo_dx[i]     = rec_ForwardTagger->getFloat("dx", k);
+          ft_hodo_dy[i]     = rec_ForwardTagger->getFloat("dy", k);
+          ft_hodo_radius[i] = rec_ForwardTagger->getFloat("radius", k);
         }
       }
     }

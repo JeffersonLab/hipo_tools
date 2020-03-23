@@ -18,7 +18,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include <unordered_map>
+#include "robin_hood.h"
 #include <vector>
 //#include "reader.h"
 
@@ -34,7 +34,7 @@ namespace hipo {
 
   class schema {
   private:
-    std::unordered_map<std::string, int> schemaEntriesMap;
+    robin_hood::unordered_map<std::string, int> schemaEntriesMap;
     std::vector<schemaEntry_t>           schemaEntries;
 
     int         groupid;
@@ -97,7 +97,7 @@ namespace hipo {
 
   class dictionary {
   private:
-    std::unordered_map<std::string, schema> factory;
+    robin_hood::unordered_map<std::string, schema> factory;
 
   public:
     dictionary(){};

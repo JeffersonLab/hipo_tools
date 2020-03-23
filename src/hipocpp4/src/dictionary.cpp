@@ -156,10 +156,9 @@ namespace hipo {
   // Implementation of dictionary class
   //=============================================
   std::vector<std::string> dictionary::getSchemaList() {
-    std::unordered_map<std::string, schema>::iterator it;
     std::vector<std::string>                          vec;
-    for (it = factory.begin(); it != factory.end(); it++) {
-      vec.push_back(it->first);
+    for (auto && it : factory) {
+      vec.push_back(it.first);
     }
     return vec;
   }
