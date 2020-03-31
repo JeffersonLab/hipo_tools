@@ -1170,6 +1170,7 @@ int main(int argc, char** argv) {
             // Layers 6 12 18 24 30 36 are saved
             // Choose every other one starting at 6, 18, 30
             // Assuiming they are in r1,r2,r3
+            // std::cout << layer << " " << rec_Traj->getFloat("x", k) << std::endl;
             if (layer == 6) {
               dc_r1_x[i] = rec_Traj->getFloat("x", k);
               dc_r1_y[i] = rec_Traj->getFloat("y", k);
@@ -1178,7 +1179,7 @@ int main(int argc, char** argv) {
               dc_r2_x[i] = rec_Traj->getFloat("x", k);
               dc_r2_y[i] = rec_Traj->getFloat("y", k);
               dc_r2_z[i] = rec_Traj->getFloat("z", k);
-            } else if (layer == 30) {
+            } else if (layer == 30 || layer == 36) {
               dc_r3_x[i] = rec_Traj->getFloat("x", k);
               dc_r3_y[i] = rec_Traj->getFloat("y", k);
               dc_r3_z[i] = rec_Traj->getFloat("z", k);
