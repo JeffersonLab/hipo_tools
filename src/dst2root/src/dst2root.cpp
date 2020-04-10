@@ -33,10 +33,12 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
   clas12->Branch("solenoid", &solenoid);
 
   clas12->Branch("category", &category);
+  clas12->Branch("ft_category", &ft_category);
   clas12->Branch("topology", &topology);
   clas12->Branch("beamCharge", &beamCharge);
   clas12->Branch("liveTime", &liveTime);
   clas12->Branch("startTime", &startTime);
+  clas12->Branch("ft_startTime", &ft_startTime);
   clas12->Branch("RFTime", &RFTime);
   clas12->Branch("helicity", &helicity);
   clas12->Branch("helicityRaw", &helicityRaw);
@@ -52,6 +54,7 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
   clas12->Branch("hel_status", &hel_status);
 
   clas12->Branch("pid", &pid);
+  clas12->Branch("ft_pid", &ft_pid);
   clas12->Branch("p", &p);
   clas12->Branch("p2", &p2);
   clas12->Branch("px", &px);
@@ -61,10 +64,14 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
   clas12->Branch("vy", &vy);
   clas12->Branch("vz", &vz);
   clas12->Branch("vt", &vt);
+  clas12->Branch("ft_vt", &ft_vt);
   clas12->Branch("charge", &charge);
   clas12->Branch("beta", &beta);
+  clas12->Branch("ft_beta", &ft_beta);
   clas12->Branch("chi2pid", &chi2pid);
+  clas12->Branch("ft_chi2pid", &ft_chi2pid);
   clas12->Branch("status", &status);
+  clas12->Branch("ft_status", &ft_status);
 
   if (is_mc) {
     clas12->Branch("mc_npart", &mc_npart);
@@ -383,6 +390,10 @@ int main(int argc, char** argv) {
   auto rec_Traj          = std::make_shared<hipo::bank>(dict->getSchema("REC::Traj"));
   auto rec_CovMat        = std::make_shared<hipo::bank>(dict->getSchema("REC::CovMat"));
 
+  // ForwardTagger
+  auto recft_Particle = std::make_shared<hipo::bank>(dict->getSchema("RECFT::Particle"));
+  auto recft_Event    = std::make_shared<hipo::bank>(dict->getSchema("RECFT::Event"));
+
   // Monte Carlo only banks
   auto mc_Header   = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
   auto mc_Event    = std::make_shared<hipo::bank>(dict->getSchema("MC::Event"));
@@ -402,9 +413,11 @@ int main(int argc, char** argv) {
       break;
     reader->read(*hipo_event);
     hipo_event->getStructure(*rec_Event);
+    hipo_event->getStructure(*recft_Event);
     hipo_event->getStructure(*run_Config);
     hipo_event->getStructure(*hel_Flip);
     hipo_event->getStructure(*rec_Particle);
+    hipo_event->getStructure(*recft_Particle);
     hipo_event->getStructure(*rec_ForwardTagger);
     hipo_event->getStructure(*rec_Track);
     hipo_event->getStructure(*rec_Cherenkov);
@@ -435,6 +448,14 @@ int main(int argc, char** argv) {
       helicity    = rec_Event->getByte(6, 0);
       helicityRaw = rec_Event->getByte(7, 0);
       procTime    = rec_Event->getFloat(8, 0);
+    }
+
+    l            = recft_Event->getRows();
+    ft_category  = NAN;
+    ft_startTime = NAN;
+    if (l != -1) {
+      ft_category  = recft_Event->getFloat("category", 0);
+      ft_startTime = recft_Event->getFloat("startTime", 0);
     }
 
     l = run_Config->getRows();
@@ -546,6 +567,25 @@ int main(int argc, char** argv) {
           ((rec_Particle->getFloat("beta", i) != -9999) ? rec_Particle->getFloat("beta", i) : NAN);
       chi2pid[i] = rec_Particle->getFloat("chi2pid", i);
       status[i]  = rec_Particle->getInt("status", i);
+    }
+
+    l = recft_Particle->getRows();
+    if (l != -1) {
+      ft_pid.resize(l);
+      ft_vt.resize(l);
+      ft_beta.resize(l);
+      ft_chi2pid.resize(l);
+      ft_status.resize(l);
+
+      for (int i = 0; i < l; i++) {
+        ft_pid[i] = recft_Particle->getInt("pid", i);
+        ft_vt[i]  = recft_Particle->getFloat("vt", i);
+        ft_beta[i] =
+            ((recft_Particle->getFloat("beta", i) != -9999) ? recft_Particle->getFloat("beta", i)
+                                                            : NAN);
+        ft_chi2pid[i] = recft_Particle->getFloat("chi2pid", i);
+        ft_status[i]  = recft_Particle->getInt("status", i);
+      }
     }
 
     len_pid    = rec_Particle->getRows();
