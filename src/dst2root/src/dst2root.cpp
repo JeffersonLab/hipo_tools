@@ -312,8 +312,10 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
 }
 
 int main(int argc, char** argv) {
-  ROOT::EnableThreadSafety();
-  ROOT::EnableImplicitMT(2);
+  if (ROOT::IsImplicitMTEnabled()) {
+    ROOT::EnableThreadSafety();
+    ROOT::EnableImplicitMT(2);
+  }
   std::string InFileName;
   std::string OutFileName;
   bool        is_mc      = false;
@@ -474,9 +476,9 @@ int main(int argc, char** argv) {
 
       l = mc_Event->getRows();
       if (l != -1) {
-        mc_npart  = mc_Event->getInt(0, 0);
-        mc_ebeam  = mc_Event->getFloat(6, 0);
-        mc_weight = mc_Event->getFloat(9, 0);
+        mc_npart  = mc_Event->getInt("npart", 0);
+        mc_ebeam  = mc_Event->getFloat("ebeam", 0);
+        mc_weight = mc_Event->getFloat("weight", 0);
       }
 
       l = mc_Particle->getRows();
