@@ -26,6 +26,9 @@ Int_t   mode;
 Float_t torus;
 Float_t solenoid;
 
+Int_t   ft_category;
+Float_t ft_startTime;
+
 Int_t    category;
 Int_t    topology;
 Float_t  beamCharge;
@@ -46,6 +49,7 @@ Int_t   hel_pattern;
 Int_t   hel_status;
 
 v_int   pid;
+v_int   ft_pid;
 v_float p;
 v_float p2;
 v_float px;
@@ -55,10 +59,14 @@ v_float vx;
 v_float vy;
 v_float vz;
 v_float vt;
+v_float ft_vt;
 v_int   charge;
 v_float beta;
+v_float ft_beta;
 v_float chi2pid;
+v_float ft_chi2pid;
 v_int   status;
+v_float ft_status;
 
 v_int   dc_sec;
 v_float dc_px;

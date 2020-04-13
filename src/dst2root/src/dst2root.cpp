@@ -33,10 +33,12 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
   clas12->Branch("solenoid", &solenoid);
 
   clas12->Branch("category", &category);
+  clas12->Branch("ft_category", &ft_category);
   clas12->Branch("topology", &topology);
   clas12->Branch("beamCharge", &beamCharge);
   clas12->Branch("liveTime", &liveTime);
   clas12->Branch("startTime", &startTime);
+  clas12->Branch("ft_startTime", &ft_startTime);
   clas12->Branch("RFTime", &RFTime);
   clas12->Branch("helicity", &helicity);
   clas12->Branch("helicityRaw", &helicityRaw);
@@ -52,6 +54,7 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
   clas12->Branch("hel_status", &hel_status);
 
   clas12->Branch("pid", &pid);
+  clas12->Branch("ft_pid", &ft_pid);
   clas12->Branch("p", &p);
   clas12->Branch("p2", &p2);
   clas12->Branch("px", &px);
@@ -61,10 +64,14 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
   clas12->Branch("vy", &vy);
   clas12->Branch("vz", &vz);
   clas12->Branch("vt", &vt);
+  clas12->Branch("ft_vt", &ft_vt);
   clas12->Branch("charge", &charge);
   clas12->Branch("beta", &beta);
+  clas12->Branch("ft_beta", &ft_beta);
   clas12->Branch("chi2pid", &chi2pid);
+  clas12->Branch("ft_chi2pid", &ft_chi2pid);
   clas12->Branch("status", &status);
+  clas12->Branch("ft_status", &ft_status);
 
   if (is_mc) {
     clas12->Branch("mc_npart", &mc_npart);
@@ -312,8 +319,10 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
 }
 
 int main(int argc, char** argv) {
-  ROOT::EnableThreadSafety();
-  ROOT::EnableImplicitMT(2);
+  if (ROOT::IsImplicitMTEnabled()) {
+    ROOT::EnableThreadSafety();
+    ROOT::EnableImplicitMT(2);
+  }
   std::string InFileName;
   std::string OutFileName;
   bool        is_mc      = false;
@@ -381,6 +390,10 @@ int main(int argc, char** argv) {
   auto rec_Traj          = std::make_shared<hipo::bank>(dict->getSchema("REC::Traj"));
   auto rec_CovMat        = std::make_shared<hipo::bank>(dict->getSchema("REC::CovMat"));
 
+  // ForwardTagger
+  auto recft_Particle = std::make_shared<hipo::bank>(dict->getSchema("RECFT::Particle"));
+  auto recft_Event    = std::make_shared<hipo::bank>(dict->getSchema("RECFT::Event"));
+
   // Monte Carlo only banks
   auto mc_Header   = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
   auto mc_Event    = std::make_shared<hipo::bank>(dict->getSchema("MC::Event"));
@@ -400,9 +413,11 @@ int main(int argc, char** argv) {
       break;
     reader->read(*hipo_event);
     hipo_event->getStructure(*rec_Event);
+    hipo_event->getStructure(*recft_Event);
     hipo_event->getStructure(*run_Config);
     hipo_event->getStructure(*hel_Flip);
     hipo_event->getStructure(*rec_Particle);
+    hipo_event->getStructure(*recft_Particle);
     hipo_event->getStructure(*rec_ForwardTagger);
     hipo_event->getStructure(*rec_Track);
     hipo_event->getStructure(*rec_Cherenkov);
@@ -433,6 +448,14 @@ int main(int argc, char** argv) {
       helicity    = rec_Event->getByte(6, 0);
       helicityRaw = rec_Event->getByte(7, 0);
       procTime    = rec_Event->getFloat(8, 0);
+    }
+
+    l            = recft_Event->getRows();
+    ft_category  = -9999;
+    ft_startTime = NAN;
+    if (l != -1) {
+      ft_category  = recft_Event->getFloat("category", 0);
+      ft_startTime = recft_Event->getFloat("startTime", 0);
     }
 
     l = run_Config->getRows();
@@ -474,9 +497,9 @@ int main(int argc, char** argv) {
 
       l = mc_Event->getRows();
       if (l != -1) {
-        mc_npart  = mc_Event->getInt(0, 0);
-        mc_ebeam  = mc_Event->getFloat(6, 0);
-        mc_weight = mc_Event->getFloat(9, 0);
+        mc_npart  = mc_Event->getInt("npart", 0);
+        mc_ebeam  = mc_Event->getFloat("ebeam", 0);
+        mc_weight = mc_Event->getFloat("weight", 0);
       }
 
       l = mc_Particle->getRows();
@@ -502,51 +525,82 @@ int main(int argc, char** argv) {
       }
     }
 
-    if (good_rec && rec_Particle->getRows() == -1)
+    len_pid = rec_Particle->getRows();
+
+    if (good_rec && len_pid == -1)
       continue;
     if (elec_first && (rec_Particle->getInt(0, 0) != 11 || rec_Particle->getInt(0, 0) != 0))
       continue;
 
-    l = rec_Particle->getRows();
-    if (l == -1)
-      continue;
+    if (len_pid != -1) {
+      pid.resize(len_pid);
+      p.resize(len_pid);
+      p2.resize(len_pid);
+      px.resize(len_pid);
+      py.resize(len_pid);
+      pz.resize(len_pid);
+      vx.resize(len_pid);
+      vy.resize(len_pid);
+      vz.resize(len_pid);
+      vt.resize(len_pid);
+      charge.resize(len_pid);
+      beta.resize(len_pid);
+      chi2pid.resize(len_pid);
+      status.resize(len_pid);
 
-    pid.resize(l);
-    p.resize(l);
-    p2.resize(l);
-    px.resize(l);
-    py.resize(l);
-    pz.resize(l);
-    vx.resize(l);
-    vy.resize(l);
-    vz.resize(l);
-    vt.resize(l);
-    charge.resize(l);
-    beta.resize(l);
-    chi2pid.resize(l);
-    status.resize(l);
-
-    for (int i = 0; i < l; i++) {
-      pid[i]    = rec_Particle->getInt("pid", i);
-      p2[i]     = (rec_Particle->getFloat("px", i) * rec_Particle->getFloat("px", i) +
-               rec_Particle->getFloat("py", i) * rec_Particle->getFloat("py", i) +
-               rec_Particle->getFloat("pz", i) * rec_Particle->getFloat("pz", i));
-      p[i]      = sqrt(p2[i]);
-      px[i]     = rec_Particle->getFloat("px", i);
-      py[i]     = rec_Particle->getFloat("py", i);
-      pz[i]     = rec_Particle->getFloat("pz", i);
-      vx[i]     = rec_Particle->getFloat("vx", i);
-      vy[i]     = rec_Particle->getFloat("vy", i);
-      vz[i]     = rec_Particle->getFloat("vz", i);
-      vt[i]     = rec_Particle->getFloat("vt", i);
-      charge[i] = rec_Particle->getInt("charge", i);
-      beta[i] =
-          ((rec_Particle->getFloat("beta", i) != -9999) ? rec_Particle->getFloat("beta", i) : NAN);
-      chi2pid[i] = rec_Particle->getFloat("chi2pid", i);
-      status[i]  = rec_Particle->getInt("status", i);
+      for (int i = 0; i < len_pid; i++) {
+        pid[i]    = rec_Particle->getInt("pid", i);
+        p2[i]     = (rec_Particle->getFloat("px", i) * rec_Particle->getFloat("px", i) +
+                 rec_Particle->getFloat("py", i) * rec_Particle->getFloat("py", i) +
+                 rec_Particle->getFloat("pz", i) * rec_Particle->getFloat("pz", i));
+        p[i]      = sqrt(p2[i]);
+        px[i]     = rec_Particle->getFloat("px", i);
+        py[i]     = rec_Particle->getFloat("py", i);
+        pz[i]     = rec_Particle->getFloat("pz", i);
+        vx[i]     = rec_Particle->getFloat("vx", i);
+        vy[i]     = rec_Particle->getFloat("vy", i);
+        vz[i]     = rec_Particle->getFloat("vz", i);
+        vt[i]     = rec_Particle->getFloat("vt", i);
+        charge[i] = rec_Particle->getInt("charge", i);
+        beta[i] = ((rec_Particle->getFloat("beta", i) != -9999) ? rec_Particle->getFloat("beta", i)
+                                                                : NAN);
+        chi2pid[i] = rec_Particle->getFloat("chi2pid", i);
+        status[i]  = rec_Particle->getInt("status", i);
+      }
     }
 
-    len_pid    = rec_Particle->getRows();
+    l = recft_Particle->getRows();
+    if (l != -1) {
+      ft_pid.resize(l);
+      ft_vt.resize(l);
+      ft_beta.resize(l);
+      ft_chi2pid.resize(l);
+      ft_status.resize(l);
+
+      for (int i = 0; i < l; i++) {
+        ft_pid[i] = recft_Particle->getInt("pid", i);
+        ft_vt[i]  = recft_Particle->getFloat("vt", i);
+        ft_beta[i] =
+            ((recft_Particle->getFloat("beta", i) != -9999) ? recft_Particle->getFloat("beta", i)
+                                                            : NAN);
+        ft_chi2pid[i] = recft_Particle->getFloat("chi2pid", i);
+        ft_status[i]  = recft_Particle->getInt("status", i);
+      }
+    } else if (l == 0) {
+      ft_pid.resize(len_pid);
+      ft_vt.resize(len_pid);
+      ft_beta.resize(len_pid);
+      ft_chi2pid.resize(len_pid);
+      ft_status.resize(len_pid);
+      for (int i = 0; i < len_pid; i++) {
+        ft_pid[i]     = -9999;
+        ft_vt[i]      = NAN;
+        ft_beta[i]    = NAN;
+        ft_chi2pid[i] = NAN;
+        ft_status[i]  = NAN;
+      }
+    }
+
     len_pindex = rec_Calorimeter->getRows();
     ec_tot_energy.resize(len_pid);
     ec_pcal_energy.resize(len_pid);
@@ -786,7 +840,6 @@ int main(int argc, char** argv) {
         ec_tot_energy[i] = ((etot != 0.0) ? etot : NAN);
     }
 
-    len_pid    = rec_Particle->getRows();
     len_pindex = rec_Cherenkov->getRows();
 
     cc_nphe_tot.resize(len_pid);
@@ -898,7 +951,6 @@ int main(int argc, char** argv) {
         cc_nphe_tot[i] = ((nphe_tot != 0.0) ? nphe_tot : NAN);
     }
 
-    len_pid    = rec_Particle->getRows();
     len_pindex = rec_Scintillator->getRows();
 
     sc_ftof_1a_sec.resize(len_pid);
@@ -1086,7 +1138,6 @@ int main(int argc, char** argv) {
       }
     }
 
-    len_pid    = rec_Particle->getRows();
     len_pindex = rec_Track->getRows();
 
     dc_sec.resize(len_pid);
@@ -1106,7 +1157,6 @@ int main(int argc, char** argv) {
       }
     }
 
-    len_pid    = rec_Particle->getRows();
     len_pindex = rec_Traj->getRows();
 
     dc_r1_x.resize(len_pid);
@@ -1170,6 +1220,7 @@ int main(int argc, char** argv) {
             // Layers 6 12 18 24 30 36 are saved
             // Choose every other one starting at 6, 18, 30
             // Assuiming they are in r1,r2,r3
+            // std::cout << layer << " " << rec_Traj->getFloat("x", k) << std::endl;
             if (layer == 6) {
               dc_r1_x[i] = rec_Traj->getFloat("x", k);
               dc_r1_y[i] = rec_Traj->getFloat("y", k);
@@ -1178,7 +1229,7 @@ int main(int argc, char** argv) {
               dc_r2_x[i] = rec_Traj->getFloat("x", k);
               dc_r2_y[i] = rec_Traj->getFloat("y", k);
               dc_r2_z[i] = rec_Traj->getFloat("z", k);
-            } else if (layer == 30) {
+            } else if (layer == 30 || layer == 36) {
               dc_r3_x[i] = rec_Traj->getFloat("x", k);
               dc_r3_y[i] = rec_Traj->getFloat("y", k);
               dc_r3_z[i] = rec_Traj->getFloat("z", k);
@@ -1188,7 +1239,6 @@ int main(int argc, char** argv) {
       }
     }
 
-    len_pid    = rec_Particle->getRows();
     len_pindex = rec_ForwardTagger->getRows();
 
     ft_cal_energy.resize(len_pid);
@@ -1263,7 +1313,6 @@ int main(int argc, char** argv) {
     }
 
     if (cov) {
-      len_pid    = rec_Particle->getRows();
       len_pindex = rec_CovMat->getRows();
 
       CovMat_11.resize(len_pid);
@@ -1325,7 +1374,7 @@ int main(int argc, char** argv) {
     }
 
     if (traj) {
-      len_pid = rec_Traj->getRows();
+      l = rec_Traj->getRows();
       traj_pindex_vec.resize(len_pid);
       traj_index_vec.resize(len_pid);
       traj_detId_vec.resize(len_pid);
@@ -1338,7 +1387,7 @@ int main(int argc, char** argv) {
       traj_cz_vec.resize(len_pid);
       traj_pathlength_vec.resize(len_pid);
 
-      for (int i = 0; i < len_pid; i++) {
+      for (int i = 0; i < l; i++) {
         traj_pindex_vec[i]     = rec_Traj->getInt(1, i);
         traj_index_vec[i]      = rec_Traj->getInt(2, i);
         traj_detId_vec[i]      = rec_Traj->getInt(3, i);

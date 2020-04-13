@@ -64,14 +64,6 @@ setenv PYTHONPATH $PYTHONPATH:$HIPO_TOOLS/lib
 * Don't write loops! Use [RDataFrame](https://root.cern.ch/doc/master/group__tutorial__dataframe.html)
 
 
-Reading hipo files in python
----------------------
-### hipopy
-
-Easily read files in python using hipopy, which is build automatically if Cython is found.
-An example of reading a hipo4 file in python can be found [here](examples/hipo4/clas12_event.py).
-
-
 Converting hipo files
 ---------------------
 
@@ -188,6 +180,184 @@ For more detailed examples of using dst2root converted files checkout the more d
 
 [java examples](https://userweb.jlab.org/~gavalian/docs/sphinx/hipo/html/chapters/java_groovy_analysis.html#ec-sampling-fraction)
 
+
+Reading hipo files in python
+---------------------
+### hipopy
+
+Easily read files in python using hipopy, which is build automatically if Cython is found.
+An example of reading a hipo4 file in python can be found [here](examples/hipo4/clas12_event.py).
+
+Availible hipopy
+```python
+beamCharge
+beta
+cal_chi2
+cal_detector
+cal_du
+cal_dv
+cal_dw
+cal_energy
+cal_hx
+cal_hy
+cal_hz
+cal_index
+cal_layer
+cal_len
+cal_lu
+cal_lv
+cal_lw
+cal_m2u
+cal_m2v
+cal_m2w
+cal_m3u
+cal_m3v
+cal_m3w
+cal_path
+cal_pindex
+cal_sector
+cal_status
+cal_time
+cal_x
+cal_y
+cal_z
+category
+charge
+chern_chi2
+chern_detector
+chern_dphi
+chern_dtheta
+chern_index
+chern_len
+chern_nphe
+chern_path
+chern_phi
+chern_pindex
+chern_sector
+chern_status
+chern_theta
+chern_time
+chern_x
+chern_y
+chern_z
+chi2pid
+event_len
+ft_chi2
+ft_detector
+ft_dx
+ft_dy
+ft_energy
+ft_len
+ft_path
+ft_pindex
+ft_radius
+ft_size
+ft_status
+ft_time
+ft_x
+ft_y
+ft_z
+helicity
+helicityRaw
+liveTime
+mc_atarget
+mc_btype
+mc_ebeam
+mc_lund_daughter
+mc_lund_energy
+mc_lund_index
+mc_lund_lifetime
+mc_lund_mass
+mc_lund_parent
+mc_lund_pid
+mc_lund_px
+mc_lund_py
+mc_lund_pz
+mc_lund_type
+mc_lund_vx
+mc_lund_vy
+mc_lund_vz
+mc_npart
+mc_pbeam
+mc_pid
+mc_processid
+mc_ptarget
+mc_px
+mc_py
+mc_pz
+mc_targetid
+mc_vt
+mc_vx
+mc_vy
+mc_vz
+mc_weight
+mc_ztarget
+pid
+procTime
+px
+py
+pz
+sc_chi2
+sc_component
+sc_detector
+sc_energy
+sc_hx
+sc_hy
+sc_hz
+sc_index
+sc_layer
+sc_len
+sc_path
+sc_pindex
+sc_sector
+sc_status
+sc_time
+sc_x
+sc_y
+sc_z
+startTime
+status
+topology
+trk_NDF
+trk_NDF_nomm
+trk_chi2
+trk_chi2_nomm
+trk_detector
+trk_index
+trk_len
+trk_pindex
+trk_px_nomm
+trk_py_nomm
+trk_pz_nomm
+trk_q
+trk_sector
+trk_status
+trk_vx_nomm
+trk_vy_nomm
+trk_vz_nomm
+vd_cx1
+vd_cx2
+vd_cy1
+vd_cy2
+vd_cz1
+vd_cz2
+vd_index1
+vd_index2
+vd_len
+vd_r
+vd_x
+vd_x1
+vd_x2
+vd_y
+vd_y1
+vd_y2
+vd_z
+vd_z1
+vd_z2
+vx
+vy
+vz
+```
 
 Todo
 ----
