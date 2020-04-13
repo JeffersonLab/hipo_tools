@@ -451,7 +451,7 @@ int main(int argc, char** argv) {
     }
 
     l            = recft_Event->getRows();
-    ft_category  = NAN;
+    ft_category  = -9999;
     ft_startTime = NAN;
     if (l != -1) {
       ft_category  = recft_Event->getFloat("category", 0);
@@ -593,7 +593,7 @@ int main(int argc, char** argv) {
       ft_chi2pid.resize(len_pid);
       ft_status.resize(len_pid);
       for (int i = 0; i < len_pid; i++) {
-        ft_pid[i]     = NAN;
+        ft_pid[i]     = -9999;
         ft_vt[i]      = NAN;
         ft_beta[i]    = NAN;
         ft_chi2pid[i] = NAN;
