@@ -463,8 +463,8 @@ int main(int argc, char** argv) {
       run       = run_Config->getInt(0, 0);
       event     = run_Config->getInt(1, 0);
       unixtime  = run_Config->getInt(2, 0);
-      trigger   = run_Config->getLong(3, 0);
-      timestamp = run_Config->getLong(4, 0);
+      trigger   = run_Config->getLongLong(3, 0);
+      timestamp = run_Config->getLongLong(4, 0);
       type      = run_Config->getInt(5, 0);
       mode      = run_Config->getInt(6, 0);
       torus     = run_Config->getFloat(7, 0);

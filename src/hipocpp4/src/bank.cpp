@@ -178,6 +178,14 @@ namespace hipo {
     return -99;
   }
 
+  long long bank::getLongLong(int item, int index) {
+    if (bankSchema.getEntryType(item) == 8) {
+      int offset = bankSchema.getOffset(item, index, bankRows);
+      return getLongLongAt(offset);
+    }
+    return -99;
+  }
+
   void bank::putInt(const char* name, int index, int32_t value) {
     int item   = bankSchema.getEntryOrder(name);
     int type   = bankSchema.getEntryType(item);
@@ -255,6 +263,16 @@ namespace hipo {
     }
     return -99;
   }
+
+  long long bank::getLongLong(const char* name, int index) {
+    int item = bankSchema.getEntryOrder(name);
+    if (bankSchema.getEntryType(item) == 8) {
+      int offset = bankSchema.getOffset(item, index, bankRows);
+      return getLongLongAt(offset);
+    }
+    return -99;
+  }
+
   void bank::show() {
     for (int i = 0; i < bankSchema.getEntries(); i++) {
       printf("%14d : ", i);
