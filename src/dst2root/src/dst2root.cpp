@@ -435,7 +435,6 @@ int main(int argc, char** argv) {
 
     if (!is_batch && (++entry % 10000) == 0)
       std::cout << "\t" << floor(100 * entry / tot_hipo_events) << "%\r\r" << std::flush;
-    tot_events_processed++;
 
     l = rec_Event->getRows();
     if (l != -1) {
@@ -529,9 +528,10 @@ int main(int argc, char** argv) {
 
     if (good_rec && len_pid == -1)
       continue;
-    if (elec_first && (rec_Particle->getInt(0, 0) != 11 || rec_Particle->getInt(0, 0) != 0))
+    if (elec_first && rec_Particle->getInt(0, 0) != 11)
       continue;
 
+    tot_events_processed++;
     if (len_pid != -1) {
       pid.resize(len_pid);
       p.resize(len_pid);
