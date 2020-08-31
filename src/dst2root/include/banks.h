@@ -16,15 +16,15 @@ int    NPGP;
 double LT;
 float  PTIME;
 
-Int_t   run;
-Int_t   event;
-Int_t   unixtime;
-Float_t trigger;
-Float_t timestamp;
-Int_t   type;
-Int_t   mode;
-Float_t torus;
-Float_t solenoid;
+Int_t     run;
+Int_t     event;
+Int_t     unixtime;
+long long trigger;
+long long timestamp;
+Int_t     type;
+Int_t     mode;
+Float_t   torus;
+Float_t   solenoid;
 
 Int_t   ft_category;
 Float_t ft_startTime;

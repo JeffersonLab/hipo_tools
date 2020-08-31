@@ -435,7 +435,6 @@ int main(int argc, char** argv) {
 
     if (!is_batch && (++entry % 10000) == 0)
       std::cout << "\t" << floor(100 * entry / tot_hipo_events) << "%\r\r" << std::flush;
-    tot_events_processed++;
 
     l = rec_Event->getRows();
     if (l != -1) {
@@ -463,8 +462,8 @@ int main(int argc, char** argv) {
       run       = run_Config->getInt(0, 0);
       event     = run_Config->getInt(1, 0);
       unixtime  = run_Config->getInt(2, 0);
-      trigger   = run_Config->getLong(3, 0);
-      timestamp = run_Config->getLong(4, 0);
+      trigger   = run_Config->getLongLong(3, 0);
+      timestamp = run_Config->getLongLong(4, 0);
       type      = run_Config->getInt(5, 0);
       mode      = run_Config->getInt(6, 0);
       torus     = run_Config->getFloat(7, 0);
@@ -529,9 +528,10 @@ int main(int argc, char** argv) {
 
     if (good_rec && len_pid == -1)
       continue;
-    if (elec_first && (rec_Particle->getInt(0, 0) != 11 || rec_Particle->getInt(0, 0) != 0))
+    if (elec_first && rec_Particle->getInt(0, 0) != 11)
       continue;
 
+    tot_events_processed++;
     if (len_pid != -1) {
       pid.resize(len_pid);
       p.resize(len_pid);

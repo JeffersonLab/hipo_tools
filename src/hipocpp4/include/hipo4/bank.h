@@ -65,6 +65,10 @@ namespace hipo {
     }
     long getLongAt(int index) { return *reinterpret_cast<int64_t*>(&structureAddress[index + 8]); }
 
+    long long getLongLongAt(int index) {
+      return *reinterpret_cast<int64_t*>(&structureAddress[index + 8]);
+    }
+
     std::string getStringAt(int index);
 
     void putIntAt(int index, int value) {
@@ -163,26 +167,29 @@ namespace hipo {
       return this->get<T>(item, index);
     }
 
-    int    getInt(int item, int index);
-    int    getShort(int item, int index);
-    int    getByte(int item, int index);
-    float  getFloat(int item, int index);
-    double getDouble(int item, int index);
-    long   getLong(int item, int index);
+    int       getInt(int item, int index);
+    int       getShort(int item, int index);
+    int       getByte(int item, int index);
+    float     getFloat(int item, int index);
+    double    getDouble(int item, int index);
+    long      getLong(int item, int index);
+    long long getLongLong(int item, int index);
 
-    int    getInt(const char* name, int index);
-    int    getShort(const char* name, int index);
-    int    getByte(const char* name, int index);
-    float  getFloat(const char* name, int index);
-    double getDouble(const char* name, int index);
-    long   getLong(const char* name, int index);
+    int       getInt(const char* name, int index);
+    int       getShort(const char* name, int index);
+    int       getByte(const char* name, int index);
+    float     getFloat(const char* name, int index);
+    double    getDouble(const char* name, int index);
+    long      getLong(const char* name, int index);
+    long long getLongLong(const char* name, int index);
 
-    int    getInt(std::string name, int index) { return getInt(name.c_str(), index); }
-    int    getShort(std::string name, int index) { return getShort(name.c_str(), index); }
-    int    getByte(std::string name, int index) { return getByte(name.c_str(), index); }
-    float  getFloat(std::string name, int index) { return getFloat(name.c_str(), index); }
-    double getDouble(std::string name, int index) { return getDouble(name.c_str(), index); }
-    long   getLong(std::string name, int index) { return getLong(name.c_str(), index); }
+    int       getInt(std::string name, int index) { return getInt(name.c_str(), index); }
+    int       getShort(std::string name, int index) { return getShort(name.c_str(), index); }
+    int       getByte(std::string name, int index) { return getByte(name.c_str(), index); }
+    float     getFloat(std::string name, int index) { return getFloat(name.c_str(), index); }
+    double    getDouble(std::string name, int index) { return getDouble(name.c_str(), index); }
+    long      getLong(std::string name, int index) { return getLong(name.c_str(), index); }
+    long long getLongLong(std::string name, int index) { return getLongLong(name.c_str(), index); }
 
     void putInt(const char* name, int index, int32_t value);
     void putShort(const char* name, int index, int16_t value);
