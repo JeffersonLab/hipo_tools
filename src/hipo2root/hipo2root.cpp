@@ -945,8 +945,8 @@ int main(int argc, char** argv) {
         REC_Traj_path_vec.resize(l);
 
         for (int i = 0; i < l; i++) {
-          REC_Traj_index_vec[i]    = rec_Traj->getInt(0, i);
-          REC_Traj_pindex_vec[i]   = rec_Traj->getInt(1, i);
+          REC_Traj_pindex_vec[i]   = rec_Traj->getInt(0, i);
+          REC_Traj_index_vec[i]    = rec_Traj->getInt(1, i);
           REC_Traj_detector_vec[i] = rec_Traj->getInt(2, i);
           REC_Traj_layer_vec[i]    = rec_Traj->getInt(3, i);
           REC_Traj_x_vec[i]        = rec_Traj->getFloat(4, i);
