@@ -115,7 +115,11 @@ namespace hipo {
 
   int schema::getRowLength() {
     int nentries = schemaEntries.size();
-    int size     = schemaEntries[nentries - 1].offset + schemaEntries[nentries - 1].typeSize;
+
+    if (nentries == 0)
+      return 0;
+
+    int size = schemaEntries[nentries - 1].offset + schemaEntries[nentries - 1].typeSize;
     return size;
   }
 
@@ -156,8 +160,8 @@ namespace hipo {
   // Implementation of dictionary class
   //=============================================
   std::vector<std::string> dictionary::getSchemaList() {
-    std::vector<std::string>                          vec;
-    for (auto && it : factory) {
+    std::vector<std::string> vec;
+    for (auto&& it : factory) {
       vec.push_back(it.first);
     }
     return vec;

@@ -90,8 +90,11 @@ namespace hipo {
   bank::~bank() {}
 
   void bank::notify() {
-    int size = bankSchema.getRowLength();
-    bankRows = getSize() / size;
+
+    if (bankSchema.getRowLength() == 0)
+      return;
+
+    bankRows = getSize() / bankSchema.getRowLength();
   }
 
   int bank::getInt(int item, int index) {
