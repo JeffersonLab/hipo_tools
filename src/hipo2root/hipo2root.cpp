@@ -84,6 +84,7 @@ int main(int argc, char** argv) {
   auto rec_ForwardTagger = std::make_shared<hipo::bank>(dict->getSchema("REC::ForwardTagger"));
   auto rec_Traj          = std::make_shared<hipo::bank>(dict->getSchema("REC::Traj"));
   auto rec_CovMat        = std::make_shared<hipo::bank>(dict->getSchema("REC::CovMat"));
+  auto rec_ScintExtras   = std::make_shared<hipo::bank>(dict->getSchema("REC::ScintExtras"));
 
   // Monte Carlo only banks
   auto mc_Header   = std::make_shared<hipo::bank>(dict->getSchema("MC::Header"));
@@ -252,6 +253,11 @@ int main(int argc, char** argv) {
   clas12->Branch("REC_Scintillator_hy", &REC_Scintillator_hy_vec);
   clas12->Branch("REC_Scintillator_hz", &REC_Scintillator_hz_vec);
   clas12->Branch("REC_Scintillator_status", &REC_Scintillator_status_vec);
+
+  clas12->Branch("REC_ScintExtras_dedx", &REC_ScintExtras_dedx_vec);
+  clas12->Branch("REC_ScintExtras_size", &REC_ScintExtras_size_vec);
+  clas12->Branch("REC_ScintExtras_layermult", &REC_ScintExtras_layermult_vec);
+
   clas12->Branch("REC_Track_index", &REC_Track_index_vec);
   clas12->Branch("REC_Track_pindex", &REC_Track_pindex_vec);
   clas12->Branch("REC_Track_detector", &REC_Track_detector_vec);
@@ -422,6 +428,7 @@ int main(int argc, char** argv) {
     hipo_event->getStructure(*rec_Cherenkov);
     hipo_event->getStructure(*rec_Scintillator);
     hipo_event->getStructure(*rec_Calorimeter);
+    hipo_event->getStructure(*rec_ScintExtras);
     if (cov)
       hipo_event->getStructure(*rec_CovMat);
     if (traj)
@@ -735,6 +742,20 @@ int main(int argc, char** argv) {
         REC_Scintillator_status_vec[i]    = rec_Scintillator->getInt(16, i);
       }
     }
+
+    l = rec_ScintExtras->getRows();
+    if (l != -1) {
+      REC_ScintExtras_dedx_vec.resize(l);
+      REC_ScintExtras_size_vec.resize(l);
+      REC_ScintExtras_layermult_vec.resize(l);
+
+      for (int i = 0; i < l; i++) {
+        REC_ScintExtras_dedx_vec[i]      = rec_ScintExtras->getFloat(0, i);
+        REC_ScintExtras_size_vec[i]      = rec_ScintExtras->getInt(1, i);
+        REC_ScintExtras_layermult_vec[i] = rec_ScintExtras->getInt(2, i);
+      }
+    }
+
     l = rec_ForwardTagger->getRows();
     if (l != -1) {
       REC_ForwardTagger_index_vec.resize(l);

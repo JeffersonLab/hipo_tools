@@ -1,3 +1,5 @@
+#include <vector>
+
 using v_int   = std::vector<Int_t>;
 using v_float = std::vector<Float_t>;
 
@@ -255,6 +257,10 @@ v_float sc_cnd_z;
 v_float sc_cnd_hx;
 v_float sc_cnd_hy;
 v_float sc_cnd_hz;
+
+v_float sc_extras_dedx;
+v_int   sc_extras_size;
+v_float sc_extras_layermult;
 
 v_float ft_cal_energy;
 v_float ft_cal_time;

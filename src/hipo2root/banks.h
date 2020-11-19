@@ -121,6 +121,11 @@ v_float REC_Scintillator_hx_vec;
 v_float REC_Scintillator_hy_vec;
 v_float REC_Scintillator_hz_vec;
 v_int   REC_Scintillator_status_vec;
+
+v_float REC_ScintExtras_dedx_vec;
+v_int   REC_ScintExtras_size_vec;
+v_int   REC_ScintExtras_layermult_vec;
+
 v_int   REC_Track_index_vec;
 v_int   REC_Track_pindex_vec;
 v_int   REC_Track_detector_vec;
