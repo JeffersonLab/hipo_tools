@@ -1149,7 +1149,7 @@ int main(int argc, char** argv) {
           sc_cnd_hz[i]        = rec_Scintillator->getFloat(15, k);
         }
 
-        if (pindex == i) {
+        if (pindex == i && rec_ScintExtras->getRows() > 0) {
           sc_extras_dedx[i]      = rec_ScintExtras->getFloat(0, k);
           sc_extras_size[i]      = rec_ScintExtras->getInt(1, k);
           sc_extras_layermult[i] = rec_ScintExtras->getInt(2, k);
