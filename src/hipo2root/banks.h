@@ -121,6 +121,11 @@ v_float REC_Scintillator_hx_vec;
 v_float REC_Scintillator_hy_vec;
 v_float REC_Scintillator_hz_vec;
 v_int   REC_Scintillator_status_vec;
+
+v_float REC_ScintExtras_dedx_vec;
+v_int   REC_ScintExtras_size_vec;
+v_int   REC_ScintExtras_layermult_vec;
+
 v_int   REC_Track_index_vec;
 v_int   REC_Track_pindex_vec;
 v_int   REC_Track_detector_vec;
@@ -218,6 +223,8 @@ v_float MC_Lund_pz_vec;
 v_float MC_Lund_vx_vec;
 v_float MC_Lund_vy_vec;
 v_float MC_Lund_vz_vec;
+v_int   MC_Lund_parent_vec;
+v_int   MC_Lund_daughter_vec;
 
 v_int   CND_Hits_id_vec;
 v_int   CND_Hits_status_vec;

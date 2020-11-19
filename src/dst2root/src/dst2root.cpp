@@ -266,6 +266,10 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
   clas12->Branch("sc_cnd_hy", &sc_cnd_hy);
   clas12->Branch("sc_cnd_hz", &sc_cnd_hz);
 
+  clas12->Branch("sc_extras_dedx", &sc_extras_dedx);
+  clas12->Branch("sc_extras_size", &sc_extras_size);
+  clas12->Branch("sc_extras_layermult", &sc_extras_layermult);
+
   clas12->Branch("ft_cal_energy", &ft_cal_energy);
   clas12->Branch("ft_cal_time", &ft_cal_time);
   clas12->Branch("ft_cal_path", &ft_cal_path);
@@ -384,6 +388,7 @@ int main(int argc, char** argv) {
   auto rec_Particle      = std::make_shared<hipo::bank>(dict->getSchema("REC::Particle"));
   auto rec_Calorimeter   = std::make_shared<hipo::bank>(dict->getSchema("REC::Calorimeter"));
   auto rec_Scintillator  = std::make_shared<hipo::bank>(dict->getSchema("REC::Scintillator"));
+  auto rec_ScintExtras   = std::make_shared<hipo::bank>(dict->getSchema("REC::ScintExtras"));
   auto rec_Cherenkov     = std::make_shared<hipo::bank>(dict->getSchema("REC::Cherenkov"));
   auto rec_Track         = std::make_shared<hipo::bank>(dict->getSchema("REC::Track"));
   auto rec_ForwardTagger = std::make_shared<hipo::bank>(dict->getSchema("REC::ForwardTagger"));
@@ -422,6 +427,7 @@ int main(int argc, char** argv) {
     hipo_event->getStructure(*rec_Track);
     hipo_event->getStructure(*rec_Cherenkov);
     hipo_event->getStructure(*rec_Scintillator);
+    hipo_event->getStructure(*rec_ScintExtras);
     hipo_event->getStructure(*rec_Calorimeter);
     hipo_event->getStructure(*rec_Traj);
     if (cov)
@@ -1010,6 +1016,9 @@ int main(int argc, char** argv) {
     sc_cnd_hx.resize(len_pid);
     sc_cnd_hy.resize(len_pid);
     sc_cnd_hz.resize(len_pid);
+    sc_extras_dedx.resize(len_pid);
+    sc_extras_size.resize(len_pid);
+    sc_extras_layermult.resize(len_pid);
 
     for (int i = 0; i < len_pid; i++) {
       sc_ftof_1a_sec[i]       = -1;
@@ -1069,6 +1078,10 @@ int main(int argc, char** argv) {
       sc_cnd_hx[i]        = NAN;
       sc_cnd_hy[i]        = NAN;
       sc_cnd_hz[i]        = NAN;
+
+      sc_extras_dedx[i]      = NAN;
+      sc_extras_size[i]      = -1;
+      sc_extras_layermult[i] = NAN;
     }
 
     for (int i = 0; i < len_pid; i++) {
@@ -1134,6 +1147,12 @@ int main(int argc, char** argv) {
           sc_cnd_hx[i]        = rec_Scintillator->getFloat(13, k);
           sc_cnd_hy[i]        = rec_Scintillator->getFloat(14, k);
           sc_cnd_hz[i]        = rec_Scintillator->getFloat(15, k);
+        }
+
+        if (pindex == i && rec_ScintExtras->getRows() > 0) {
+          sc_extras_dedx[i]      = rec_ScintExtras->getFloat(0, k);
+          sc_extras_size[i]      = rec_ScintExtras->getInt(1, k);
+          sc_extras_layermult[i] = rec_ScintExtras->getInt(2, k);
         }
       }
     }
