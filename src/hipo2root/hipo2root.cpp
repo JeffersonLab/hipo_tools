@@ -176,6 +176,8 @@ int main(int argc, char** argv) {
     clas12->Branch("MC_Lund_vx", &MC_Lund_vx_vec);
     clas12->Branch("MC_Lund_vy", &MC_Lund_vy_vec);
     clas12->Branch("MC_Lund_vz", &MC_Lund_vz_vec);
+    clas12->Branch("MC_Lund_parent", &MC_Lund_parent_vec);
+    clas12->Branch("MC_Lund_daughter", &MC_Lund_daughter_vec);
   }
 
   clas12->Branch("REC_Calorimeter_index", &REC_Calorimeter_index_vec);
@@ -512,17 +514,21 @@ int main(int argc, char** argv) {
         MC_Lund_vz_vec.resize(l);
         MC_Lund_mass_vec.resize(l);
         MC_Lund_E_vec.resize(l);
+        MC_Lund_parent_vec.resize(l);
+        MC_Lund_daughter_vec.resize(l);
 
         for (int i = 0; i < l; i++) {
-          MC_Lund_pid_vec[i]  = mc_Lund->getInt(3, i);
-          MC_Lund_px_vec[i]   = mc_Lund->getFloat(6, i);
-          MC_Lund_py_vec[i]   = mc_Lund->getFloat(7, i);
-          MC_Lund_pz_vec[i]   = mc_Lund->getFloat(8, i);
-          MC_Lund_E_vec[i]    = mc_Lund->getFloat(9, i);
-          MC_Lund_mass_vec[i] = mc_Lund->getFloat(10, i);
-          MC_Lund_vx_vec[i]   = mc_Lund->getFloat(11, i);
-          MC_Lund_vy_vec[i]   = mc_Lund->getFloat(12, i);
-          MC_Lund_vz_vec[i]   = mc_Lund->getFloat(13, i);
+          MC_Lund_pid_vec[i]      = mc_Lund->getInt(3, i);
+          MC_Lund_parent_vec[i]   = mc_Lund->getInt(4, i);
+          MC_Lund_daughter_vec[i] = mc_Lund->getInt(5, i);
+          MC_Lund_px_vec[i]       = mc_Lund->getFloat(6, i);
+          MC_Lund_py_vec[i]       = mc_Lund->getFloat(7, i);
+          MC_Lund_pz_vec[i]       = mc_Lund->getFloat(8, i);
+          MC_Lund_E_vec[i]        = mc_Lund->getFloat(9, i);
+          MC_Lund_mass_vec[i]     = mc_Lund->getFloat(10, i);
+          MC_Lund_vx_vec[i]       = mc_Lund->getFloat(11, i);
+          MC_Lund_vy_vec[i]       = mc_Lund->getFloat(12, i);
+          MC_Lund_vz_vec[i]       = mc_Lund->getFloat(13, i);
         }
       }
     }

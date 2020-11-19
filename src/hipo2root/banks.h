@@ -223,6 +223,8 @@ v_float MC_Lund_pz_vec;
 v_float MC_Lund_vx_vec;
 v_float MC_Lund_vy_vec;
 v_float MC_Lund_vz_vec;
+v_int   MC_Lund_parent_vec;
+v_int   MC_Lund_daughter_vec;
 
 v_int   CND_Hits_id_vec;
 v_int   CND_Hits_status_vec;
