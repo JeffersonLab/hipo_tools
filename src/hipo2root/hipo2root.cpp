@@ -181,11 +181,14 @@ int main(int argc, char** argv) {
     clas12->Branch("MC_Lund_daughter", &MC_Lund_daughter_vec);
 
     clas12->Branch("MC_True_detector", &MC_True_detector_vec);
+    clas12->Branch("MC_True_pid", &MC_True_pid_vec);
+    clas12->Branch("MC_True_mpid", &MC_True_mpid_vec);
     clas12->Branch("MC_True_tid", &MC_True_tid_vec);
     clas12->Branch("MC_True_mtid", &MC_True_mtid_vec);
     clas12->Branch("MC_True_otid", &MC_True_otid_vec);
     clas12->Branch("MC_True_trackE", &MC_True_trackE_vec);
     clas12->Branch("MC_True_totEdep", &MC_True_totEdep_vec);
+    clas12->Branch("MC_True_avgX", &MC_True_avgY_vec);
     clas12->Branch("MC_True_avgY", &MC_True_avgY_vec);
     clas12->Branch("MC_True_avgZ", &MC_True_avgZ_vec);
     clas12->Branch("MC_True_avgLx", &MC_True_avgLx_vec);
@@ -562,11 +565,14 @@ int main(int argc, char** argv) {
       l = mc_True->getRows();
       if (l != -1) {
         MC_True_detector_vec.resize(l);
+        MC_True_pid_vec.resize(l);
+        MC_True_mpid_vec.resize(l);
         MC_True_tid_vec.resize(l);
         MC_True_mtid_vec.resize(l);
         MC_True_otid_vec.resize(l);
         MC_True_trackE_vec.resize(l);
         MC_True_totEdep_vec.resize(l);
+        MC_True_avgX_vec.resize(l);
         MC_True_avgY_vec.resize(l);
         MC_True_avgZ_vec.resize(l);
         MC_True_avgLx_vec.resize(l);
@@ -588,11 +594,14 @@ int main(int argc, char** argv) {
 
         for (int i = 0; i < l; i++) {
           MC_True_detector_vec[i] = mc_True->getInt("detector", i);
+          MC_True_pid_vec[i]      = mc_True->getInt("pid", i);
+          MC_True_mpid_vec[i]     = mc_True->getInt("mpid", i);
           MC_True_tid_vec[i]      = mc_True->getInt("tid", i);
           MC_True_mtid_vec[i]     = mc_True->getInt("mtid", i);
           MC_True_otid_vec[i]     = mc_True->getInt("otid", i);
           MC_True_trackE_vec[i]   = mc_True->getFloat("trackE", i);
           MC_True_totEdep_vec[i]  = mc_True->getFloat("totEdep", i);
+          MC_True_avgX_vec[i]     = mc_True->getFloat("avgX", i);
           MC_True_avgY_vec[i]     = mc_True->getFloat("avgY", i);
           MC_True_avgZ_vec[i]     = mc_True->getFloat("avgZ", i);
           MC_True_avgLx_vec[i]    = mc_True->getFloat("avgLx", i);
