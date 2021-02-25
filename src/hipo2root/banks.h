@@ -227,11 +227,14 @@ v_int   MC_Lund_parent_vec;
 v_int   MC_Lund_daughter_vec;
 
 v_int   MC_True_detector_vec;
+v_int   MC_True_pid_vec;
+v_int   MC_True_mpid_vec;
 v_int   MC_True_tid_vec;
 v_int   MC_True_mtid_vec;
 v_int   MC_True_otid_vec;
 v_float MC_True_trackE_vec;
 v_float MC_True_totEdep_vec;
+v_float MC_True_avgX_vec;
 v_float MC_True_avgY_vec;
 v_float MC_True_avgZ_vec;
 v_float MC_True_avgLx_vec;
