@@ -91,6 +91,7 @@ int main(int argc, char** argv) {
   auto mc_Event    = std::make_shared<hipo::bank>(dict->getSchema("MC::Event"));
   auto mc_Particle = std::make_shared<hipo::bank>(dict->getSchema("MC::Particle"));
   auto mc_Lund     = std::make_shared<hipo::bank>(dict->getSchema("MC::Lund"));
+  auto mc_True     = std::make_shared<hipo::bank>(dict->getSchema("MC::True"));
 
   // Time Based Tracking Banks
   auto tbt_Tracks  = std::make_shared<hipo::bank>(dict->getSchema("TimeBasedTrkg::TBTracks"));
@@ -178,6 +179,31 @@ int main(int argc, char** argv) {
     clas12->Branch("MC_Lund_vz", &MC_Lund_vz_vec);
     clas12->Branch("MC_Lund_parent", &MC_Lund_parent_vec);
     clas12->Branch("MC_Lund_daughter", &MC_Lund_daughter_vec);
+
+    clas12->Branch("MC_True_detector", &MC_True_detector_vec);
+    clas12->Branch("MC_True_tid", &MC_True_tid_vec);
+    clas12->Branch("MC_True_mtid", &MC_True_mtid_vec);
+    clas12->Branch("MC_True_otid", &MC_True_otid_vec);
+    clas12->Branch("MC_True_trackE", &MC_True_trackE_vec);
+    clas12->Branch("MC_True_totEdep", &MC_True_totEdep_vec);
+    clas12->Branch("MC_True_avgY", &MC_True_avgY_vec);
+    clas12->Branch("MC_True_avgZ", &MC_True_avgZ_vec);
+    clas12->Branch("MC_True_avgLx", &MC_True_avgLx_vec);
+    clas12->Branch("MC_True_avgLy", &MC_True_avgLy_vec);
+    clas12->Branch("MC_True_avgLz", &MC_True_avgLz_vec);
+    clas12->Branch("MC_True_px", &MC_True_px_vec);
+    clas12->Branch("MC_True_py", &MC_True_py_vec);
+    clas12->Branch("MC_True_pz", &MC_True_pz_vec);
+    clas12->Branch("MC_True_vx", &MC_True_vx_vec);
+    clas12->Branch("MC_True_vy", &MC_True_vy_vec);
+    clas12->Branch("MC_True_vz", &MC_True_vz_vec);
+    clas12->Branch("MC_True_mvx", &MC_True_mvx_vec);
+    clas12->Branch("MC_True_mvy", &MC_True_mvy_vec);
+    clas12->Branch("MC_True_mvz", &MC_True_mvz_vec);
+    clas12->Branch("MC_True_avgT", &MC_True_avgT_vec);
+    clas12->Branch("MC_True_nsteps", &MC_True_nsteps_vec);
+    clas12->Branch("MC_True_procID", &MC_True_procID_vec);
+    clas12->Branch("MC_True_hitn", &MC_True_hitn_vec);
   }
 
   clas12->Branch("REC_Calorimeter_index", &REC_Calorimeter_index_vec);
@@ -440,6 +466,7 @@ int main(int argc, char** argv) {
       hipo_event->getStructure(*mc_Particle);
       hipo_event->getStructure(*mc_Event);
       hipo_event->getStructure(*mc_Lund);
+      hipo_event->getStructure(*mc_True);
     }
     if (tbt) {
       hipo_event->getStructure(*tbt_Tracks);
@@ -529,6 +556,61 @@ int main(int argc, char** argv) {
           MC_Lund_vx_vec[i]       = mc_Lund->getFloat(11, i);
           MC_Lund_vy_vec[i]       = mc_Lund->getFloat(12, i);
           MC_Lund_vz_vec[i]       = mc_Lund->getFloat(13, i);
+        }
+      }
+
+      l = mc_True->getRows();
+      if (l != -1) {
+        MC_True_detector_vec.resize(l);
+        MC_True_tid_vec.resize(l);
+        MC_True_mtid_vec.resize(l);
+        MC_True_otid_vec.resize(l);
+        MC_True_trackE_vec.resize(l);
+        MC_True_totEdep_vec.resize(l);
+        MC_True_avgY_vec.resize(l);
+        MC_True_avgZ_vec.resize(l);
+        MC_True_avgLx_vec.resize(l);
+        MC_True_avgLy_vec.resize(l);
+        MC_True_avgLz_vec.resize(l);
+        MC_True_px_vec.resize(l);
+        MC_True_py_vec.resize(l);
+        MC_True_pz_vec.resize(l);
+        MC_True_vx_vec.resize(l);
+        MC_True_vy_vec.resize(l);
+        MC_True_vz_vec.resize(l);
+        MC_True_mvx_vec.resize(l);
+        MC_True_mvy_vec.resize(l);
+        MC_True_mvz_vec.resize(l);
+        MC_True_avgT_vec.resize(l);
+        MC_True_nsteps_vec.resize(l);
+        MC_True_procID_vec.resize(l);
+        MC_True_hitn_vec.resize(l);
+
+        for (int i = 0; i < l; i++) {
+          MC_True_detector_vec[i] = mc_True->getInt("detector", i);
+          MC_True_tid_vec[i]      = mc_True->getInt("tid", i);
+          MC_True_mtid_vec[i]     = mc_True->getInt("mtid", i);
+          MC_True_otid_vec[i]     = mc_True->getInt("otid", i);
+          MC_True_trackE_vec[i]   = mc_True->getFloat("trackE", i);
+          MC_True_totEdep_vec[i]  = mc_True->getFloat("totEdep", i);
+          MC_True_avgY_vec[i]     = mc_True->getFloat("avgY", i);
+          MC_True_avgZ_vec[i]     = mc_True->getFloat("avgZ", i);
+          MC_True_avgLx_vec[i]    = mc_True->getFloat("avgLx", i);
+          MC_True_avgLy_vec[i]    = mc_True->getFloat("avgLy", i);
+          MC_True_avgLz_vec[i]    = mc_True->getFloat("avgLz", i);
+          MC_True_px_vec[i]       = mc_True->getFloat("px", i);
+          MC_True_py_vec[i]       = mc_True->getFloat("py", i);
+          MC_True_pz_vec[i]       = mc_True->getFloat("pz", i);
+          MC_True_vx_vec[i]       = mc_True->getFloat("vx", i);
+          MC_True_vy_vec[i]       = mc_True->getFloat("vy", i);
+          MC_True_vz_vec[i]       = mc_True->getFloat("vz", i);
+          MC_True_mvx_vec[i]      = mc_True->getFloat("mvx", i);
+          MC_True_mvy_vec[i]      = mc_True->getFloat("mvy", i);
+          MC_True_mvz_vec[i]      = mc_True->getFloat("mvz", i);
+          MC_True_avgT_vec[i]     = mc_True->getFloat("avgT", i);
+          MC_True_nsteps_vec[i]   = mc_True->getInt("nsteps", i);
+          MC_True_procID_vec[i]   = mc_True->getInt("procID", i);
+          MC_True_hitn_vec[i]     = mc_True->getInt("hitn", i);
         }
       }
     }
