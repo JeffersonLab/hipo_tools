@@ -6,18 +6,6 @@ endif()
 
 include_directories(include)
 
-add_executable(dst2root_3 src/dst2root_3.cpp)
-target_link_libraries(dst2root_3
-  PRIVATE hipocpp3_static
-  PUBLIC ${ROOT_LIBRARIES}
-  )
-
-add_dependencies(dst2root_3 hipocpp3_static)
-install(TARGETS dst2root_3
-  EXPORT ${PROJECT_NAME}Targets
-  RUNTIME DESTINATION bin)
-
-
 add_executable(dst2root src/dst2root.cpp)
 target_link_libraries(dst2root
   PRIVATE hipocpp4_static

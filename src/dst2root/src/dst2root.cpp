@@ -1016,6 +1016,7 @@ int main(int argc, char** argv) {
     sc_cnd_hx.resize(len_pid);
     sc_cnd_hy.resize(len_pid);
     sc_cnd_hz.resize(len_pid);
+
     sc_extras_dedx.resize(len_pid);
     sc_extras_size.resize(len_pid);
     sc_extras_layermult.resize(len_pid);
@@ -1089,6 +1090,7 @@ int main(int argc, char** argv) {
         int pindex   = rec_Scintillator->getInt(1, k);
         int detector = rec_Scintillator->getInt(2, k);
         int layer    = rec_Scintillator->getInt(4, k);
+
         if (pindex == i && detector == FTOF && layer == FTOF_1A) {
           sc_ftof_1a_sec[i]       = rec_Scintillator->getInt(3, k);
           sc_ftof_1a_component[i] = rec_Scintillator->getInt(5, k);

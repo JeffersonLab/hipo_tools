@@ -36,9 +36,6 @@ ELSE()
   add_definitions(-D__LZ4__)
 ENDIF()
 
-# Add directory for hipo3 library
-include_directories(src/hipocpp3/include)
-add_subdirectory(src/hipocpp3)
 
 # Add directory for hipo4 library
 include_directories(src/hipocpp4/include)
