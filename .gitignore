@@ -43,3 +43,4 @@ __pycache__/
 src/hipopy/hipopy.cpp
 *.root
 .dccache
+*.hipo
