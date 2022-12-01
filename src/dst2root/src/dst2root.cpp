@@ -20,39 +20,38 @@
 #include "clipp.h"
 #include "constants.h"
 
-void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
+void init(TTree* clas12, bool is_mc, bool cov, bool traj, bool small) {
 
   clas12->Branch("run", &run);
   clas12->Branch("event", &event);
-  clas12->Branch("unixtime", &unixtime);
-  clas12->Branch("trigger", &trigger);
-  clas12->Branch("timestamp", &timestamp);
-  clas12->Branch("type", &type);
-  clas12->Branch("mode", &mode);
-  clas12->Branch("torus", &torus);
-  clas12->Branch("solenoid", &solenoid);
-
-  clas12->Branch("category", &category);
-  clas12->Branch("ft_category", &ft_category);
-  clas12->Branch("topology", &topology);
   clas12->Branch("beamCharge", &beamCharge);
   clas12->Branch("liveTime", &liveTime);
   clas12->Branch("startTime", &startTime);
-  clas12->Branch("ft_startTime", &ft_startTime);
-  clas12->Branch("RFTime", &RFTime);
   clas12->Branch("helicity", &helicity);
-  clas12->Branch("helicityRaw", &helicityRaw);
-  clas12->Branch("procTime", &procTime);
-
-  clas12->Branch("hel_run", &hel_run);
-  clas12->Branch("hel_event", &hel_event);
-  clas12->Branch("hel_timestamp", &hel_timestamp);
-  clas12->Branch("hel_helicity", &hel_helicity);
-  clas12->Branch("hel_helicityRaw", &hel_helicityRaw);
-  clas12->Branch("hel_pair", &hel_pair);
-  clas12->Branch("hel_pattern", &hel_pattern);
-  clas12->Branch("hel_status", &hel_status);
-
+  if (!small) {
+    clas12->Branch("unixtime", &unixtime);
+    clas12->Branch("trigger", &trigger);
+    clas12->Branch("timestamp", &timestamp);
+    clas12->Branch("type", &type);
+    clas12->Branch("mode", &mode);
+    clas12->Branch("torus", &torus);
+    clas12->Branch("solenoid", &solenoid);
+    clas12->Branch("category", &category);
+    clas12->Branch("ft_category", &ft_category);
+    clas12->Branch("topology", &topology);
+    clas12->Branch("ft_startTime", &ft_startTime);
+    clas12->Branch("RFTime", &RFTime);
+    clas12->Branch("helicityRaw", &helicityRaw);
+    clas12->Branch("procTime", &procTime);
+    clas12->Branch("hel_run", &hel_run);
+    clas12->Branch("hel_event", &hel_event);
+    clas12->Branch("hel_timestamp", &hel_timestamp);
+    clas12->Branch("hel_helicity", &hel_helicity);
+    clas12->Branch("hel_helicityRaw", &hel_helicityRaw);
+    clas12->Branch("hel_pair", &hel_pair);
+    clas12->Branch("hel_pattern", &hel_pattern);
+    clas12->Branch("hel_status", &hel_status);
+  }
   clas12->Branch("pid", &pid);
   clas12->Branch("ft_pid", &ft_pid);
   clas12->Branch("p", &p);
@@ -103,10 +102,6 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
   clas12->Branch("cvt_y", &cvt_y);
   clas12->Branch("cvt_z", &cvt_z);
 
-  clas12->Branch("fmt_x", &fmt_x);
-  clas12->Branch("fmt_y", &fmt_y);
-  clas12->Branch("fmt_z", &fmt_z);
-
   clas12->Branch("ec_tot_energy", &ec_tot_energy);
   clas12->Branch("ec_pcal_energy", &ec_pcal_energy);
   clas12->Branch("ec_pcal_sec", &ec_pcal_sec);
@@ -121,15 +116,17 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
   clas12->Branch("ec_pcal_lu", &ec_pcal_lu);
   clas12->Branch("ec_pcal_lv", &ec_pcal_lv);
   clas12->Branch("ec_pcal_lw", &ec_pcal_lw);
-  clas12->Branch("ec_pcal_du", &ec_pcal_du);
-  clas12->Branch("ec_pcal_dv", &ec_pcal_dv);
-  clas12->Branch("ec_pcal_dw", &ec_pcal_dw);
-  clas12->Branch("ec_pcal_m2u", &ec_pcal_m2u);
-  clas12->Branch("ec_pcal_m2v", &ec_pcal_m2v);
-  clas12->Branch("ec_pcal_m2w", &ec_pcal_m2w);
-  clas12->Branch("ec_pcal_m3u", &ec_pcal_m3u);
-  clas12->Branch("ec_pcal_m3v", &ec_pcal_m3v);
-  clas12->Branch("ec_pcal_m3w", &ec_pcal_m3w);
+  if (!small) {
+    clas12->Branch("ec_pcal_du", &ec_pcal_du);
+    clas12->Branch("ec_pcal_dv", &ec_pcal_dv);
+    clas12->Branch("ec_pcal_dw", &ec_pcal_dw);
+    clas12->Branch("ec_pcal_m2u", &ec_pcal_m2u);
+    clas12->Branch("ec_pcal_m2v", &ec_pcal_m2v);
+    clas12->Branch("ec_pcal_m2w", &ec_pcal_m2w);
+    clas12->Branch("ec_pcal_m3u", &ec_pcal_m3u);
+    clas12->Branch("ec_pcal_m3v", &ec_pcal_m3v);
+    clas12->Branch("ec_pcal_m3w", &ec_pcal_m3w);
+  }
 
   clas12->Branch("ec_ecin_energy", &ec_ecin_energy);
   clas12->Branch("ec_ecin_sec", &ec_ecin_sec);
@@ -144,15 +141,17 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
   clas12->Branch("ec_ecin_lu", &ec_pcal_lu);
   clas12->Branch("ec_ecin_lv", &ec_pcal_lv);
   clas12->Branch("ec_ecin_lw", &ec_pcal_lw);
-  clas12->Branch("ec_ecin_du", &ec_pcal_du);
-  clas12->Branch("ec_ecin_dv", &ec_pcal_dv);
-  clas12->Branch("ec_ecin_dw", &ec_pcal_dw);
-  clas12->Branch("ec_ecin_m2u", &ec_pcal_m2u);
-  clas12->Branch("ec_ecin_m2v", &ec_pcal_m2v);
-  clas12->Branch("ec_ecin_m2w", &ec_pcal_m2w);
-  clas12->Branch("ec_ecin_m3u", &ec_pcal_m3u);
-  clas12->Branch("ec_ecin_m3v", &ec_pcal_m3v);
-  clas12->Branch("ec_ecin_m3w", &ec_pcal_m3w);
+  if (!small) {
+    clas12->Branch("ec_ecin_du", &ec_pcal_du);
+    clas12->Branch("ec_ecin_dv", &ec_pcal_dv);
+    clas12->Branch("ec_ecin_dw", &ec_pcal_dw);
+    clas12->Branch("ec_ecin_m2u", &ec_pcal_m2u);
+    clas12->Branch("ec_ecin_m2v", &ec_pcal_m2v);
+    clas12->Branch("ec_ecin_m2w", &ec_pcal_m2w);
+    clas12->Branch("ec_ecin_m3u", &ec_pcal_m3u);
+    clas12->Branch("ec_ecin_m3v", &ec_pcal_m3v);
+    clas12->Branch("ec_ecin_m3w", &ec_pcal_m3w);
+  }
 
   clas12->Branch("ec_ecout_energy", &ec_ecout_energy);
   clas12->Branch("ec_ecout_sec", &ec_ecout_sec);
@@ -167,129 +166,137 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj) {
   clas12->Branch("ec_ecout_lu", &ec_pcal_lu);
   clas12->Branch("ec_ecout_lv", &ec_pcal_lv);
   clas12->Branch("ec_ecout_lw", &ec_pcal_lw);
-  clas12->Branch("ec_ecout_du", &ec_pcal_du);
-  clas12->Branch("ec_ecout_dv", &ec_pcal_dv);
-  clas12->Branch("ec_ecout_dw", &ec_pcal_dw);
-  clas12->Branch("ec_ecout_m2u", &ec_pcal_m2u);
-  clas12->Branch("ec_ecout_m2v", &ec_pcal_m2v);
-  clas12->Branch("ec_ecout_m2w", &ec_pcal_m2w);
-  clas12->Branch("ec_ecout_m3u", &ec_pcal_m3u);
-  clas12->Branch("ec_ecout_m3v", &ec_pcal_m3v);
-  clas12->Branch("ec_ecout_m3w", &ec_pcal_m3w);
+  if (!small) {
+    clas12->Branch("ec_ecout_du", &ec_pcal_du);
+    clas12->Branch("ec_ecout_dv", &ec_pcal_dv);
+    clas12->Branch("ec_ecout_dw", &ec_pcal_dw);
+    clas12->Branch("ec_ecout_m2u", &ec_pcal_m2u);
+    clas12->Branch("ec_ecout_m2v", &ec_pcal_m2v);
+    clas12->Branch("ec_ecout_m2w", &ec_pcal_m2w);
+    clas12->Branch("ec_ecout_m3u", &ec_pcal_m3u);
+    clas12->Branch("ec_ecout_m3v", &ec_pcal_m3v);
+    clas12->Branch("ec_ecout_m3w", &ec_pcal_m3w);
+  }
 
   clas12->Branch("cc_nphe_tot", &cc_nphe_tot);
-  clas12->Branch("cc_ltcc_sec", &cc_ltcc_sec);
-  clas12->Branch("cc_ltcc_nphe", &cc_ltcc_nphe);
-  clas12->Branch("cc_ltcc_time", &cc_ltcc_time);
-  clas12->Branch("cc_ltcc_path", &cc_ltcc_path);
-  clas12->Branch("cc_ltcc_theta", &cc_ltcc_theta);
-  clas12->Branch("cc_ltcc_phi", &cc_ltcc_phi);
-  clas12->Branch("cc_ltcc_x", &cc_ltcc_x);
-  clas12->Branch("cc_ltcc_y", &cc_ltcc_y);
-  clas12->Branch("cc_ltcc_z", &cc_ltcc_z);
+  if (!small) {
+    clas12->Branch("cc_ltcc_sec", &cc_ltcc_sec);
+    clas12->Branch("cc_ltcc_nphe", &cc_ltcc_nphe);
+    clas12->Branch("cc_ltcc_time", &cc_ltcc_time);
+    clas12->Branch("cc_ltcc_path", &cc_ltcc_path);
+    clas12->Branch("cc_ltcc_theta", &cc_ltcc_theta);
+    clas12->Branch("cc_ltcc_phi", &cc_ltcc_phi);
+    clas12->Branch("cc_ltcc_x", &cc_ltcc_x);
+    clas12->Branch("cc_ltcc_y", &cc_ltcc_y);
+    clas12->Branch("cc_ltcc_z", &cc_ltcc_z);
 
-  clas12->Branch("cc_htcc_sec", &cc_htcc_sec);
-  clas12->Branch("cc_htcc_nphe", &cc_htcc_nphe);
-  clas12->Branch("cc_htcc_time", &cc_htcc_time);
-  clas12->Branch("cc_htcc_path", &cc_htcc_path);
-  clas12->Branch("cc_htcc_theta", &cc_htcc_theta);
-  clas12->Branch("cc_htcc_phi", &cc_htcc_phi);
-  clas12->Branch("cc_htcc_x", &cc_htcc_x);
-  clas12->Branch("cc_htcc_y", &cc_htcc_y);
-  clas12->Branch("cc_htcc_z", &cc_htcc_z);
+    clas12->Branch("cc_htcc_sec", &cc_htcc_sec);
+    clas12->Branch("cc_htcc_nphe", &cc_htcc_nphe);
+    clas12->Branch("cc_htcc_time", &cc_htcc_time);
+    clas12->Branch("cc_htcc_path", &cc_htcc_path);
+    clas12->Branch("cc_htcc_theta", &cc_htcc_theta);
+    clas12->Branch("cc_htcc_phi", &cc_htcc_phi);
+    clas12->Branch("cc_htcc_x", &cc_htcc_x);
+    clas12->Branch("cc_htcc_y", &cc_htcc_y);
+    clas12->Branch("cc_htcc_z", &cc_htcc_z);
 
-  clas12->Branch("cc_rich_sec", &cc_rich_sec);
-  clas12->Branch("cc_rich_nphe", &cc_rich_nphe);
-  clas12->Branch("cc_rich_time", &cc_rich_time);
-  clas12->Branch("cc_rich_path", &cc_rich_path);
-  clas12->Branch("cc_rich_theta", &cc_rich_theta);
-  clas12->Branch("cc_rich_phi", &cc_rich_phi);
-  clas12->Branch("cc_rich_x", &cc_rich_x);
-  clas12->Branch("cc_rich_y", &cc_rich_y);
-  clas12->Branch("cc_rich_z", &cc_rich_z);
-
+    clas12->Branch("cc_rich_sec", &cc_rich_sec);
+    clas12->Branch("cc_rich_nphe", &cc_rich_nphe);
+    clas12->Branch("cc_rich_time", &cc_rich_time);
+    clas12->Branch("cc_rich_path", &cc_rich_path);
+    clas12->Branch("cc_rich_theta", &cc_rich_theta);
+    clas12->Branch("cc_rich_phi", &cc_rich_phi);
+    clas12->Branch("cc_rich_x", &cc_rich_x);
+    clas12->Branch("cc_rich_y", &cc_rich_y);
+    clas12->Branch("cc_rich_z", &cc_rich_z);
+  }
   clas12->Branch("sc_ftof_1a_sec", &sc_ftof_1a_sec);
   clas12->Branch("sc_ftof_1a_time", &sc_ftof_1a_time);
   clas12->Branch("sc_ftof_1a_path", &sc_ftof_1a_path);
-  clas12->Branch("sc_ftof_1a_energy", &sc_ftof_1a_energy);
-  clas12->Branch("sc_ftof_1a_component", &sc_ftof_1a_component);
-  clas12->Branch("sc_ftof_1a_x", &sc_ftof_1a_x);
-  clas12->Branch("sc_ftof_1a_y", &sc_ftof_1a_y);
-  clas12->Branch("sc_ftof_1a_z", &sc_ftof_1a_z);
-  clas12->Branch("sc_ftof_1a_hx", &sc_ftof_1a_hx);
-  clas12->Branch("sc_ftof_1a_hy", &sc_ftof_1a_hy);
-  clas12->Branch("sc_ftof_1a_hz", &sc_ftof_1a_hz);
-
+  if (!small) {
+    clas12->Branch("sc_ftof_1a_energy", &sc_ftof_1a_energy);
+    clas12->Branch("sc_ftof_1a_component", &sc_ftof_1a_component);
+    clas12->Branch("sc_ftof_1a_x", &sc_ftof_1a_x);
+    clas12->Branch("sc_ftof_1a_y", &sc_ftof_1a_y);
+    clas12->Branch("sc_ftof_1a_z", &sc_ftof_1a_z);
+    clas12->Branch("sc_ftof_1a_hx", &sc_ftof_1a_hx);
+    clas12->Branch("sc_ftof_1a_hy", &sc_ftof_1a_hy);
+    clas12->Branch("sc_ftof_1a_hz", &sc_ftof_1a_hz);
+  }
   clas12->Branch("sc_ftof_1b_sec", &sc_ftof_1b_sec);
   clas12->Branch("sc_ftof_1b_time", &sc_ftof_1b_time);
   clas12->Branch("sc_ftof_1b_path", &sc_ftof_1b_path);
-  clas12->Branch("sc_ftof_1b_energy", &sc_ftof_1b_energy);
-  clas12->Branch("sc_ftof_1b_component", &sc_ftof_1b_component);
-  clas12->Branch("sc_ftof_1b_x", &sc_ftof_1b_x);
-  clas12->Branch("sc_ftof_1b_y", &sc_ftof_1b_y);
-  clas12->Branch("sc_ftof_1b_z", &sc_ftof_1b_z);
-  clas12->Branch("sc_ftof_1b_hx", &sc_ftof_1b_hx);
-  clas12->Branch("sc_ftof_1b_hy", &sc_ftof_1b_hy);
-  clas12->Branch("sc_ftof_1b_hz", &sc_ftof_1b_hz);
+  if (!small) {
+    clas12->Branch("sc_ftof_1b_energy", &sc_ftof_1b_energy);
+    clas12->Branch("sc_ftof_1b_component", &sc_ftof_1b_component);
+    clas12->Branch("sc_ftof_1b_x", &sc_ftof_1b_x);
+    clas12->Branch("sc_ftof_1b_y", &sc_ftof_1b_y);
+    clas12->Branch("sc_ftof_1b_z", &sc_ftof_1b_z);
+    clas12->Branch("sc_ftof_1b_hx", &sc_ftof_1b_hx);
+    clas12->Branch("sc_ftof_1b_hy", &sc_ftof_1b_hy);
+    clas12->Branch("sc_ftof_1b_hz", &sc_ftof_1b_hz);
+  }
 
   clas12->Branch("sc_ftof_2_sec", &sc_ftof_2_sec);
   clas12->Branch("sc_ftof_2_time", &sc_ftof_2_time);
   clas12->Branch("sc_ftof_2_path", &sc_ftof_2_path);
-  clas12->Branch("sc_ftof_2_energy", &sc_ftof_2_energy);
-  clas12->Branch("sc_ftof_2_component", &sc_ftof_2_component);
-  clas12->Branch("sc_ftof_2_x", &sc_ftof_2_x);
-  clas12->Branch("sc_ftof_2_y", &sc_ftof_2_y);
-  clas12->Branch("sc_ftof_2_z", &sc_ftof_2_z);
-  clas12->Branch("sc_ftof_2_hx", &sc_ftof_2_hx);
-  clas12->Branch("sc_ftof_2_hy", &sc_ftof_2_hy);
-  clas12->Branch("sc_ftof_2_hz", &sc_ftof_2_hz);
-
+  if (!small) {
+    clas12->Branch("sc_ftof_2_energy", &sc_ftof_2_energy);
+    clas12->Branch("sc_ftof_2_component", &sc_ftof_2_component);
+    clas12->Branch("sc_ftof_2_x", &sc_ftof_2_x);
+    clas12->Branch("sc_ftof_2_y", &sc_ftof_2_y);
+    clas12->Branch("sc_ftof_2_z", &sc_ftof_2_z);
+    clas12->Branch("sc_ftof_2_hx", &sc_ftof_2_hx);
+    clas12->Branch("sc_ftof_2_hy", &sc_ftof_2_hy);
+    clas12->Branch("sc_ftof_2_hz", &sc_ftof_2_hz);
+  }
   clas12->Branch("sc_ctof_time", &sc_ctof_time);
   clas12->Branch("sc_ctof_path", &sc_ctof_path);
-  clas12->Branch("sc_ctof_energy", &sc_ctof_energy);
-  clas12->Branch("sc_ctof_component", &sc_ctof_component);
-  clas12->Branch("sc_ctof_x", &sc_ctof_x);
-  clas12->Branch("sc_ctof_y", &sc_ctof_y);
-  clas12->Branch("sc_ctof_z", &sc_ctof_z);
-  clas12->Branch("sc_ctof_hx", &sc_ctof_hx);
-  clas12->Branch("sc_ctof_hy", &sc_ctof_hy);
-  clas12->Branch("sc_ctof_hz", &sc_ctof_hz);
+  if (!small) {
+    clas12->Branch("sc_ctof_energy", &sc_ctof_energy);
+    clas12->Branch("sc_ctof_component", &sc_ctof_component);
+    clas12->Branch("sc_ctof_x", &sc_ctof_x);
+    clas12->Branch("sc_ctof_y", &sc_ctof_y);
+    clas12->Branch("sc_ctof_z", &sc_ctof_z);
+    clas12->Branch("sc_ctof_hx", &sc_ctof_hx);
+    clas12->Branch("sc_ctof_hy", &sc_ctof_hy);
+    clas12->Branch("sc_ctof_hz", &sc_ctof_hz);
 
-  clas12->Branch("sc_cnd_time", &sc_cnd_time);
-  clas12->Branch("sc_cnd_path", &sc_cnd_path);
-  clas12->Branch("sc_cnd_energy", &sc_cnd_energy);
-  clas12->Branch("sc_cnd_component", &sc_cnd_component);
-  clas12->Branch("sc_cnd_x", &sc_cnd_x);
-  clas12->Branch("sc_cnd_y", &sc_cnd_y);
-  clas12->Branch("sc_cnd_z", &sc_cnd_z);
-  clas12->Branch("sc_cnd_hx", &sc_cnd_hx);
-  clas12->Branch("sc_cnd_hy", &sc_cnd_hy);
-  clas12->Branch("sc_cnd_hz", &sc_cnd_hz);
+    clas12->Branch("sc_cnd_time", &sc_cnd_time);
+    clas12->Branch("sc_cnd_path", &sc_cnd_path);
+    clas12->Branch("sc_cnd_energy", &sc_cnd_energy);
+    clas12->Branch("sc_cnd_component", &sc_cnd_component);
+    clas12->Branch("sc_cnd_x", &sc_cnd_x);
+    clas12->Branch("sc_cnd_y", &sc_cnd_y);
+    clas12->Branch("sc_cnd_z", &sc_cnd_z);
+    clas12->Branch("sc_cnd_hx", &sc_cnd_hx);
+    clas12->Branch("sc_cnd_hy", &sc_cnd_hy);
+    clas12->Branch("sc_cnd_hz", &sc_cnd_hz);
 
-  clas12->Branch("sc_extras_dedx", &sc_extras_dedx);
-  clas12->Branch("sc_extras_size", &sc_extras_size);
-  clas12->Branch("sc_extras_layermult", &sc_extras_layermult);
+    clas12->Branch("sc_extras_dedx", &sc_extras_dedx);
+    clas12->Branch("sc_extras_size", &sc_extras_size);
+    clas12->Branch("sc_extras_layermult", &sc_extras_layermult);
 
-  clas12->Branch("ft_cal_energy", &ft_cal_energy);
-  clas12->Branch("ft_cal_time", &ft_cal_time);
-  clas12->Branch("ft_cal_path", &ft_cal_path);
-  clas12->Branch("ft_cal_x", &ft_cal_x);
-  clas12->Branch("ft_cal_y", &ft_cal_y);
-  clas12->Branch("ft_cal_z", &ft_cal_z);
-  clas12->Branch("ft_cal_dx", &ft_cal_dx);
-  clas12->Branch("ft_cal_dy", &ft_cal_dy);
-  clas12->Branch("ft_cal_radius", &ft_cal_radius);
+    clas12->Branch("ft_cal_energy", &ft_cal_energy);
+    clas12->Branch("ft_cal_time", &ft_cal_time);
+    clas12->Branch("ft_cal_path", &ft_cal_path);
+    clas12->Branch("ft_cal_x", &ft_cal_x);
+    clas12->Branch("ft_cal_y", &ft_cal_y);
+    clas12->Branch("ft_cal_z", &ft_cal_z);
+    clas12->Branch("ft_cal_dx", &ft_cal_dx);
+    clas12->Branch("ft_cal_dy", &ft_cal_dy);
+    clas12->Branch("ft_cal_radius", &ft_cal_radius);
 
-  clas12->Branch("ft_hodo_energy", &ft_hodo_energy);
-  clas12->Branch("ft_hodo_time", &ft_hodo_time);
-  clas12->Branch("ft_hodo_path", &ft_hodo_path);
-  clas12->Branch("ft_hodo_x", &ft_hodo_x);
-  clas12->Branch("ft_hodo_y", &ft_hodo_y);
-  clas12->Branch("ft_hodo_z", &ft_hodo_z);
-  clas12->Branch("ft_hodo_dx", &ft_hodo_dx);
-  clas12->Branch("ft_hodo_dy", &ft_hodo_dy);
-  clas12->Branch("ft_hodo_radius", &ft_hodo_radius);
-
+    clas12->Branch("ft_hodo_energy", &ft_hodo_energy);
+    clas12->Branch("ft_hodo_time", &ft_hodo_time);
+    clas12->Branch("ft_hodo_path", &ft_hodo_path);
+    clas12->Branch("ft_hodo_x", &ft_hodo_x);
+    clas12->Branch("ft_hodo_y", &ft_hodo_y);
+    clas12->Branch("ft_hodo_z", &ft_hodo_z);
+    clas12->Branch("ft_hodo_dx", &ft_hodo_dx);
+    clas12->Branch("ft_hodo_dy", &ft_hodo_dy);
+    clas12->Branch("ft_hodo_radius", &ft_hodo_radius);
+  }
   if (cov) {
     clas12->Branch("CovMat_11", &CovMat_11);
     clas12->Branch("CovMat_12", &CovMat_12);
@@ -337,10 +344,12 @@ int main(int argc, char** argv) {
   bool        elec_first = false;
   bool        cov        = false;
   bool        traj       = false;
+  bool        small      = true;
   float       max_size   = 1500;
 
   auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
               clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
+              clipp::option("-a", "--all").set(small) % "Get all banks",
               clipp::option("-b", "--batch").set(is_batch) % "Don't show progress and statistics",
               clipp::option("-r", "--rec").set(good_rec) %
                   "Only save events where number of partilces in the event > 0",
@@ -405,7 +414,7 @@ int main(int argc, char** argv) {
   auto mc_Particle = std::make_shared<hipo::bank>(dict->getSchema("MC::Particle"));
   auto mc_Lund     = std::make_shared<hipo::bank>(dict->getSchema("MC::Lund"));
 
-  init(clas12, is_mc, cov, traj);
+  init(clas12, is_mc, cov, traj, small);
 
   int  entry                = 0;
   int  l                    = 0;
@@ -1016,6 +1025,7 @@ int main(int argc, char** argv) {
     sc_cnd_hx.resize(len_pid);
     sc_cnd_hy.resize(len_pid);
     sc_cnd_hz.resize(len_pid);
+
     sc_extras_dedx.resize(len_pid);
     sc_extras_size.resize(len_pid);
     sc_extras_layermult.resize(len_pid);
@@ -1089,6 +1099,7 @@ int main(int argc, char** argv) {
         int pindex   = rec_Scintillator->getInt(1, k);
         int detector = rec_Scintillator->getInt(2, k);
         int layer    = rec_Scintillator->getInt(4, k);
+
         if (pindex == i && detector == FTOF && layer == FTOF_1A) {
           sc_ftof_1a_sec[i]       = rec_Scintillator->getInt(3, k);
           sc_ftof_1a_component[i] = rec_Scintillator->getInt(5, k);

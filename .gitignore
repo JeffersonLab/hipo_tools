@@ -28,7 +28,7 @@ Makefile
 cmake_install.cmake
 install_manifest.txt
 
-# emacs/vim 
+# emacs/vim
 ~*
 *.swp
 *.swo
@@ -42,5 +42,6 @@ __pycache__/
 .vscode
 src/hipopy/hipopy.cpp
 *.root
+*.hipo
 .dccache
 *.hipo
