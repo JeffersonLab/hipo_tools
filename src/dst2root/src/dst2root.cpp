@@ -349,7 +349,7 @@ int main(int argc, char** argv) {
 
   auto cli = (clipp::option("-h", "--help").set(print_help) % "print help",
               clipp::option("-mc", "--MC").set(is_mc) % "Convert dst and mc banks",
-              clipp::option("-a", "--all").set(small) % "Get all banks",
+              clipp::option("-a", "--all").set(small, false) % "Get all banks",
               clipp::option("-b", "--batch").set(is_batch) % "Don't show progress and statistics",
               clipp::option("-r", "--rec").set(good_rec) %
                   "Only save events where number of partilces in the event > 0",
