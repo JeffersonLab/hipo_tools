@@ -262,6 +262,7 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj, bool small) {
     clas12->Branch("sc_ctof_hy", &sc_ctof_hy);
     clas12->Branch("sc_ctof_hz", &sc_ctof_hz);
 
+    clas12->Branch("sc_cnd_layer", &sc_cnd_layer);
     clas12->Branch("sc_cnd_time", &sc_cnd_time);
     clas12->Branch("sc_cnd_path", &sc_cnd_path);
     clas12->Branch("sc_cnd_energy", &sc_cnd_energy);
@@ -1015,6 +1016,7 @@ int main(int argc, char** argv) {
     sc_ctof_hy.resize(len_pid);
     sc_ctof_hz.resize(len_pid);
 
+    sc_cnd_layer.resize(len_pid);
     sc_cnd_time.resize(len_pid);
     sc_cnd_path.resize(len_pid);
     sc_cnd_energy.resize(len_pid);
@@ -1078,6 +1080,7 @@ int main(int argc, char** argv) {
       sc_ctof_hy[i]        = NAN;
       sc_ctof_hz[i]        = NAN;
 
+      sc_cnd_layer[i]     = -1;
       sc_cnd_time[i]      = NAN;
       sc_cnd_path[i]      = NAN;
       sc_cnd_energy[i]    = NAN;
@@ -1148,6 +1151,7 @@ int main(int argc, char** argv) {
           sc_ctof_hy[i]        = rec_Scintillator->getFloat(14, k);
           sc_ctof_hz[i]        = rec_Scintillator->getFloat(15, k);
         } else if (pindex == i && detector == CND) {
+          sc_cnd_layer[i]     = layer;
           sc_cnd_component[i] = rec_Scintillator->getInt(5, k);
           sc_cnd_energy[i]    = rec_Scintillator->getFloat(6, k);
           sc_cnd_time[i]      = rec_Scintillator->getFloat(7, k);

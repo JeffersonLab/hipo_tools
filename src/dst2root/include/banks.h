@@ -247,6 +247,7 @@ v_float sc_ctof_hx;
 v_float sc_ctof_hy;
 v_float sc_ctof_hz;
 
+v_int   sc_cnd_layer;
 v_float sc_cnd_time;
 v_float sc_cnd_path;
 v_float sc_cnd_energy;
