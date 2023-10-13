@@ -135,22 +135,22 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj, bool small) {
   clas12->Branch("ec_ecin_x", &ec_ecin_x);
   clas12->Branch("ec_ecin_y", &ec_ecin_y);
   clas12->Branch("ec_ecin_z", &ec_ecin_z);
-  clas12->Branch("ec_ecin_hx", &ec_pcal_hx);
-  clas12->Branch("ec_ecin_hy", &ec_pcal_hy);
-  clas12->Branch("ec_ecin_hz", &ec_pcal_hz);
-  clas12->Branch("ec_ecin_lu", &ec_pcal_lu);
-  clas12->Branch("ec_ecin_lv", &ec_pcal_lv);
-  clas12->Branch("ec_ecin_lw", &ec_pcal_lw);
+  clas12->Branch("ec_ecin_hx", &ec_ecin_hx);
+  clas12->Branch("ec_ecin_hy", &ec_ecin_hy);
+  clas12->Branch("ec_ecin_hz", &ec_ecin_hz);
+  clas12->Branch("ec_ecin_lu", &ec_ecin_lu);
+  clas12->Branch("ec_ecin_lv", &ec_ecin_lv);
+  clas12->Branch("ec_ecin_lw", &ec_ecin_lw);
   if (!small) {
-    clas12->Branch("ec_ecin_du", &ec_pcal_du);
-    clas12->Branch("ec_ecin_dv", &ec_pcal_dv);
-    clas12->Branch("ec_ecin_dw", &ec_pcal_dw);
-    clas12->Branch("ec_ecin_m2u", &ec_pcal_m2u);
-    clas12->Branch("ec_ecin_m2v", &ec_pcal_m2v);
-    clas12->Branch("ec_ecin_m2w", &ec_pcal_m2w);
-    clas12->Branch("ec_ecin_m3u", &ec_pcal_m3u);
-    clas12->Branch("ec_ecin_m3v", &ec_pcal_m3v);
-    clas12->Branch("ec_ecin_m3w", &ec_pcal_m3w);
+    clas12->Branch("ec_ecin_du", &ec_ecin_du);
+    clas12->Branch("ec_ecin_dv", &ec_ecin_dv);
+    clas12->Branch("ec_ecin_dw", &ec_ecin_dw);
+    clas12->Branch("ec_ecin_m2u", &ec_ecin_m2u);
+    clas12->Branch("ec_ecin_m2v", &ec_ecin_m2v);
+    clas12->Branch("ec_ecin_m2w", &ec_ecin_m2w);
+    clas12->Branch("ec_ecin_m3u", &ec_ecin_m3u);
+    clas12->Branch("ec_ecin_m3v", &ec_ecin_m3v);
+    clas12->Branch("ec_ecin_m3w", &ec_ecin_m3w);
   }
 
   clas12->Branch("ec_ecout_energy", &ec_ecout_energy);
@@ -160,22 +160,22 @@ void init(TTree* clas12, bool is_mc, bool cov, bool traj, bool small) {
   clas12->Branch("ec_ecout_x", &ec_ecout_x);
   clas12->Branch("ec_ecout_y", &ec_ecout_y);
   clas12->Branch("ec_ecout_z", &ec_ecout_z);
-  clas12->Branch("ec_ecout_hx", &ec_pcal_hx);
-  clas12->Branch("ec_ecout_hy", &ec_pcal_hy);
-  clas12->Branch("ec_ecout_hz", &ec_pcal_hz);
-  clas12->Branch("ec_ecout_lu", &ec_pcal_lu);
-  clas12->Branch("ec_ecout_lv", &ec_pcal_lv);
-  clas12->Branch("ec_ecout_lw", &ec_pcal_lw);
+  clas12->Branch("ec_ecout_hx", &ec_ecout_hx);
+  clas12->Branch("ec_ecout_hy", &ec_ecout_hy);
+  clas12->Branch("ec_ecout_hz", &ec_ecout_hz);
+  clas12->Branch("ec_ecout_lu", &ec_ecout_lu);
+  clas12->Branch("ec_ecout_lv", &ec_ecout_lv);
+  clas12->Branch("ec_ecout_lw", &ec_ecout_lw);
   if (!small) {
-    clas12->Branch("ec_ecout_du", &ec_pcal_du);
-    clas12->Branch("ec_ecout_dv", &ec_pcal_dv);
-    clas12->Branch("ec_ecout_dw", &ec_pcal_dw);
-    clas12->Branch("ec_ecout_m2u", &ec_pcal_m2u);
-    clas12->Branch("ec_ecout_m2v", &ec_pcal_m2v);
-    clas12->Branch("ec_ecout_m2w", &ec_pcal_m2w);
-    clas12->Branch("ec_ecout_m3u", &ec_pcal_m3u);
-    clas12->Branch("ec_ecout_m3v", &ec_pcal_m3v);
-    clas12->Branch("ec_ecout_m3w", &ec_pcal_m3w);
+    clas12->Branch("ec_ecout_du", &ec_ecout_du);
+    clas12->Branch("ec_ecout_dv", &ec_ecout_dv);
+    clas12->Branch("ec_ecout_dw", &ec_ecout_dw);
+    clas12->Branch("ec_ecout_m2u", &ec_ecout_m2u);
+    clas12->Branch("ec_ecout_m2v", &ec_ecout_m2v);
+    clas12->Branch("ec_ecout_m2w", &ec_ecout_m2w);
+    clas12->Branch("ec_ecout_m3u", &ec_ecout_m3u);
+    clas12->Branch("ec_ecout_m3v", &ec_ecout_m3v);
+    clas12->Branch("ec_ecout_m3w", &ec_ecout_m3w);
   }
 
   clas12->Branch("cc_nphe_tot", &cc_nphe_tot);
