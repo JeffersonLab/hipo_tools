@@ -10,7 +10,7 @@
 
 namespace hipo {
 
-  void schema::parse(std::string schString) {
+  void schema::parse(const std::string& schString) {
     std::vector<std::string> entries;
     std::vector<std::string> entry;
     hipo::utils::tokenize(schString, entries, ",");
@@ -30,7 +30,7 @@ namespace hipo {
     }
   }
 
-  int schema::getTypeByString(std::string& typeName) {
+  int schema::getTypeByString(const std::string& typeName) {
     if (typeName == "B") {
       return 1;
     } else if (typeName == "S") {
@@ -97,23 +97,36 @@ namespace hipo {
     return out;
   }
 
-  int schema::getOffset(int item, int order, int rows) {
-    int offset = rows * schemaEntries[item].offset + order * schemaEntries[item].typeSize;
-    return offset;
+  int schema::getOffset(int item, int order, int rows) const {
+    const auto& sch = schemaEntries[item];
+    return rows * sch.offset + order * sch.typeSize;
   }
-  int schema::getOffset(const char* name, int order, int rows) {
-    int item = schemaEntriesMap[name];
+
+  int schema::getOffset(std::string name, int order, int rows) const {
+    int item = schemaEntriesMap.at(name);
     return getOffset(item, order, rows);
   }
 
-  int schema::getEntryOrder(std::string name) { return schemaEntriesMap[name]; }
+  int schema::getEntryOrder(const std::string name) const {
+    if (exists(name))
+      return schemaEntriesMap.at(name); // at needed for const function
+
+    if (warningCount > 0) {
+      warningCount--;
+      std::cerr << "Warning , hipo::schema getEntryOrder(const char *name) item :" << name
+                << " not found, for bank " << schemaName << " data for this item is not valid "
+                << std::endl;
+    }
+    return 0;
+  }
+
   int schema::getSizeForRows(int rows) {
     int nentries = schemaEntries.size();
     int offset   = getOffset(nentries - 1, rows - 1, rows) + schemaEntries[nentries - 1].typeSize;
     return offset;
   }
 
-  int schema::getRowLength() {
+  int schema::getRowLength() const noexcept {
     int nentries = schemaEntries.size();
 
     if (nentries == 0)

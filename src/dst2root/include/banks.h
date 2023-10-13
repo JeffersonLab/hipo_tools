@@ -247,6 +247,7 @@ v_float sc_ctof_hx;
 v_float sc_ctof_hy;
 v_float sc_ctof_hz;
 
+v_int   sc_cnd_layer;
 v_float sc_cnd_time;
 v_float sc_cnd_path;
 v_float sc_cnd_energy;
@@ -281,6 +282,16 @@ v_float ft_hodo_z;
 v_float ft_hodo_dx;
 v_float ft_hodo_dy;
 v_float ft_hodo_radius;
+
+v_float ft_bmt_energy;
+v_float ft_bmt_time;
+v_float ft_bmt_path;
+v_float ft_bmt_x;
+v_float ft_bmt_y;
+v_float ft_bmt_z;
+v_float ft_bmt_dx;
+v_float ft_bmt_dy;
+v_float ft_bmt_radius;
 
 int   mc_run;
 int   mc_event;

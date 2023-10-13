@@ -50,6 +50,7 @@ namespace hipo {
     int          getGroup();
     int          getItem();
     void         init(const char* buffer, int size);
+    void         initNoCopy(const char* buffer, int size);
     const char*  getAddress();
     virtual void show();
     void         setSize(int size);
